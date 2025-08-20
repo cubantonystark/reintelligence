@@ -11,7 +11,7 @@ A Flask web application for interactive property search, analysis, and visualiza
   Click any marker to see property address, price, number of beds/baths, and listing photo. Direct link to the Zillow listing included.
 
 - **AI-Powered Analysis:**  
-  Click the "Good deal?" button on any property marker to request an automated investment analysis powered by OpenAI GPT-4o, including comparable sales and financing scenarios.
+  Click the "Good deal?" button on any property marker to request an automated AI powered investment analysis, including comparable sales and financing scenarios.
 
 ## Code Overview
 
