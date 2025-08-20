@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Properties</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Roboto', Arial, sans-serif;
+        background: #f7f8fa;
+      }
+      #map { width: 100vw; height: 100vh; }
+      #chatgpt-popup {
+        display: none;
+        position: fixed;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #e8f0fe 0%, #f4f7fa 100%);
+        padding: 2.5em 2em 2em 2em;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+        z-index: 9999;
+        max-width: 90vw;
+        min-width: 320px;
+        max-height: 80vh;
+        overflow: visible;
+        border: 2px solid #bad1ff;
+        animation: popupFadeIn 0.3s ease;
+      }
+      @keyframes popupFadeIn {
+        from { opacity: 0; transform: translate(-50%, -50%) scale(0.95);}
+        to { opacity: 1; transform: translate(-50%, -50%) scale(1);}
+      }
+      #chatgpt-popup-close {
+        position: absolute;
+        top: 1em; right: 1.5em;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.5em;
+        color: #6a91d8;
+        transition: color 0.2s;
+      }
+      #chatgpt-popup-close:hover {
+        color: #f56a6a;
+        transform: scale(1.25);
+      }
+      #chatgpt-report {
+        font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+        color: #273a5a;
+        font-size: 1.05em;
+        line-height: 1.7;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        max-height: 60vh;
+        overflow-y: auto;
+        word-break: break-word;
+      }
+      .popup-header {
+        text-align: center;
+        font-family: 'Montserrat', Arial, sans-serif;
+        font-size: 1.3em;
+        font-weight: 600;
+        color: #3e6fd5;
+        margin-bottom: 0.6em;
+        letter-spacing: 0.02em;
+      }
+      .popup-loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin: 1.5em 0;
+      }
+      .loader-dot {
+        width: 12px; height: 12px;
+        border-radius: 50%;
+        background: #8fb6f6;
+        opacity: 0.7;
+        animation: bounce 1.2s infinite;
+        animation-delay: calc(var(--i) * 0.15s);
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0);}
+        50% { transform: translateY(-12px);}
+      }
+      @media (max-width: 600px) {
+        #chatgpt-popup {
+          padding: 1.2em 0.6em 1em 0.6em;
+          border-radius: 12px;
+        }
+        .popup-header {
+          font-size: 1.08em;
+        }
+        #chatgpt-report {
+          max-height: 50vh;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div id="map">
+        {{ map_html|safe }}
+    </div>
+    <div id="chatgpt-popup">
+        <span id="chatgpt-popup-close" onclick="closeChatGptPopup()">×</span>
+        <div id="chatgpt-report"></div>
+    </div>
+    <script>
+    window.onload = function() {
+      var leafletMap = window.map;
+      var markers = [];
+
+      function clearMarkers() {
+        markers.forEach(function(m) { leafletMap.removeLayer(m); });
+        markers = [];
+      }
+
+      function addMarkers(homes) {
+        clearMarkers();
+        if (homes.length === 0) {
+          var center = leafletMap.getCenter();
+          var marker = L.marker([center.lat, center.lng]).bindPopup("No properties found in this area.");
+          marker.addTo(leafletMap);
+          markers.push(marker);
+          return;
+        }
+        homes.forEach(function(home) {
+          var popupContent =
+            `<b>${home.address}</b><br>
+             Price: $${home.price}<br>
+             Beds: ${home.bedrooms} | Baths: ${home.bathrooms}<br>
+             <a href='https://www.zillow.com${home.detail_url}' target='_blank'>View Listing</a><br>
+             <img src="${home.img_url}" width="150"><br>
+             <button style="margin-top:8px;background:#6a91d8;color:#fff;border:none;padding:8px 16px;border-radius:7px;cursor:pointer;font-weight:600;" onclick="sendClickedInfo('${home.address}', '${home.price}')">Good deal?</button>`;
+          var marker = L.marker([home.lat, home.lon]).bindPopup(popupContent);
+          marker.addTo(leafletMap);
+          markers.push(marker);
+        });
+      }
+
+      function fetchHomesForBounds() {
+        var bounds = leafletMap.getBounds();
+        var sw = bounds.getSouthWest();
+        var ne = bounds.getNorthEast();
+        fetch("/refresh", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            sw_lat: sw.lat,
+            sw_lng: sw.lng,
+            ne_lat: ne.lat,
+            ne_lng: ne.lng
+          })
+        })
+        .then(resp => resp.json())
+        .then(homes => {
+          addMarkers(homes);
+        });
+      }
+
+      fetchHomesForBounds();
+      leafletMap.on("moveend zoomend", fetchHomesForBounds);
+    };
+
+    function sendClickedInfo(address, price) {
+      showChatGptPopup(`
+	    <div style="text-align:center;color:#6a91d8;">Analyzing...</div>
+        <div class="popup-loader">
+          <div class="loader-dot" style="--i:0"></div>
+          <div class="loader-dot" style="--i:1"></div>
+          <div class="loader-dot" style="--i:2"></div>
+        </div>
+      `, true);
+      fetch('/clicked', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ address: address, price: price })
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        if(data.report) {
+          showChatGptPopup(
+            `<b>Property Report:</b><br><pre style='white-space: pre-wrap;'>${data.report}</pre>`
+          );
+        } else {
+          showChatGptPopup("No report received.");
+        }
+      });
+    }
+
+    function showChatGptPopup(html, loading=false) {
+      document.getElementById('chatgpt-report').innerHTML = html;
+      document.getElementById('chatgpt-popup').style.display = 'block';
+    }
+    function closeChatGptPopup() {
+      document.getElementById('chatgpt-popup').style.display = 'none';
+    }
+    </script>
+</body>
+</html>
