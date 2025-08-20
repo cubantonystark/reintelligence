@@ -1,78 +1,100 @@
 from openai import OpenAI
 import http.client
 import json, os
+import re
 from flask import Flask, render_template, request, jsonify
 import folium
+import requests
+from urllib.parse import quote
 
 app = Flask(__name__)
 
 os.environ["OPENAI_API_KEY"] = "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"
-
 client = OpenAI()
 
-def fetch_homes(sw_lat=None, sw_lng=None, ne_lat=None, ne_lng=None):
+def reverse_geocode(lat, lon):
+    url = f"https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={lon}"
+    headers = {'User-Agent': 'PropertyMapApp/1.0'}
+    try:
+        resp = requests.get(url, headers=headers, timeout=5)
+        data = resp.json()
+        address_obj = data.get('address', {})
+        city = (address_obj.get('city') or address_obj.get('town') or address_obj.get('village') or address_obj.get('county'))
+        state = address_obj.get('state')
+        postcode = address_obj.get('postcode')
+        if postcode:
+            location = postcode
+        elif city and state:
+            location = f"{city}, {state}"
+        elif state:
+            location = state
+        else:
+            location = "Tampa, FL"
+        return location
+    except Exception as e:
+        return "Tampa, FL"
+
+def fetch_homes(location, sw_lat=None, sw_lng=None, ne_lat=None, ne_lng=None):
     conn = http.client.HTTPSConnection("zillow-com1.p.rapidapi.com")
     headers = {
         'x-rapidapi-key': "a21f37a14emsh4a6f745b07a0863p130fc3jsnb0ac087aeaa9",
         'x-rapidapi-host': "zillow-com1.p.rapidapi.com"
     }
-    url = "/propertyExtendedSearch?location=tampa%2C%20fl&status_type=ForSale&home_type=Houses&limit=500"
+    location_encoded = quote(location)
+    url = f"/propertyExtendedSearch?location={location_encoded}&status_type=ForSale&home_type=Houses&limit=1000"
     conn.request("GET", url, headers=headers)
     res = conn.getresponse()
     data = res.read()
     listings = []
-    try:
-        result = json.loads(data.decode("utf-8"))
-        for home in result.get('props', []):
-            lat = home.get('latitude')
-            lon = home.get('longitude')
-            address = home.get('address', 'No address')
-            price = home.get('price', 'No price')
-            bedrooms = home.get('bedrooms', 'N/A')
-            bathrooms = home.get('bathrooms', 'N/A')
-            img_url = home.get('imgSrc')
-            detail_url = home.get('detailUrl')
-            if lat is not None and lon is not None:
-                if sw_lat is not None and sw_lng is not None and ne_lat is not None and ne_lng is not None:
-                    if not (sw_lat <= lat <= ne_lat and sw_lng <= lon <= ne_lng):
-                        continue
-                listings.append({
-                    'lat': lat,
-                    'lon': lon,
-                    'address': address,
-                    'price': price,
-                    'bedrooms': bedrooms,
-                    'bathrooms': bathrooms,
-                    'img_url': img_url,
-                    'detail_url': detail_url
-                })
-        print(f"Homes returned: {len(listings)}")
-    except Exception as e:
-        print("Error parsing listings:", str(e))
+    result = None
+    for encoding in ['utf-8', 'latin1']:
+        try:
+            text = data.decode(encoding)
+            result = json.loads(text)
+            break
+        except Exception:
+            continue
+    if result is None:
+        try:
+            text = data.decode('utf-8', errors='ignore')
+            result = json.loads(text)
+        except Exception as e:
+            print("Failed to decode/load Zillow API response. Raw response below:")
+            print(data)
+            result = {"props": []}
+    if not isinstance(result, dict) or 'props' not in result:
+        result = {"props": []}
+    for home in result.get('props', []):
+        lat = home.get('latitude')
+        lon = home.get('longitude')
+        address = home.get('address', 'No address')
+        price = home.get('price', 'No price')
+        bedrooms = home.get('bedrooms', 'N/A')
+        bathrooms = home.get('bathrooms', 'N/A')
+        img_url = home.get('imgSrc')
+        detail_url = home.get('detailUrl')
+        if (not address or address == 'No address') and lat is not None and lon is not None:
+            address = reverse_geocode(lat, lon)
+        if lat is not None and lon is not None:
+            if sw_lat is not None and sw_lng is not None and ne_lat is not None and ne_lng is not None:
+                if not (sw_lat <= lat <= ne_lat and sw_lng <= lon <= ne_lng):
+                    continue
+            listings.append({
+                'lat': lat,
+                'lon': lon,
+                'address': address,
+                'price': price,
+                'bedrooms': bedrooms,
+                'bathrooms': bathrooms,
+                'img_url': img_url,
+                'detail_url': detail_url
+            })
     return listings
 
 @app.route("/")
 def index():
     start_coords = (27.9506, -82.4572)
-    homes = fetch_homes()
     folium_map = folium.Map(location=start_coords, zoom_start=12)
-    if homes:
-        for home in homes:
-            popup_html = (
-                f"<b>{home['address']}</b><br>"
-                f"Price: ${home['price']}<br>"
-                f"Beds: {home['bedrooms']} | Baths: {home['bathrooms']}<br>"
-                f"<a href='https://www.zillow.com{home['detail_url']}' target='_blank'>View Listing</a><br>"
-                f"<img src='{home['img_url']}' width='150'><br>"
-                f"<button onclick=\"sendClickedInfo('{home['address']}', '{home['price']}')\">Good deal?</button>"
-            )
-            folium.Marker(
-                [home['lat'], home['lon']],
-                popup=folium.Popup(popup_html, max_width=300),
-                icon=folium.Icon(icon="home", prefix="fa", color="blue"),
-            ).add_to(folium_map)
-    else:
-        folium.Marker(start_coords, popup="No homes found or API error").add_to(folium_map)
     map_html = folium_map.get_root().render()
     return render_template("base.html", map_html=map_html)
 
@@ -83,7 +105,10 @@ def refresh():
     sw_lng = bounds.get("sw_lng")
     ne_lat = bounds.get("ne_lat")
     ne_lng = bounds.get("ne_lng")
-    homes = fetch_homes(sw_lat, sw_lng, ne_lat, ne_lng)
+    center_lat = bounds.get("center_lat")
+    center_lng = bounds.get("center_lng")
+    location = reverse_geocode(center_lat, center_lng)
+    homes = fetch_homes(location, sw_lat, sw_lng, ne_lat, ne_lng)
     return jsonify(homes)
 
 @app.route("/clicked", methods=["POST"])
@@ -93,10 +118,10 @@ def clicked():
     price = data.get("price", "No price")
 
     prompt = (
-        f"Analyze the property at {address} listed for ${price}. "
-        "Is it a good deal based on comparables in the area? "
-        "Show me recent comparable sales and run numbers for financing with a VA loan and a conventional loan. "
-        "Summarize if buying this property is a good investment and give it an investment grade from a-f. Limit the introductory text to the address only. Do not display the To determine if the property at... text"
+        f"Generate a detailed property investment report for the property at {address}, listed for ${price}.\n"
+        "Organize the report into the following sections, using these exact headers:\n"
+        "Property Insights\nArea Comparables\nFinancing Scenarios\nSummary\nGrade\n"
+        "Output the report in markdown format using section headers and markdown lists/tables as needed. Do not include introductions. For property Insights, just list the property Adress, the listing type and the Type. Use interest rates taht reflect the current landscape."
     )
 
     try:
@@ -105,11 +130,11 @@ def clicked():
             messages=[{"role": "user", "content": prompt}],
             max_tokens=2000
         )
-        chatgpt_text = response.choices[0].message.content
+        ai_report = response.choices[0].message.content
     except Exception as e:
-        chatgpt_text = f"Error contacting ChatGPT: {str(e)}"
+        ai_report = f"Error contacting ChatGPT: {str(e)}"
 
-    return jsonify({"status": "success", "info": f"{address},{price}", "report": chatgpt_text})
+    return jsonify({"status": "success", "info": f"{address},{price}", "report": ai_report})
 
 if __name__ == "__main__":
     app.run(host="192.168.4.150", port=5000, debug=True)
