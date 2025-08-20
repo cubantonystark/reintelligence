@@ -96,7 +96,7 @@ def clicked():
         f"Analyze the property at {address} listed for ${price}. "
         "Is it a good deal based on comparables in the area? "
         "Show me recent comparable sales and run numbers for financing with a VA loan and a conventional loan. "
-        "Summarize if buying this property is a good investment and give it an investment grade from a-f. Limit the introductory text to: 'Property analysis for:' and the address only. Do not display the To determine if the property at... text"
+        "Summarize if buying this property is a good investment and give it an investment grade from a-f. Limit the introductory text to the address only. Do not display the To determine if the property at... text"
     )
 
     try:
