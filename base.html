@@ -1,201 +1,395 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
     <title>Properties</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-      body {
-        font-family: 'Roboto', Arial, sans-serif;
-        background: #f7f8fa;
-      }
-      #map { width: 100vw; height: 100vh; }
-      #chatgpt-popup {
-        display: none;
-        position: fixed;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        background: linear-gradient(135deg, #e8f0fe 0%, #f4f7fa 100%);
-        padding: 2.5em 2em 2em 2em;
-        border-radius: 20px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
-        z-index: 9999;
-        max-width: 90vw;
-        min-width: 320px;
-        max-height: 80vh;
-        overflow: visible;
-        border: 2px solid #bad1ff;
-        animation: popupFadeIn 0.3s ease;
-      }
-      @keyframes popupFadeIn {
-        from { opacity: 0; transform: translate(-50%, -50%) scale(0.95);}
-        to { opacity: 1; transform: translate(-50%, -50%) scale(1);}
-      }
-      #chatgpt-popup-close {
-        position: absolute;
-        top: 1em; right: 1.5em;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 1.5em;
-        color: #6a91d8;
-        transition: color 0.2s;
-      }
-      #chatgpt-popup-close:hover {
-        color: #f56a6a;
-        transform: scale(1.25);
-      }
-      #chatgpt-report {
-        font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
-        color: #273a5a;
-        font-size: 1.05em;
-        line-height: 1.7;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-        max-height: 60vh;
-        overflow-y: auto;
-        word-break: break-word;
-      }
-      .popup-header {
-        text-align: center;
-        font-family: 'Montserrat', Arial, sans-serif;
-        font-size: 1.3em;
-        font-weight: 600;
-        color: #3e6fd5;
-        margin-bottom: 0.6em;
-        letter-spacing: 0.02em;
-      }
-      .popup-loader {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        margin: 1.5em 0;
-      }
-      .loader-dot {
-        width: 12px; height: 12px;
-        border-radius: 50%;
-        background: #8fb6f6;
-        opacity: 0.7;
-        animation: bounce 1.2s infinite;
-        animation-delay: calc(var(--i) * 0.15s);
-      }
-      @keyframes bounce {
-        0%, 100% { transform: translateY(0);}
-        50% { transform: translateY(-12px);}
-      }
-      @media (max-width: 600px) {
-        #chatgpt-popup {
-          padding: 1.2em 0.6em 1em 0.6em;
-          border-radius: 12px;
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
-        .popup-header {
-          font-size: 1.08em;
+        body { position: relative; }
+        #map {
+            height: 95vh;
+            width: 100vw;
+            min-height: 400px;
+            min-width: 100vw;
         }
-        #chatgpt-report {
-          max-height: 50vh;
+        .leaflet-house-icon {
+            background: none !important;
+            border: none !important;
         }
-      }
+        .house-red {
+            color: #d00;
+            text-shadow: 0 2px 4px #fff;
+        }
+        .house-blue {
+            color: #0078D4;
+            text-shadow: 0 2px 4px #fff;
+        }
+        .gpt-popup {
+            width: 60vw;
+            height: 60vh;
+            max-width: 60vw;
+            max-height: 60vh;
+            min-width: 300px;
+            min-height: 200px;
+            overflow-x: auto;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+            font-size: 14px;
+            padding: 10px;
+            box-sizing: border-box;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.17);
+            position: relative;
+        }
+        .print-link {
+            position: absolute;
+            top: 10px;
+            right: 18px;
+            z-index: 2;
+            font-family: Arial,sans-serif;
+            font-size: 15px;
+        }
+        .gpt-popup p {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            white-space: normal;
+            word-break: break-word;
+            margin: 0 0 1em 0;
+        }
+        .gpt-popup pre, .gpt-popup code {
+            white-space: pre;
+            word-break: normal;
+            font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
+            font-size: 14px;
+            background: #f8f8f8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: block;
+            overflow-x: auto;
+            margin-bottom: 1em;
+        }
+        #splashScreen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #splashScreenContent {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.17);
+            padding: 30px 50px;
+            text-align: center;
+            font-size: 1.3em;
+            color: #0078D4;
+        }
+        @media (max-width: 900px) {
+            .gpt-popup {
+                width: 85vw;
+                max-width: 85vw;
+            }
+        }
+        @media (max-width: 600px) {
+            #map {
+                height: 92vh;
+                min-height: 350px;
+            }
+            .gpt-popup {
+                width: 98vw;
+                max-width: 98vw;
+                height: 55vh;
+                min-width: 98vw;
+                font-size: 15px;
+            }
+            #splashScreenContent {
+                padding: 20px 10px;
+                font-size: 1em;
+            }
+        }
+        @media (max-width: 400px) {
+            .gpt-popup {
+                width: 99vw;
+                max-width: 99vw;
+                min-width: 99vw;
+                height: 50vh;
+                font-size: 13px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="map">
-        {{ map_html|safe }}
-    </div>
-    <div id="chatgpt-popup">
-        <span id="chatgpt-popup-close" onclick="closeChatGptPopup()">×</span>
-        <div id="chatgpt-report"></div>
+    <div id="map"></div>
+    <div id="splashScreen">
+        <div id="splashScreenContent">
+            <span style="font-size:2em;">&#128221;</span><br>
+            Generating investment report...
+        </div>
     </div>
     <script>
-    window.onload = function() {
-      var leafletMap = window.map;
-      var markers = [];
+        var markers = [];
+        var markerData = [];
+        var refreshTimeout = null;
+        var REFRESH_DELAY_MS = 2200;
 
-      function clearMarkers() {
-        markers.forEach(function(m) { leafletMap.removeLayer(m); });
-        markers = [];
-      }
+        var _tileLayers = {};
+        var _activeLayer = "satellite"; // satellite is default
 
-      function addMarkers(homes) {
-        clearMarkers();
-        if (homes.length === 0) {
-          var center = leafletMap.getCenter();
-          var marker = L.marker([center.lat, center.lng]).bindPopup("No properties found in this area.");
-          marker.addTo(leafletMap);
-          markers.push(marker);
-          return;
+        function makeHouseIcon(colorClass) {
+            return L.divIcon({
+                html: "<span class='house-" + colorClass + "' style='font-size:3em;'>&#127968;</span>",
+                iconSize: [48, 48],
+                iconAnchor: [24, 48],
+                className: "leaflet-house-icon"
+            });
         }
-        homes.forEach(function(home) {
-          var popupContent =
-            `<b>${home.address}</b><br>
-             Price: $${home.price}<br>
-             Beds: ${home.bedrooms} | Baths: ${home.bathrooms}<br>
-             <a href='https://www.zillow.com${home.detail_url}' target='_blank'>View Listing</a><br>
-             <img src="${home.img_url}" width="150"><br>
-             <button style="margin-top:8px;background:#6a91d8;color:#fff;border:none;padding:8px 16px;border-radius:7px;cursor:pointer;font-weight:600;" onclick="sendClickedInfo('${home.address}', '${home.price}')">Good deal?</button>`;
-          var marker = L.marker([home.lat, home.lon]).bindPopup(popupContent);
-          marker.addTo(leafletMap);
-          markers.push(marker);
-        });
-      }
 
-      function fetchHomesForBounds() {
-        var bounds = leafletMap.getBounds();
-        var sw = bounds.getSouthWest();
-        var ne = bounds.getNorthEast();
-        fetch("/refresh", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-            sw_lat: sw.lat,
-            sw_lng: sw.lng,
-            ne_lat: ne.lat,
-            ne_lng: ne.lng
-          })
-        })
-        .then(resp => resp.json())
-        .then(homes => {
-          addMarkers(homes);
-        });
-      }
+        function getHouseIconForLayer() {
+            // Red for satellite, blue for streets
+            return _activeLayer === "satellite"
+                ? makeHouseIcon("red")
+                : makeHouseIcon("blue");
+        }
 
-      fetchHomesForBounds();
-      leafletMap.on("moveend zoomend", fetchHomesForBounds);
-    };
+        function createLeafletMap(lat, lng, zoom) {
+            var satellite = L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                maxZoom: 19
+            });
+            var streets = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            });
+            _tileLayers["satellite"] = satellite;
+            _tileLayers["streets"] = streets;
 
-    function sendClickedInfo(address, price) {
-      showChatGptPopup(`
-	    <div style="text-align:center;color:#6a91d8;">Analyzing...</div>
-        <div class="popup-loader">
-          <div class="loader-dot" style="--i:0"></div>
-          <div class="loader-dot" style="--i:1"></div>
-          <div class="loader-dot" style="--i:2"></div>
-        </div>
-      `, true);
-      fetch('/clicked', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address: address, price: price })
-      })
-      .then(resp => resp.json())
-      .then(data => {
-        if(data.report) {
-          showChatGptPopup(
-            `<b>Property Report:</b><br><pre style='white-space: pre-wrap;'>${data.report}</pre>`
-          );
+            var map = L.map('map', {
+                center: [lat, lng],
+                zoom: zoom,
+                layers: [satellite]
+            });
+            var baseLayers = {
+                "Satellite": satellite,
+                "Streets": streets
+            };
+            var layerControl = L.control.layers(baseLayers).addTo(map);
+
+            // Listen for base layer change to update icons
+            map.on('baselayerchange', function(e) {
+                // Determine which layer is active by name
+                if (e.name === "Satellite") {
+                    _activeLayer = "satellite";
+                } else {
+                    _activeLayer = "streets";
+                }
+                updateHouseIcons();
+            });
+
+            window._mobile_map_ref = map;
+            return map;
+        }
+
+        function updateHouseIcons() {
+            var map = getLeafletMap();
+            // Remove all current markers
+            markers.forEach(function(marker) { map.removeLayer(marker); });
+            markers = [];
+            // Add all markers again with new icon color
+            markerData.forEach(function(home) {
+                var icon = getHouseIconForLayer();
+                var marker = L.marker([home.lat, home.lon], {icon: icon}).addTo(map);
+                var popupHtml = `<span style='font-size:1.5em;'>&#127968;</span> <b>${home.address}</b><br>
+                    Price: $${home.price}<br>
+                    Beds: ${home.bedrooms} | Baths: ${home.bathrooms}<br>
+                    <a href='https://www.zillow.com${home.detail_url}' target='_blank'>View Listing</a><br>
+                    <img src='${home.img_url}' width='150'><br>
+                    <button onclick="sendClickedInfo('${home.address}', '${home.price}')">Good deal?</button>`;
+                marker.bindPopup(popupHtml);
+                markers.push(marker);
+            });
+        }
+
+        function getLeafletMap() {
+            if (window._mobile_map_ref) return window._mobile_map_ref;
+            for (var key in window) {
+                if (
+                    key.startsWith('map_') &&
+                    window[key] &&
+                    typeof window[key] === 'object' &&
+                    typeof window[key].getCenter === 'function' &&
+                    typeof window[key].on === 'function'
+                ) {
+                    return window[key];
+                }
+            }
+            return null;
+        }
+
+        function setupMapRefresh(retryCount = 0) {
+            var map = getLeafletMap();
+            if (!map) {
+                if (retryCount < 20) {
+                    setTimeout(function() { setupMapRefresh(retryCount + 1); }, 500);
+                } else {
+                    alert("Leaflet Map not found!");
+                }
+                return;
+            }
+            function clearMarkers() {
+                markers.forEach(function(marker) { map.removeLayer(marker); });
+                markers = [];
+            }
+            function refreshHomes() {
+                var bounds = map.getBounds();
+                var center = map.getCenter();
+                var payload = {
+                    sw_lat: bounds.getSouthWest().lat,
+                    sw_lng: bounds.getSouthWest().lng,
+                    ne_lat: bounds.getNorthEast().lat,
+                    ne_lng: bounds.getNorthEast().lng,
+                    center_lat: center.lat,
+                    center_lng: center.lng
+                };
+                axios.post('/refresh', payload)
+                    .then(function(response) {
+                        clearMarkers();
+                        markerData = response.data || [];
+                        updateHouseIcons();
+                    });
+            }
+            function delayedRefresh() {
+                if (refreshTimeout) {
+                    clearTimeout(refreshTimeout);
+                }
+                refreshTimeout = setTimeout(refreshHomes, REFRESH_DELAY_MS);
+            }
+            map.on('moveend', delayedRefresh);
+            map.on('zoomend', delayedRefresh);
+            refreshHomes();
+        }
+
+        function showSplash() {
+            document.getElementById('splashScreen').style.display = 'flex';
+        }
+        function hideSplash() {
+            document.getElementById('splashScreen').style.display = 'none';
+        }
+
+        function printPopupReport(popupDiv, address) {
+            var printWindow = window.open('', '', 'width=800,height=600');
+            var clone = popupDiv.cloneNode(true);
+            var printLinks = clone.getElementsByClassName('print-link');
+            if (printLinks.length > 0) printLinks[0].parentNode.removeChild(printLinks[0]);
+            printWindow.document.write('<html><head><title>' + (address || 'Investment Report') + '</title>');
+            printWindow.document.write('<style>body{font-family:Arial,sans-serif;padding:30px;} pre, code{font-family:monospace;} p{font-family:Arial,sans-serif;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h2 style="margin-top:0;">' + (address || 'Investment Report') + '</h2>');
+            printWindow.document.write(clone.innerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(function(){ printWindow.print(); }, 250);
+        }
+
+        function sendClickedInfo(address, price) {
+            showSplash();
+            axios.post('/clicked', { address: address, price: price })
+                .then(function(response) {
+                    hideSplash();
+                    var md = response.data.report;
+                    // Append scoring logic and disclaimer in fine print, separate lines and period
+                    md += '\n\n<sub><span style="color: #888;">Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.</span></sub>';
+                    md += '\n\n<sub><span style="color: #888;">Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.</span></sub>';
+                    var popupDiv = document.createElement('div');
+                    popupDiv.className = 'gpt-popup';
+                    var printLink = document.createElement('a');
+                    printLink.href = "#";
+                    printLink.className = "print-link";
+                    printLink.innerHTML = "🖨️ Print";
+                    printLink.onclick = function(e) {
+                        e.preventDefault();
+                        printPopupReport(popupDiv, address);
+                    };
+                    popupDiv.appendChild(printLink);
+                    var contentDiv = document.createElement('div');
+                    contentDiv.innerHTML = marked.parse(md);
+                    popupDiv.appendChild(contentDiv);
+                    var gptPopup = L.popup({
+                        maxWidth: "60vw",
+                        minWidth: "300px",
+                        maxHeight: "60vh",
+                        minHeight: "200px"
+                    })
+                    .setContent(popupDiv);
+                    var map = getLeafletMap();
+                    if(map) {
+                        gptPopup.setLatLng(map.getCenter()).openOn(map);
+                    }
+                }).catch(function() {
+                    hideSplash();
+                    alert("Error generating report. Please try again.");
+                });
+        }
+
+        function mobileInit() {
+            if (navigator.geolocation) {
+                showSplash();
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    hideSplash();
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var zoom = 14;
+                    createLeafletMap(lat, lng, zoom);
+                    setupMapRefresh();
+                }, function(error) {
+                    hideSplash();
+                    window.onload = function() { 
+                        createLeafletMap(25.7617, -80.1918, 12); // Miami, FL
+                        setupMapRefresh();
+                    };
+                }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+            } else {
+                window.onload = function() { 
+                    createLeafletMap(25.7617, -80.1918, 12); // Miami, FL
+                    setupMapRefresh();
+                };
+            }
+        }
+
+        function isMobileDevice() {
+            return (
+                typeof window.orientation !== "undefined"
+                || navigator.userAgent.indexOf('IEMobile') !== -1
+                || /android|ipad|iphone|ipod/i.test(navigator.userAgent)
+            );
+        }
+
+        if (isMobileDevice()) {
+            mobileInit();
         } else {
-          showChatGptPopup("No report received.");
+            window.onload = function() {
+                createLeafletMap(25.7617, -80.1918, 12); // Miami, FL
+                setupMapRefresh();
+            };
         }
-      });
-    }
-
-    function showChatGptPopup(html, loading=false) {
-      document.getElementById('chatgpt-report').innerHTML = html;
-      document.getElementById('chatgpt-popup').style.display = 'block';
-    }
-    function closeChatGptPopup() {
-      document.getElementById('chatgpt-popup').style.display = 'none';
-    }
     </script>
 </body>
 </html>
