@@ -167,18 +167,6 @@ def cleanup_pros_cons_section(report_html):
     )
     return report_html
 
-FINE_PRINT_HTML = """
-<div class="fine-print-wrapper">
-    <div class="fine-print-block">
-        <div class="fine-print scoring">
-            Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.
-        </div>
-        <div class="fine-print">
-            Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.
-        </div>
-    </div>
-</div>
-"""
 
 @app.route("/clicked", methods=["POST"])
 def clicked():
@@ -289,11 +277,6 @@ Add a sensitivity note: “Every 0.25% change in rate moves the payment by about
 Summary — section header. Give a plain-English summary that clearly states whether this is a good investment, average, or poor investment and why, based on the details above. Be explicit and direct in your judgement.
 
 Next Steps — section header. Present an actionable, ordered list of recommendations for the buyer, focusing specifically on what they should pay attention to during a property inspection (e.g., roof age, HVAC, plumbing, foundation, moisture, electrical, pest issues, permit status, neighborhood review, etc). Use this section: <h3><span class="material-icons">list_alt</span> Next Steps</h3>
-
-Fine Print (small text)
-Show the following, separated by one line feed:
-“Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.”
-“Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.”
 
 Additional Helpful Buyer Sections (Optional but Recommended)
 Property Taxes & Insurance Estimates — last year’s taxes + monthly insurance estimate (why this matters: ongoing costs impact affordability).
