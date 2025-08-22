@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Properties</title>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <!-- Google Material Icons for section headers and animated splash -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -15,52 +15,109 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: hidden;
-        }
-        body { position: relative; }
-        #map {
-            height: 95vh;
-            width: 100vw;
-            min-height: 400px;
-            min-width: 100vw;
-        }
-        .leaflet-house-icon {
-            background: none !important;
-            border: none !important;
-        }
-        .house-red {
-            color: #d00;
-            text-shadow: 0 2px 4px #fff;
-        }
-        .house-blue {
-            color: #0078D4;
-            text-shadow: 0 2px 4px #fff;
-        }
-        .gpt-popup {
-            width: 900px;
-            max-width: 90vw;
-            min-width: 320px;
-            height: auto;
-            max-height: 90vh;
-            min-height: 320px;
-            overflow-x: auto;
-            overflow-y: auto;
-            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-            font-size: 1rem;
-            padding: 10px;
             box-sizing: border-box;
             background: #f8f8fb;
-            border-radius: 16px;
-            box-shadow: 0 4px 32px rgba(0,0,0,0.17);
-            position: relative;
+            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
         }
-        .print-link {
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            box-sizing: border-box;
+        }
+        #header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            background: rgba(248,248,251,0.85);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.09);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 10001;
+            height: 54px;
+            font-size: 0.93em;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        #header-inner {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            max-width: 100vw;
+            margin: 0;
+            padding: 0 10px;
+            gap: 0;
+        }
+        #lookup-form {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: 0;
+        }
+        #lookup-input {
+            font-size: 0.95em;
+            padding: 6px 10px;
+            border-radius: 7px;
+            border: 1px solid #ccc;
+            min-width: 50px;
+            width: 100%;
+            background: #fff;
+            box-sizing: border-box;
+            height: 36px;
+        }
+        #lookup-btn {
+            padding: 6px 18px;
+            border-radius: 7px;
+            background: #0078D4;
+            color: #fff;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            min-width: 80px;
+            transition: background 0.2s;
+            white-space: nowrap;
+            margin-left: 6px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+        }
+        #lookup-btn:hover {
+            background: #005fa3;
+        }
+        #lang-toggle {
+            flex: 0 0 auto;
+            padding: 4px 12px;
+            border-radius: 7px;
+            background: #273469;
+            color: #fff;
+            border: none;
+            font-size: 0.93em;
+            cursor: pointer;
+            min-width: 48px;
+            max-width: 72px;
+            transition: background 0.2s;
+            white-space: nowrap;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            margin-left: 36px;
+        }
+        #lang-toggle:hover {
+            background: #1a216b;
+        }
+        #map {
             position: absolute;
-            top: 10px;
-            right: 18px;
-            z-index: 2;
-            font-family: Arial,sans-serif;
-            font-size: 15px;
+            top: 54px;
+            left: 0;
+            width: 100vw;
+            height: calc(100vh - 54px);
+            min-height: 320px;
+            z-index: 1;
         }
         #splashScreen {
             position: fixed;
@@ -77,77 +134,88 @@
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 16px rgba(0,0,0,0.17);
-            padding: 30px 50px;
+            padding: 14px 18px;
             text-align: center;
-            font-size: 1.3em;
+            font-size: 0.97em;
             color: #0078D4;
         }
         .splash-spinner {
             display: inline-block;
-            width: 2.7em;
-            height: 2.7em;
-            border: 0.35em solid #e0e7ef;
-            border-top: 0.35em solid #0078D4;
+            width: 2.1em;
+            height: 2.1em;
+            border: 0.32em solid #e0e7ef;
+            border-top: 0.32em solid #0078D4;
             border-radius: 50%;
             animation: splash-spin 1s linear infinite;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             vertical-align: middle;
         }
         @keyframes splash-spin {
             0% { transform: rotate(0deg);}
             100% { transform: rotate(360deg);}
         }
-        .report-card-header {
-            background: #fff;
-            border-radius: 16px 16px 0 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            padding: 22px 22px 10px 22px;
+        #report-overlay-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(30,40,63,.20);
+            z-index: 4999;
+            display: none;
+        }
+        .gpt-popup {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5000;
+            background: #f8f8fb;
+            border-radius: 16px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.17);
+            box-sizing: border-box;
+            padding: 10px 12px 16px 12px;
+            margin: 0;
+            overflow-y: auto;
+            overflow-x: auto;
             font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-            text-align: left;
+            font-size: 0.78rem;
+            max-width: 440px;
+            width: 95vw;
+            max-height: calc(100vh - 80px);
         }
-        .report-grade {
-            display: inline-block;
-            font-size: 2em;
-            font-weight: bold;
-            background: #e9f7ef;
-            color: #35a47f;
-            border-radius: 8px;
-            padding: 4px 16px;
-            margin-left: 18px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        @media (max-width: 650px) {
+            .gpt-popup {
+                position: fixed;
+                top: 0;
+                left: 0;
+                transform: none;
+                width: 100vw;
+                max-width: 100vw;
+                min-width: 0;
+                height: 100vh;
+                max-height: 100vh;
+                padding: 11px 2vw 12px 2vw;
+                border-radius: 0;
+                font-size: 0.76rem;
+            }
         }
-        .report-section {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            margin: 18px 0;
-            padding: 18px 22px;
-            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-        }
-        .report-section h2, .report-section h3 {
-            font-size: 1.2em;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1a355d;
-            display: flex;
-            align-items: center;
-        }
-        .material-icons {
-            font-size: 1.15em !important;
-            margin-right: 0.3em;
-            vertical-align: middle;
+        @media (max-width: 480px) {
+            .gpt-popup {
+                font-size: 0.74rem;
+                padding: 7px 1vw 8px 1vw;
+            }
         }
         .report-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
             margin-bottom: 10px;
-            font-size: 0.98em;
+            font-size: 0.72em;
             overflow-x: auto;
             display: block;
         }
         .report-table th, .report-table td {
-            padding: 8px 10px;
+            padding: 3px 5px;
             text-align: left;
         }
         .report-table th {
@@ -160,198 +228,164 @@
         .report-table tr:nth-child(odd) {
             background: #fff;
         }
-        .pros-cons-container {
-            display: flex;
-            gap: 16px;
-            width: 100%;
-        }
-        .pros-box, .cons-box {
-            flex: 1;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 1em;
-            margin-top: 6px;
-            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-        }
-        .pros-box {
-            background: #e6f7e6;
-            color: #217a3a;
-            border: 1px solid #b2e5c9;
-        }
-        .cons-box {
-            background: #ffeaea;
-            color: #b63d3d;
-            border: 1px solid #f7cccc;
-        }
-        .bottom-line {
-            font-size: 1.07em;
-            font-weight: 500;
-            color: #1a355d;
-            background: #f2f7fa;
-            border-radius: 8px;
-            padding: 12px 20px;
-            margin-top: 16px;
-        }
-        .next-steps {
-            margin-top: 8px;
-            padding-left: 22px;
-            font-size: 1em;
-        }
-        .fine-print-wrapper {
-            width: 100%;
-            margin-top: 18px;
-            margin-bottom: 0;
+        .gpt-popup-btns {
             display: flex;
             flex-direction: row;
-            align-items: flex-start;
-            justify-content: flex-start;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 5px;
         }
-        .fine-print-block {
+        .gpt-popup-close-btn, .gpt-popup-print-btn {
+            background: #273469;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 12px;
+            cursor: pointer;
+            font-size: 0.74em;
+            min-width: 54px;
+            height: 28px;
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            max-width: 700px;
+            align-items: center;
         }
-        .fine-print {
-            background: none;
-            font-size: 1.08em;
-            color: #7c8a99;
-            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-            text-align: left;
-            line-height: 1.5em;
-            padding: 0 10px 0 0;
-            font-style: italic;
-            border-radius: 5px;
-            margin-bottom: 4px;
-            letter-spacing: .2px;
-            box-shadow: 0 0 0 transparent;
+        .gpt-popup-print-btn {
+            background: #0078D4;
         }
-        .fine-print .scoring {
-            font-weight: 700;
-            color: #53616d;
-            font-size: 1.11em;
-            text-shadow: 0 1px 2px #f8f8fb;
-            font-family: 'Quicksand', 'Nunito', 'Arial', sans-serif;
-            margin-bottom: 2px;
+        .gpt-popup-close-btn:active, .gpt-popup-print-btn:active {
+            background: #1a216b;
         }
-        @media (max-width: 900px) {
-            .gpt-popup {
-                width: 95vw;
-                max-width: 98vw;
-                min-width: 320px;
-            }
-            .fine-print-wrapper {
-                max-width: 95vw;
-            }
-            .fine-print-block {
-                max-width: 95vw;
-            }
-            .fine-print {
-                font-size: 1em;
-                padding: 0 4vw 0 0;
-            }
-        }
-        @media (max-width: 768px) {
-            .pros-cons-container {
-                flex-direction: column !important;
-                gap: 0.7em !important;
-                width: 100%;
-            }
-            .pros-box, .cons-box {
-                margin-top: 0.7em;
-                margin-bottom: 0.7em;
-                width: 100%;
-            }
-            .report-table {
-                font-size: 0.94em;
-            }
-            .fine-print-wrapper {
+        /* Responsive header bar */
+        @media (max-width: 650px) {
+            #header-inner {
                 flex-direction: column;
-                align-items: flex-start;
-                margin-top: 16px;
+                align-items: stretch;
+                justify-content: flex-start;
+                gap: 8px;
+                padding: 0 2vw;
             }
-            .fine-print-block {
-                max-width: 99vw;
+            #lookup-form, #lang-toggle {
+                width: 100%;
+                min-width: 0;
+                margin-left: 0 !important;
             }
-            .fine-print {
-                font-size: 0.95em;
-                padding: 0 2vw 0 0;
-                margin-bottom: 3px;
-            }
-        }
-        @media (max-width: 600px) {
-            #map {
-                height: 92vh;
-                min-height: 350px;
-            }
-            .gpt-popup {
-                width: 98vw;
-                max-width: 98vw;
-                height: 55vh;
-                min-width: 98vw;
-                font-size: 1em;
-            }
-            #splashScreenContent {
-                padding: 20px 10px;
-                font-size: 1em;
-            }
-            .report-card-header, .report-section, .pros-box, .cons-box, .bottom-line {
-                padding: 10px 8px;
-                font-size: 0.95em;
-            }
-            .report-card-header { font-size: 1em; }
-            .report-table th, .report-table td { padding: 6px 4px; font-size: 0.9em; }
-            .report-table { font-size: 0.91em; }
-            .fine-print-block {
-                max-width: 99vw;
-            }
-            .fine-print {
-                font-size: 0.95em;
-                padding: 0 2vw 0 0;
-                margin-bottom: 3px;
+            #lang-toggle {
+                margin-top: 6px;
             }
         }
-        @media (max-width: 400px) {
-            .gpt-popup {
-                width: 99vw;
-                max-width: 99vw;
-                min-width: 99vw;
-                height: 50vh;
-                font-size: 0.88em;
+        @media (max-width: 480px) {
+            #header-inner {
+                padding: 0 1vw;
             }
-            .fine-print-block {
-                max-width: 99vw;
+            #lookup-input, #lookup-btn, #lang-toggle {
+                font-size: 0.90em;
+                min-width: 44px;
             }
-            .fine-print {
-                font-size: 0.88em;
-                padding: 0 1vw 0 0;
-                margin-bottom: 2px;
+            #lookup-btn {
+                height: 32px;
+                min-width: 68px;
+                padding: 5px 13px;
+            }
+            #lang-toggle {
+                height: 26px;
+                padding: 3px 7px;
+                min-width: 35px;
+                max-width: 50px;
+                font-size: 0.87em;
             }
         }
     </style>
 </head>
 <body>
+    <div id="header-bar">
+        <div id="header-inner">
+            <form id="lookup-form" onsubmit="propertyLookup(event)">
+                <input id="lookup-input" type="text" placeholder="Lookup address or city..." autocomplete="off" />
+                <button id="lookup-btn" type="submit">Search</button>
+            </form>
+            <button id="lang-toggle">ES</button>
+        </div>
+    </div>
     <div id="map"></div>
     <div id="splashScreen">
         <div id="splashScreenContent">
             <span class="splash-spinner"></span><br>
-            <span>Analyzing...</span>
+            <span id="splash-text">Analyzing...</span>
         </div>
     </div>
+    <div id="report-overlay-bg"></div>
     <script>
+        var currentLanguage = "en";
+        var UI_TEXT = {
+            en: {
+                search_placeholder: "Lookup address or city...",
+                search_button: "Search",
+                splash: "Analyzing...",
+                print: "🖨️ Print",
+                good_deal: "Good deal?",
+                not_found: "No properties found.",
+                error: "Search error.",
+                error_report: "Error generating report. Please try again.",
+                price: "Price",
+                beds: "Beds",
+                baths: "Baths",
+                view_listing: "View Listing",
+                close: "Close"
+            },
+            es: {
+                search_placeholder: "Buscar dirección o ciudad...",
+                search_button: "Buscar",
+                splash: "Analizando...",
+                print: "🖨️ Imprimir",
+                good_deal: "¿Buena oferta?",
+                not_found: "No se encontraron propiedades.",
+                error: "Error en la búsqueda.",
+                error_report: "Error generando el informe. Intenta de nuevo.",
+                price: "Precio",
+                beds: "Habitaciones",
+                baths: "Baños",
+                view_listing: "Ver propiedad",
+                close: "Cerrar"
+            }
+        };
+
+        function updateUIText() {
+            document.getElementById('lookup-input').placeholder = UI_TEXT[currentLanguage].search_placeholder;
+            document.getElementById('lookup-btn').innerText = UI_TEXT[currentLanguage].search_button;
+            document.getElementById('splash-text').innerText = UI_TEXT[currentLanguage].splash;
+            document.getElementById('lang-toggle').innerText = currentLanguage === "en" ? "ES" : "EN";
+            if (typeof updateHouseIcons === "function") updateHouseIcons();
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === "en" ? "es" : "en";
+            updateUIText();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            updateUIText();
+            document.getElementById('lang-toggle').onclick = toggleLanguage;
+            if (isMobileDevice()) {
+                mobileInit();
+            } else {
+                createLeafletMap(25.7617, -80.1918, 12);
+                setupMapRefresh();
+            }
+        });
+
         var markers = [];
         var markerData = [];
         var refreshTimeout = null;
         var REFRESH_DELAY_MS = 2200;
-
         var _tileLayers = {};
-        var _activeLayer = "streets"; // Streets as default
+        var _activeLayer = "streets";
 
         function makeHouseIcon(colorClass) {
             return L.divIcon({
-                html: "<span class='house-" + colorClass + "' style='font-size:3em;'>&#127968;</span>",
-                iconSize: [48, 48],
-                iconAnchor: [24, 48],
+                html: "<span class='house-" + colorClass + "' style='font-size:2em;'>&#127968;</span>",
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
                 className: "leaflet-house-icon"
             });
         }
@@ -406,14 +440,13 @@
             markers = [];
             markerData.forEach(function(home) {
                 var icon = getHouseIconForLayer();
-                var marker = L.marker([home.lat, home.lon], {icon: icon}).addTo(map);
                 var popupHtml = `<span style='font-size:1.5em;'>&#127968;</span> <b>${home.address}</b><br>
-                    Price: $${home.price}<br>
-                    Beds: ${home.bedrooms} | Baths: ${home.bathrooms}<br>
-                    ${home.last_sold_amount && home.last_sold_amount !== "N/A" ? "Last Sold: " + home.last_sold_amount + "<br>" : ""}
-                    <a href='https://www.zillow.com${home.detail_url}' target='_blank'>View Listing</a><br>
-                    <img src='${home.img_url}' width='150'><br>
-                    <button onclick="sendClickedInfo('${home.address}', '${home.price}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}')">Good deal?</button>`;
+                    ${UI_TEXT[currentLanguage].price}: $${home.price}<br>
+                    ${UI_TEXT[currentLanguage].beds}: ${home.bedrooms} | ${UI_TEXT[currentLanguage].baths}: ${home.bathrooms}<br>
+                    <a href='https://www.zillow.com${home.detail_url}' target='_blank'>${UI_TEXT[currentLanguage].view_listing}</a><br>
+                    <img src='${home.img_url}' width='150' style='max-width:90vw;'><br>
+                    <button onclick="sendClickedInfo('${home.address}', '${home.price}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}')">${UI_TEXT[currentLanguage].good_deal}</button>`;
+                var marker = L.marker([home.lat, home.lon], {icon: icon}).addTo(map);
                 marker.bindPopup(popupHtml);
                 markers.push(marker);
             });
@@ -480,6 +513,13 @@
 
         function showSplash() {
             document.getElementById('splashScreen').style.display = 'flex';
+            // Restart animation
+            var spinner = document.querySelector('.splash-spinner');
+            if (spinner) {
+                spinner.style.animation = 'none';
+                spinner.offsetHeight; // force reflow
+                spinner.style.animation = null;
+            }
         }
         function hideSplash() {
             document.getElementById('splashScreen').style.display = 'none';
@@ -492,9 +532,8 @@
             if (printLinks.length > 0) printLinks[0].parentNode.removeChild(printLinks[0]);
             printWindow.document.write('<html><head><title>' + (address || 'Investment Report') + '</title>');
             printWindow.document.write('<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">');
-            printWindow.document.write('<style>body{font-family:Nunito,Quicksand,Arial,sans-serif;padding:30px;} .report-card-header, .report-section, .pros-box, .cons-box, .bottom-line, .fine-print{border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.08);} .report-card-header{margin-bottom:0;} .report-table{width:100%;border-collapse:collapse;} .report-table th{background:#e8eaf6;} .report-table tr:nth-child(even){background:#f7f7fc;} .report-table tr:nth-child(odd){background:#fff;} .pros-box{background:#e6f7e6;color:#217a3a;} .cons-box{background:#ffeaea;color:#b63d3d;} .fine-print-wrapper{margin-top:18px;display:flex;flex-direction:row;align-items:flex-start;justify-content:flex-start;} .fine-print-block{display:flex;flex-direction:column;align-items:flex-start;max-width:700px;} .fine-print{font-family:Nunito,Quicksand,Arial,sans-serif;font-size:1.08em;color:#7c8a99;text-align:left;line-height:1.5em;padding:0 10px 0 0;font-style:italic;border-radius:5px;margin-bottom:4px;letter-spacing:.2px;} .fine-print .scoring{font-weight:700;color:#53616d;font-size:1.11em;text-shadow:0 1px 2px #f8f8fb;font-family:Quicksand,Nunito,Arial,sans-serif;margin-bottom:2px;} </style>');
+            printWindow.document.write('<style>body{font-family:Nunito,Quicksand,Arial,sans-serif;padding:2vw;background:#f8f8fb;} .gpt-popup{max-width:900px;width:100%;margin:0 auto;background:#f8f8fb;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.17);padding:12px 18px;box-sizing:border-box;font-size:0.80rem;} .report-table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:10px;font-size:0.75em;overflow-x:auto;display:block;} .report-table th, .report-table td{padding:3px 5px;text-align:left;} .report-table th{background:#e8eaf6;color:#273469;} .report-table tr:nth-child(even){background:#f7f7fc;} .report-table tr:nth-child(odd){background:#fff;} .gpt-popup-btns{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;width:100%;margin-bottom:5px;} .gpt-popup-close-btn, .gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:0.78em;min-width:54px;height:28px;display:flex;align-items:center;} .gpt-popup-print-btn{background:#0078D4;} .gpt-popup-close-btn:active, .gpt-popup-print-btn:active{background:#1a216b;}@media(max-width:650px){.gpt-popup{width:98vw;padding:7px 2vw 10px 2vw;font-size:0.78rem;}.report-table th, .report-table td{padding:3px 4px;font-size:0.75em;}}@media(max-width:480px){.gpt-popup{width:99vw;padding:5px 1vw 8px 1vw;font-size:0.75rem;}}</style>');
             printWindow.document.write('</head><body>');
-            printWindow.document.write('<h2 style="margin-top:0;">' + (address || 'Investment Report') + '</h2>');
             printWindow.document.write(clone.innerHTML);
             printWindow.document.write('</body></html>');
             printWindow.document.close();
@@ -504,56 +543,117 @@
 
         function sendClickedInfo(address, price, bedrooms, bathrooms, last_sold_amount) {
             showSplash();
-            axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount })
+            if (isMobileDevice()) {
+                axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage })
+                    .then(function(response) {
+                        hideSplash();
+                        var html = response.data.report;
+                        html = html.replace(/<div class="fine-print[\s\S]*?<\/div>/gi, "");
+                        html = html.replace(/<div class="fine-print-wrapper[\s\S]*?<\/div>/gi, "");
+                        var mobileWin = window.open("", "_blank");
+                        mobileWin.document.write(`
+                            <html>
+                            <head>
+                                <title>${address}</title>
+                                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+                                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+                                <style>
+                                    body{background:#f8f8fb;margin:0;padding:0;font-family:'Nunito','Quicksand',Arial,sans-serif;}
+                                    .gpt-popup{width:100vw;max-width:100vw;margin:0;background:#f8f8fb;box-sizing:border-box;overflow-y:auto;overflow-x:auto;font-size:0.75rem;padding:7px 0 7px 0;}
+                                    .gpt-popup-btns{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;width:100%;margin-bottom:5px;}
+                                    .gpt-popup-close-btn, .gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:0.74em;min-width:54px;height:28px;display:flex;align-items:center;}
+                                    .gpt-popup-print-btn{background:#0078D4;}
+                                    .gpt-popup-close-btn:active, .gpt-popup-print-btn:active{background:#1a216b;}
+                                    .report-table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:10px;font-size:0.72em;overflow-x:auto;display:block;}
+                                    .report-table th, .report-table td{padding:3px 5px;text-align:left;}
+                                    .report-table th{background:#e8eaf6;color:#273469;}
+                                    .report-table tr:nth-child(even){background:#f7f7fc;}
+                                    .report-table tr:nth-child(odd){background:#fff;}
+                                </style>
+                            </head>
+                            <body>
+                                <div class="gpt-popup">
+                                    <div class="gpt-popup-btns">
+                                        <button class="gpt-popup-close-btn" onclick="window.close()">${UI_TEXT[currentLanguage].close}</button>
+                                        <button class="gpt-popup-print-btn" onclick="window.print()">${UI_TEXT[currentLanguage].print}</button>
+                                    </div>
+                                    <div>${html}</div>
+                                </div>
+                            </body>
+                            </html>
+                        `);
+                        mobileWin.document.close();
+                    }).catch(function() {
+                        hideSplash();
+                        alert(UI_TEXT[currentLanguage].error_report);
+                    });
+            } else {
+                axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage })
+                    .then(function(response) {
+                        hideSplash();
+                        var html = response.data.report;
+                        html = html.replace(/<div class="fine-print[\s\S]*?<\/div>/gi, "");
+                        html = html.replace(/<div class="fine-print-wrapper[\s\S]*?<\/div>/gi, "");
+                        var overlayBg = document.getElementById("report-overlay-bg");
+                        overlayBg.style.display = "block";
+                        var oldPopup = document.getElementById("floating-gpt-popup");
+                        if (oldPopup) oldPopup.remove();
+                        var popupDiv = document.createElement("div");
+                        popupDiv.className = "gpt-popup";
+                        popupDiv.id = "floating-gpt-popup";
+                        var btnBar = document.createElement("div");
+                        btnBar.className = "gpt-popup-btns";
+                        var closeBtn = document.createElement("button");
+                        closeBtn.className = "gpt-popup-close-btn";
+                        closeBtn.innerText = UI_TEXT[currentLanguage].close;
+                        closeBtn.onclick = function() {
+                            overlayBg.style.display = "none";
+                            popupDiv.remove();
+                        };
+                        var printBtn = document.createElement("button");
+                        printBtn.className = "gpt-popup-print-btn";
+                        printBtn.innerText = UI_TEXT[currentLanguage].print;
+                        printBtn.onclick = function(e) {
+                            e.preventDefault();
+                            printPopupReport(document.getElementById('floating-gpt-popup'), address);
+                        };
+                        btnBar.appendChild(printBtn);
+                        btnBar.appendChild(closeBtn);
+                        popupDiv.appendChild(btnBar);
+                        var reportContainer = document.createElement("div");
+                        reportContainer.innerHTML = html;
+                        popupDiv.appendChild(reportContainer);
+                        document.body.appendChild(popupDiv);
+                        overlayBg.onclick = function() {
+                            overlayBg.style.display = "none";
+                            var floating = document.getElementById("floating-gpt-popup");
+                            if (floating) floating.remove();
+                        };
+                    }).catch(function() {
+                        hideSplash();
+                        alert(UI_TEXT[currentLanguage].error_report);
+                    });
+            }
+        }
+
+        function propertyLookup(e) {
+            e.preventDefault();
+            var val = document.getElementById('lookup-input').value.trim();
+            if (!val) return;
+            axios.post('/refresh', { center_lat: null, center_lng: null, location: val })
                 .then(function(response) {
-                    hideSplash();
-                    var html = response.data.report;
-                    // Remove all fine print blocks from anywhere in the report
-                    html = html.replace(/<div class="fine-print[\s\S]*?<\/div>/gi, "");
-                    html = html.replace(/<div class="fine-print-wrapper[\s\S]*?<\/div>/gi, "");
-                    var popupDiv = document.createElement('div');
-                    popupDiv.className = 'gpt-popup';
-                    // Print link
-                    var printLink = document.createElement('a');
-                    printLink.href = "#";
-                    printLink.className = "print-link";
-                    printLink.innerHTML = "🖨️ Print";
-                    printLink.onclick = function(e) {
-                        e.preventDefault();
-                        printPopupReport(popupDiv, address);
-                    };
-                    popupDiv.appendChild(printLink);
-                    var contentDiv = document.createElement('div');
-                    contentDiv.innerHTML = html;
-                    popupDiv.appendChild(contentDiv);
-                    // Always append fine print block at the very bottom
-                    var finePrintBlock = document.createElement('div');
-                    finePrintBlock.innerHTML = `
-                        <div class="fine-print-wrapper">
-                            <div class="fine-print-block">
-                                <div class="fine-print scoring">
-                                    Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.
-                                </div>
-                                <div class="fine-print">
-                                    Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.
-                                </div>
-                            </div>
-                        </div>`;
-                    popupDiv.appendChild(finePrintBlock);
-                    var gptPopup = L.popup({
-                        maxWidth: "900px",
-                        minWidth: "320px",
-                        maxHeight: "90vh",
-                        minHeight: "320px"
-                    })
-                    .setContent(popupDiv);
-                    var map = getLeafletMap();
-                    if(map) {
-                        gptPopup.setLatLng(map.getCenter()).openOn(map);
+                    var homes = response.data || [];
+                    if (homes.length > 0) {
+                        var map = getLeafletMap();
+                        var first = homes[0];
+                        map.setView([first.lat, first.lon], 15);
+                        markerData = homes;
+                        updateHouseIcons();
+                    } else {
+                        alert(UI_TEXT[currentLanguage].not_found);
                     }
                 }).catch(function() {
-                    hideSplash();
-                    alert("Error generating report. Please try again.");
+                    alert(UI_TEXT[currentLanguage].error);
                 });
         }
 
@@ -569,16 +669,12 @@
                     setupMapRefresh();
                 }, function(error) {
                     hideSplash();
-                    window.onload = function() { 
-                        createLeafletMap(25.7617, -80.1918, 12);
-                        setupMapRefresh();
-                    };
-                }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
-            } else {
-                window.onload = function() { 
                     createLeafletMap(25.7617, -80.1918, 12);
                     setupMapRefresh();
-                };
+                }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
+            } else {
+                createLeafletMap(25.7617, -80.1918, 12);
+                setupMapRefresh();
             }
         }
 
@@ -588,15 +684,6 @@
                 || navigator.userAgent.indexOf('IEMobile') !== -1
                 || /android|ipad|iphone|ipod/i.test(navigator.userAgent)
             );
-        }
-
-        if (isMobileDevice()) {
-            mobileInit();
-        } else {
-            window.onload = function() {
-                createLeafletMap(25.7617, -80.1918, 12);
-                setupMapRefresh();
-            };
         }
     </script>
 </body>
