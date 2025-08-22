@@ -4,9 +4,10 @@
     <title>Properties</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Google Material Icons for section headers and animated splash -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         html, body {
@@ -36,21 +37,21 @@
             text-shadow: 0 2px 4px #fff;
         }
         .gpt-popup {
-            width: 60vw;
-            height: 60vh;
-            max-width: 60vw;
-            max-height: 60vh;
-            min-width: 300px;
-            min-height: 200px;
+            width: 900px;
+            max-width: 90vw;
+            min-width: 320px;
+            height: auto;
+            max-height: 90vh;
+            min-height: 320px;
             overflow-x: auto;
             overflow-y: auto;
-            font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
-            font-size: 14px;
+            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
+            font-size: 1rem;
             padding: 10px;
             box-sizing: border-box;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.17);
+            background: #f8f8fb;
+            border-radius: 16px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.17);
             position: relative;
         }
         .print-link {
@@ -60,25 +61,6 @@
             z-index: 2;
             font-family: Arial,sans-serif;
             font-size: 15px;
-        }
-        .gpt-popup p {
-            font-family: Arial, sans-serif;
-            font-size: 15px;
-            white-space: normal;
-            word-break: break-word;
-            margin: 0 0 1em 0;
-        }
-        .gpt-popup pre, .gpt-popup code {
-            white-space: pre;
-            word-break: normal;
-            font-family: 'Consolas', 'Menlo', 'Monaco', monospace;
-            font-size: 14px;
-            background: #f8f8f8;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: block;
-            overflow-x: auto;
-            margin-bottom: 1em;
         }
         #splashScreen {
             position: fixed;
@@ -100,10 +82,204 @@
             font-size: 1.3em;
             color: #0078D4;
         }
+        /* New spinner animation for splash page */
+        .splash-spinner {
+            display: inline-block;
+            width: 2.7em;
+            height: 2.7em;
+            border: 0.35em solid #e0e7ef;
+            border-top: 0.35em solid #0078D4;
+            border-radius: 50%;
+            animation: splash-spin 1s linear infinite;
+            margin-bottom: 12px;
+            vertical-align: middle;
+        }
+        @keyframes splash-spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+        /* --- Report Card Styling --- */
+        .report-card-header {
+            background: #fff;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 22px 22px 10px 22px;
+            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
+            text-align: left;
+        }
+        .report-grade {
+            display: inline-block;
+            font-size: 2em;
+            font-weight: bold;
+            background: #e9f7ef;
+            color: #35a47f;
+            border-radius: 8px;
+            padding: 4px 16px;
+            margin-left: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .report-section {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin: 18px 0;
+            padding: 18px 22px;
+            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
+        }
+        .report-section h2, .report-section h3 {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a355d;
+            display: flex;
+            align-items: center;
+        }
+        .material-icons {
+            font-size: 1.15em !important;
+            margin-right: 0.3em;
+            vertical-align: middle;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            font-size: 0.98em;
+            overflow-x: auto;
+            display: block;
+        }
+        .report-table th, .report-table td {
+            padding: 8px 10px;
+            text-align: left;
+        }
+        .report-table th {
+            background: #e8eaf6;
+            color: #273469;
+        }
+        .report-table tr:nth-child(even) {
+            background: #f7f7fc;
+        }
+        .report-table tr:nth-child(odd) {
+            background: #fff;
+        }
+        .pros-cons-container {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+        }
+        .pros-box, .cons-box {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-top: 6px;
+            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
+        }
+        .pros-box {
+            background: #e6f7e6;
+            color: #217a3a;
+            border: 1px solid #b2e5c9;
+        }
+        .cons-box {
+            background: #ffeaea;
+            color: #b63d3d;
+            border: 1px solid #f7cccc;
+        }
+        .bottom-line {
+            font-size: 1.07em;
+            font-weight: 500;
+            color: #1a355d;
+            background: #f2f7fa;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-top: 16px;
+        }
+        .next-steps {
+            margin-top: 8px;
+            padding-left: 22px;
+            font-size: 1em;
+        }
+        /* Fine Print at the bottom */
+        .fine-print-wrapper {
+            width: 100%;
+            margin-top: 18px;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+        .fine-print-block {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 700px;
+        }
+        .fine-print {
+            background: none;
+            font-size: 1.08em;
+            color: #7c8a99;
+            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
+            text-align: left;
+            line-height: 1.5em;
+            padding: 0 10px 0 0;
+            font-style: italic;
+            border-radius: 5px;
+            margin-bottom: 4px;
+            letter-spacing: .2px;
+            box-shadow: 0 0 0 transparent;
+        }
+        .fine-print .scoring {
+            font-weight: 700;
+            color: #53616d;
+            font-size: 1.11em;
+            text-shadow: 0 1px 2px #f8f8fb;
+            font-family: 'Quicksand', 'Nunito', 'Arial', sans-serif;
+            margin-bottom: 2px;
+        }
         @media (max-width: 900px) {
             .gpt-popup {
-                width: 85vw;
-                max-width: 85vw;
+                width: 95vw;
+                max-width: 98vw;
+                min-width: 320px;
+            }
+            .fine-print-wrapper {
+                max-width: 95vw;
+            }
+            .fine-print-block {
+                max-width: 95vw;
+            }
+            .fine-print {
+                font-size: 1em;
+                padding: 0 4vw 0 0;
+            }
+        }
+        @media (max-width: 768px) {
+            .pros-cons-container {
+                flex-direction: column !important;
+                gap: 0.7em !important;
+                width: 100%;
+            }
+            .pros-box, .cons-box {
+                margin-top: 0.7em;
+                margin-bottom: 0.7em;
+                width: 100%;
+            }
+            .report-table {
+                font-size: 0.94em;
+            }
+            .fine-print-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-top: 16px;
+            }
+            .fine-print-block {
+                max-width: 99vw;
+            }
+            .fine-print {
+                font-size: 0.95em;
+                padding: 0 2vw 0 0;
+                margin-bottom: 3px;
             }
         }
         @media (max-width: 600px) {
@@ -116,11 +292,26 @@
                 max-width: 98vw;
                 height: 55vh;
                 min-width: 98vw;
-                font-size: 15px;
+                font-size: 1em;
             }
             #splashScreenContent {
                 padding: 20px 10px;
                 font-size: 1em;
+            }
+            .report-card-header, .report-section, .pros-box, .cons-box, .bottom-line {
+                padding: 10px 8px;
+                font-size: 0.95em;
+            }
+            .report-card-header { font-size: 1em; }
+            .report-table th, .report-table td { padding: 6px 4px; font-size: 0.9em; }
+            .report-table { font-size: 0.91em; }
+            .fine-print-block {
+                max-width: 99vw;
+            }
+            .fine-print {
+                font-size: 0.95em;
+                padding: 0 2vw 0 0;
+                margin-bottom: 3px;
             }
         }
         @media (max-width: 400px) {
@@ -129,7 +320,15 @@
                 max-width: 99vw;
                 min-width: 99vw;
                 height: 50vh;
-                font-size: 13px;
+                font-size: 0.88em;
+            }
+            .fine-print-block {
+                max-width: 99vw;
+            }
+            .fine-print {
+                font-size: 0.88em;
+                padding: 0 1vw 0 0;
+                margin-bottom: 2px;
             }
         }
     </style>
@@ -138,8 +337,8 @@
     <div id="map"></div>
     <div id="splashScreen">
         <div id="splashScreenContent">
-            <span style="font-size:2em;">&#128221;</span><br>
-            Generating investment report...
+            <span class="splash-spinner"></span><br>
+            <span>Analyzing...</span>
         </div>
     </div>
     <script>
@@ -149,7 +348,7 @@
         var REFRESH_DELAY_MS = 2200;
 
         var _tileLayers = {};
-        var _activeLayer = "satellite"; // satellite is default
+        var _activeLayer = "streets"; // Streets as default
 
         function makeHouseIcon(colorClass) {
             return L.divIcon({
@@ -161,7 +360,6 @@
         }
 
         function getHouseIconForLayer() {
-            // Red for satellite, blue for streets
             return _activeLayer === "satellite"
                 ? makeHouseIcon("red")
                 : makeHouseIcon("blue");
@@ -184,7 +382,7 @@
             var map = L.map('map', {
                 center: [lat, lng],
                 zoom: zoom,
-                layers: [satellite]
+                layers: [streets]
             });
             var baseLayers = {
                 "Satellite": satellite,
@@ -192,9 +390,7 @@
             };
             var layerControl = L.control.layers(baseLayers).addTo(map);
 
-            // Listen for base layer change to update icons
             map.on('baselayerchange', function(e) {
-                // Determine which layer is active by name
                 if (e.name === "Satellite") {
                     _activeLayer = "satellite";
                 } else {
@@ -209,19 +405,18 @@
 
         function updateHouseIcons() {
             var map = getLeafletMap();
-            // Remove all current markers
             markers.forEach(function(marker) { map.removeLayer(marker); });
             markers = [];
-            // Add all markers again with new icon color
             markerData.forEach(function(home) {
                 var icon = getHouseIconForLayer();
                 var marker = L.marker([home.lat, home.lon], {icon: icon}).addTo(map);
                 var popupHtml = `<span style='font-size:1.5em;'>&#127968;</span> <b>${home.address}</b><br>
                     Price: $${home.price}<br>
                     Beds: ${home.bedrooms} | Baths: ${home.bathrooms}<br>
+                    ${home.last_sold_amount && home.last_sold_amount !== "N/A" ? "Last Sold: " + home.last_sold_amount + "<br>" : ""}
                     <a href='https://www.zillow.com${home.detail_url}' target='_blank'>View Listing</a><br>
                     <img src='${home.img_url}' width='150'><br>
-                    <button onclick="sendClickedInfo('${home.address}', '${home.price}')">Good deal?</button>`;
+                    <button onclick="sendClickedInfo('${home.address}', '${home.price}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}')">Good deal?</button>`;
                 marker.bindPopup(popupHtml);
                 markers.push(marker);
             });
@@ -299,7 +494,8 @@
             var printLinks = clone.getElementsByClassName('print-link');
             if (printLinks.length > 0) printLinks[0].parentNode.removeChild(printLinks[0]);
             printWindow.document.write('<html><head><title>' + (address || 'Investment Report') + '</title>');
-            printWindow.document.write('<style>body{font-family:Arial,sans-serif;padding:30px;} pre, code{font-family:monospace;} p{font-family:Arial,sans-serif;}</style>');
+            printWindow.document.write('<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">');
+            printWindow.document.write('<style>body{font-family:Nunito,Quicksand,Arial,sans-serif;padding:30px;} .report-card-header, .report-section, .pros-box, .cons-box, .bottom-line, .fine-print{border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.08);} .report-card-header{margin-bottom:0;} .report-table{width:100%;border-collapse:collapse;} .report-table th{background:#e8eaf6;} .report-table tr:nth-child(even){background:#f7f7fc;} .report-table tr:nth-child(odd){background:#fff;} .pros-box{background:#e6f7e6;color:#217a3a;} .cons-box{background:#ffeaea;color:#b63d3d;} .fine-print-wrapper{margin-top:18px;display:flex;flex-direction:row;align-items:flex-start;justify-content:flex-start;} .fine-print-block{display:flex;flex-direction:column;align-items:flex-start;max-width:700px;} .fine-print{font-family:Nunito,Quicksand,Arial,sans-serif;font-size:1.08em;color:#7c8a99;text-align:left;line-height:1.5em;padding:0 10px 0 0;font-style:italic;border-radius:5px;margin-bottom:4px;letter-spacing:.2px;} .fine-print .scoring{font-weight:700;color:#53616d;font-size:1.11em;text-shadow:0 1px 2px #f8f8fb;font-family:Quicksand,Nunito,Arial,sans-serif;margin-bottom:2px;} </style>');
             printWindow.document.write('</head><body>');
             printWindow.document.write('<h2 style="margin-top:0;">' + (address || 'Investment Report') + '</h2>');
             printWindow.document.write(clone.innerHTML);
@@ -309,15 +505,26 @@
             setTimeout(function(){ printWindow.print(); }, 250);
         }
 
-        function sendClickedInfo(address, price) {
+        function sendClickedInfo(address, price, bedrooms, bathrooms, last_sold_amount) {
             showSplash();
-            axios.post('/clicked', { address: address, price: price })
+            axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount })
                 .then(function(response) {
                     hideSplash();
-                    var md = response.data.report;
-                    // Append scoring logic and disclaimer in fine print, separate lines and period
-                    md += '\n\n<sub><span style="color: #888;">Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.</span></sub>';
-                    md += '\n\n<sub><span style="color: #888;">Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.</span></sub>';
+                    var html = response.data.report;
+                    var finePrintBlock = `
+                        <div class="fine-print-wrapper">
+                            <div class="fine-print-block">
+                                <div class="fine-print scoring">
+                                    Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.
+                                </div>
+                                <div class="fine-print">
+                                    Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.
+                                </div>
+                            </div>
+                        </div>`;
+                    html = html.replace(/<div class="fine-print[\s\S]*?<\/div>/gi, "");
+                    html = html.replace(/<div class="fine-print-wrapper[\s\S]*?<\/div>/gi, "");
+                    html += finePrintBlock;
                     var popupDiv = document.createElement('div');
                     popupDiv.className = 'gpt-popup';
                     var printLink = document.createElement('a');
@@ -330,13 +537,13 @@
                     };
                     popupDiv.appendChild(printLink);
                     var contentDiv = document.createElement('div');
-                    contentDiv.innerHTML = marked.parse(md);
+                    contentDiv.innerHTML = html;
                     popupDiv.appendChild(contentDiv);
                     var gptPopup = L.popup({
-                        maxWidth: "60vw",
-                        minWidth: "300px",
-                        maxHeight: "60vh",
-                        minHeight: "200px"
+                        maxWidth: "900px",
+                        minWidth: "320px",
+                        maxHeight: "90vh",
+                        minHeight: "320px"
                     })
                     .setContent(popupDiv);
                     var map = getLeafletMap();
@@ -362,13 +569,13 @@
                 }, function(error) {
                     hideSplash();
                     window.onload = function() { 
-                        createLeafletMap(25.7617, -80.1918, 12); // Miami, FL
+                        createLeafletMap(25.7617, -80.1918, 12);
                         setupMapRefresh();
                     };
                 }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
             } else {
                 window.onload = function() { 
-                    createLeafletMap(25.7617, -80.1918, 12); // Miami, FL
+                    createLeafletMap(25.7617, -80.1918, 12);
                     setupMapRefresh();
                 };
             }
@@ -386,7 +593,7 @@
             mobileInit();
         } else {
             window.onload = function() {
-                createLeafletMap(25.7617, -80.1918, 12); // Miami, FL
+                createLeafletMap(25.7617, -80.1918, 12);
                 setupMapRefresh();
             };
         }
