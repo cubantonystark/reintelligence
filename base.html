@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- PDF export support -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         html, body {
             margin: 0;
@@ -56,15 +54,14 @@
             box-shadow: 0 4px 32px rgba(0,0,0,0.17);
             position: relative;
         }
-        .print-link, .pdf-link {
+        .print-link {
             position: absolute;
             top: 10px;
+            right: 18px;
             z-index: 2;
             font-family: Arial,sans-serif;
             font-size: 15px;
         }
-        .print-link { right: 18px; }
-        .pdf-link { right: 90px; }
         #splashScreen {
             position: fixed;
             top: 0; left: 0;
@@ -493,8 +490,6 @@
             var clone = popupDiv.cloneNode(true);
             var printLinks = clone.getElementsByClassName('print-link');
             if (printLinks.length > 0) printLinks[0].parentNode.removeChild(printLinks[0]);
-            var pdfLinks = clone.getElementsByClassName('pdf-link');
-            if (pdfLinks.length > 0) pdfLinks[0].parentNode.removeChild(pdfLinks[0]);
             printWindow.document.write('<html><head><title>' + (address || 'Investment Report') + '</title>');
             printWindow.document.write('<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">');
             printWindow.document.write('<style>body{font-family:Nunito,Quicksand,Arial,sans-serif;padding:30px;} .report-card-header, .report-section, .pros-box, .cons-box, .bottom-line, .fine-print{border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,0.08);} .report-card-header{margin-bottom:0;} .report-table{width:100%;border-collapse:collapse;} .report-table th{background:#e8eaf6;} .report-table tr:nth-child(even){background:#f7f7fc;} .report-table tr:nth-child(odd){background:#fff;} .pros-box{background:#e6f7e6;color:#217a3a;} .cons-box{background:#ffeaea;color:#b63d3d;} .fine-print-wrapper{margin-top:18px;display:flex;flex-direction:row;align-items:flex-start;justify-content:flex-start;} .fine-print-block{display:flex;flex-direction:column;align-items:flex-start;max-width:700px;} .fine-print{font-family:Nunito,Quicksand,Arial,sans-serif;font-size:1.08em;color:#7c8a99;text-align:left;line-height:1.5em;padding:0 10px 0 0;font-style:italic;border-radius:5px;margin-bottom:4px;letter-spacing:.2px;} .fine-print .scoring{font-weight:700;color:#53616d;font-size:1.11em;text-shadow:0 1px 2px #f8f8fb;font-family:Quicksand,Nunito,Arial,sans-serif;margin-bottom:2px;} </style>');
@@ -527,29 +522,7 @@
                         e.preventDefault();
                         printPopupReport(popupDiv, address);
                     };
-                    // PDF link
-                    var pdfLink = document.createElement('a');
-                    pdfLink.href = "#";
-                    pdfLink.className = "pdf-link";
-                    pdfLink.innerHTML = "⬇️ PDF";
-                    pdfLink.onclick = function(e) {
-                        e.preventDefault();
-                        var clone = popupDiv.cloneNode(true);
-                        // Remove buttons from PDF
-                        var printLinks = clone.getElementsByClassName('print-link');
-                        if (printLinks.length > 0) printLinks[0].parentNode.removeChild(printLinks[0]);
-                        var pdfLinks = clone.getElementsByClassName('pdf-link');
-                        if (pdfLinks.length > 0) pdfLinks[0].parentNode.removeChild(pdfLinks[0]);
-                        html2pdf().set({
-                            margin: 0.3,
-                            filename: (address || 'Investment_Report') + '.pdf',
-                            image: { type: 'jpeg', quality: 0.98 },
-                            html2canvas: { scale: 2, useCORS: true },
-                            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-                        }).from(clone).save();
-                    };
                     popupDiv.appendChild(printLink);
-                    popupDiv.appendChild(pdfLink);
                     var contentDiv = document.createElement('div');
                     contentDiv.innerHTML = html;
                     popupDiv.appendChild(contentDiv);
