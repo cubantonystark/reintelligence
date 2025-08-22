@@ -125,8 +125,12 @@ def refresh():
     ne_lng = bounds.get("ne_lng")
     center_lat = bounds.get("center_lat")
     center_lng = bounds.get("center_lng")
-    location = reverse_geocode(center_lat, center_lng)
-    homes = fetch_homes(location, sw_lat, sw_lng, ne_lat, ne_lng)
+    location = bounds.get("location")
+    if location:
+        homes = fetch_homes(location)
+    else:
+        location = reverse_geocode(center_lat, center_lng)
+        homes = fetch_homes(location, sw_lat, sw_lng, ne_lat, ne_lng)
     return jsonify(homes)
 
 def extract_html_from_gpt_response(response_text):
@@ -167,7 +171,6 @@ def cleanup_pros_cons_section(report_html):
     )
     return report_html
 
-
 @app.route("/clicked", methods=["POST"])
 def clicked():
     data = request.get_json() or {}
@@ -178,6 +181,7 @@ def clicked():
     last_sold_amount = data.get("last_sold_amount", "N/A")
     lat = float(data.get("lat", 27.9506))
     lon = float(data.get("lon", -82.4572))
+    language = data.get("language", "en")
 
     SW_LAT = lat - 0.03
     SW_LNG = lon - 0.03
@@ -226,28 +230,21 @@ def clicked():
     financing_assumptions = "Rates: Conventional 7.0%, FHA 6.5%, VA 6.5%. Credit: 700+. FHA/VA rules: as standard. Points: 0"
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
-    prompt = f"""
+    # PROMPT TRANSLATION INCLUDED
+    lang_prompts = {
+        "en": f"""Write the report in English.
 Create a property report in HTML format styled as a clean, printable “report card” for prospective real estate buyers with no experience. Use simple, layman’s terms but keep accuracy.
-
 Required Sections & Order
-
 Header — property address, listed price and an overall letter grade (A–F) which you must calculate and assign based on the facts provided.
-
 Grade Explanation — add a section explaining why the property received its grade (A–F). Clearly describe the main factors that influenced this grade, both positive and negative, such as location, price, condition, comparables, and market trends. Use header: <h3><span class="material-icons">grade</span> Grade Explanation</h3>
-
 Location & Neighborhood — commute times, schools, nearby amenities, neighborhood feel.
-
 Property Details — type, size, beds/baths, notable upgrades (e.g., solar panels, roof).
-
 Market Snapshot & Comparables
 Show a 4-column table (address, sq ft, sold price, notes) using ONLY the comparable properties provided below.
 Below the table, write a short plain-English interpretation of what these comps mean for the property’s value.
 Clearly compare last sold amount vs. current listing price, and explain in plain English what this means for buyer value, negotiation leverage, and market trends.
-
 Condition & Maintenance — roof/systems status, yard, and key items to confirm.
-
 Monthly Cost Snapshot (Est.) — mortgage, utilities, HOA (if any).
-
 Pros & Cons Section
 Use a single header above both boxes:
 <h3><span class="material-icons">compare</span> Pros & Cons</h3>
@@ -257,7 +254,6 @@ Inside this section, show two boxes:
   <div class="cons-box"><h3><span class="material-icons">warning</span> Cons</h3>...</div>
 </div>
 Do NOT repeat or add more than one header for pros/cons in this section.
-
 Financing Scenarios (place above Summary)
 Use today’s average market rates as of {today_str}.
 If live rates are unavailable, use industry averages and clearly label them as assumptions.
@@ -272,12 +268,8 @@ Estimated Taxes, Homeowners Insurance, HOA
 Total estimated monthly payment (PITI + MI)
 Estimated cash to close (down + closing costs + prepaid items; show assumptions)
 Add a plain-English takeaway under each table (e.g., “FHA allows low down payment but adds mortgage insurance; Conventional may be cheapest long-term with 20% down.”).
-Add a sensitivity note: “Every 0.25% change in rate moves the payment by about $X/month.”
-
 Summary — section header. Give a plain-English summary that clearly states whether this is a good investment, average, or poor investment and why, based on the details above. Be explicit and direct in your judgement.
-
 Next Steps — section header. Present an actionable, ordered list of recommendations for the buyer, focusing specifically on what they should pay attention to during a property inspection (e.g., roof age, HVAC, plumbing, foundation, moisture, electrical, pest issues, permit status, neighborhood review, etc). Use this section: <h3><span class="material-icons">list_alt</span> Next Steps</h3>
-
 Additional Helpful Buyer Sections (Optional but Recommended)
 Property Taxes & Insurance Estimates — last year’s taxes + monthly insurance estimate (why this matters: ongoing costs impact affordability).
 Flood Zone & Risk Factors — note FEMA flood zone status and insurance needs (why this matters: flood insurance may add significant cost).
@@ -287,7 +279,6 @@ Homeowner Protections / Warranties — availability/value of a home warranty.
 Commute & Lifestyle Map — drive times to airport, downtown, grocery, hospitals.
 Investment Angle — potential rental income and resale outlook.
 Inspection & Red Flags Checklist — roof age, HVAC, plumbing, foundation, moisture intrusion.
-
 Formatting Requirements (HTML + CSS)
 Clean, modern card layout; soft background; rounded corners; subtle shadow.
 Responsive design:
@@ -303,7 +294,6 @@ Fine print: smaller, muted gray text at bottom.
 Use Google Material Icons instead of emojis.
 Load icons:
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
 Example headers:
 <h3><span class="material-icons">location_on</span> Location & Neighborhood</h3>
 <h3><span class="material-icons">home</span> Property Details</h3>
@@ -315,7 +305,6 @@ Example headers:
 <h3><span class="material-icons">task_alt</span> Summary</h3>
 <h3><span class="material-icons">grade</span> Grade Explanation</h3>
 <h3><span class="material-icons">list_alt</span> Next Steps</h3>
-
 Input Data (replace placeholders)
 Address: {address}
 Listed Price: {price}
@@ -324,7 +313,108 @@ Property Facts/Upgrades: {details}
 Comparables (2–4): {comparables}
 Assumptions: {assumptions}
 Financing Assumptions: {financing_assumptions}
+""",
+        "es": f"""Escribe el informe en español, claro y sencillo, para compradores primerizos.
+Crea un informe de propiedad en formato HTML, diseñado como una “ficha” moderna y limpia para compradores de bienes raíces sin experiencia. Usa términos sencillos pero mantén precisión.
+
+Secciones requeridas y orden:
+
+Encabezado — dirección de la propiedad, precio listado y una calificación general (A–F) que debes calcular y asignar según los datos proporcionados.
+
+Explicación de la Calificación — explica por qué la propiedad recibió su calificación (A–F). Describe claramente los factores principales que influyeron en la nota, positivos y negativos, como ubicación, precio, estado, comparables y tendencias del mercado. Usa el encabezado: <h3><span class="material-icons">grade</span> Explicación de la Calificación</h3>
+
+Ubicación y Vecindario — tiempos de traslado, escuelas, servicios cercanos, ambiente del vecindario.
+
+Detalles de la Propiedad — tipo, tamaño, camas/baños, mejoras notables (ej. paneles solares, techo).
+
+Panorama de Mercado y Comparables
+Muestra una tabla de 4 columnas (dirección, m², precio vendido, notas) usando SOLO las propiedades comparables proporcionadas abajo.
+Debajo de la tabla, escribe en español sencillo una interpretación de qué significan estos comparables para el valor de la propiedad.
+Compara claramente el último monto vendido vs. precio listado actual y explica en español lo que significa para el valor del comprador, poder de negociación y tendencias de mercado.
+
+Estado y Mantenimiento — estado del techo/sistemas, jardín y puntos clave a revisar.
+
+Resumen de Costos Mensuales (Est.) — hipoteca, servicios, HOA (si aplica).
+
+Sección de Pros y Contras
+Usa un solo encabezado sobre ambas cajas:
+<h3><span class="material-icons">compare</span> Pros y Contras</h3>
+Dentro de la sección, muestra dos cajas:
+<div class="pros-cons-container">
+  <div class="pros-box"><h3><span class="material-icons">thumb_up</span> Pros</h3>...</div>
+  <div class="cons-box"><h3><span class="material-icons">warning</span> Contras</h3>...</div>
+</div>
+No repitas ni agregues más de un encabezado para pros/contras en esta sección.
+
+Escenarios de Financiamiento (coloca arriba del Resumen)
+Usa tasas promedio del mercado de hoy ({today_str}).
+Si no hay tasas en vivo, usa promedios del sector y etiquétalos como supuestos.
+Muestra escenarios Convencional 30 años (y opcional 15 años) y FHA 30 años.
+Para cada escenario, presenta una tabla con:
+Precio de compra, porcentaje y monto de enganche
+Tasa de interés (promedio actual), APR (si disponible)
+Monto de préstamo (tras enganche; incluye UFMIP FHA o Cuota VA si aplica)
+Pago mensual estimado (P&I)
+Seguro hipotecario (PMI, MIP FHA, o VA $0 MI)
+Impuestos estimados, seguro, HOA
+Pago mensual total estimado (PITI + MI)
+Dinero estimado para el cierre (enganche + costos de cierre + anticipos; muestra supuestos)
+Agrega una conclusión clara bajo cada tabla (ej. “FHA permite bajo enganche pero añade seguro hipotecario; Convencional puede ser más barato a largo plazo con 20% de enganche.”).
+
+Resumen — encabezado. Da un resumen claro en español que indique si es una buena inversión, regular o mala y por qué, basado en los puntos anteriores. Sé explícito y directo.
+
+Próximos Pasos — encabezado. Presenta una lista ordenada de recomendaciones para el comprador, enfocadas en lo que debe revisar en la inspección (ej. edad del techo, HVAC, plomería, cimientos, humedad, eléctrico, plagas, permisos, vecindario, etc). Usa <h3><span class="material-icons">list_alt</span> Próximos Pasos</h3>
+
+Secciones adicionales útiles para compradores (opcional, recomendado)
+Estimados de impuestos y seguro — impuestos del último año + seguro mensual estimado (por qué: costos recurrentes afectan la accesibilidad).
+Zona de inundación y riesgos — nota el estado FEMA y necesidades de seguro (por qué: seguro de inundación puede costar mucho).
+Costos y eficiencia de servicios — promedio local de servicios, características de ahorro energético y estimación de ahorro (por qué: reduce pagos mensuales).
+Tendencias del mercado local — tendencia de precio 12 meses, días promedio en mercado (por qué: muestra fortaleza o debilidad del mercado).
+Protecciones para propietarios / garantías — disponibilidad/valor de garantía.
+Mapa de traslados y estilo de vida — tiempos en auto a aeropuerto, centro, supermercados, hospitales.
+Ángulo de inversión — posible ingreso por renta y perspectiva de reventa.
+Lista de inspección y alertas — edad del techo, HVAC, plomería, cimientos, humedad.
+
+Requisitos de formato (HTML + CSS)
+Diseño limpio y moderno; fondo suave; esquinas redondeadas; sombra sutil.
+Diseño responsivo:
+Incluye <meta name="viewport" content="width=device-width, initial-scale=1.0">.
+Centra el informe en un contenedor de máximo 900px y ancho fluido.
+Usa % o rem en rellenos, márgenes y fuentes.
+Haz tablas desplazables en pantallas pequeñas con overflow-x: auto; display: block;.
+Apila secciones lado a lado (como Pros/Contras) verticalmente en pantallas <768px.
+Asegura que las fuentes escalen bien en móvil.
+Tablas: filas alternas de color para legibilidad.
+Pros/Contras: cajas verdes/rojas distintas.
+Letra pequeña: texto gris tenue al final.
+Usa Google Material Icons, no emojis.
+Carga íconos:
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+Ejemplos de encabezados:
+<h3><span class="material-icons">location_on</span> Ubicación y Vecindario</h3>
+<h3><span class="material-icons">home</span> Detalles de la Propiedad</h3>
+<h3><span class="material-icons">bar_chart</span> Panorama de Mercado y Comparables</h3>
+<h3><span class="material-icons">build</span> Estado y Mantenimiento</h3>
+<h3><span class="material-icons">payments</span> Resumen de Costos Mensuales</h3>
+<h3><span class="material-icons">compare</span> Pros y Contras</h3>
+<h3><span class="material-icons">calculate</span> Escenarios de Financiamiento</h3>
+<h3><span class="material-icons">task_alt</span> Resumen</h3>
+<h3><span class="material-icons">grade</span> Explicación de la Calificación</h3>
+<h3><span class="material-icons">list_alt</span> Próximos Pasos</h3>
+
+Datos de entrada:
+Dirección: {address}
+Precio listado: {price}
+Último monto vendido: {last_sold_amount}
+Datos/mejoras: {details}
+Comparables (2–4): {comparables}
+Supuestos: {assumptions}
+Supuestos de financiamiento: {financing_assumptions}
 """
+    }
+
+    prompt = lang_prompts.get(language, lang_prompts["en"])
 
     try:
         response = client.chat.completions.create(
@@ -333,7 +423,6 @@ Financing Assumptions: {financing_assumptions}
             max_tokens=5000
         )
         raw_report = response.choices[0].message.content
-        #print(raw_report)  # Print out the raw ChatGPT output to the console
         ai_report = extract_html_from_gpt_response(raw_report)
         ai_report = cleanup_pros_cons_section(ai_report)
         ai_report = ai_report.strip()
