@@ -167,6 +167,19 @@ def cleanup_pros_cons_section(report_html):
     )
     return report_html
 
+FINE_PRINT_HTML = """
+<div class="fine-print-wrapper">
+    <div class="fine-print-block">
+        <div class="fine-print scoring">
+            Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.
+        </div>
+        <div class="fine-print">
+            Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.
+        </div>
+    </div>
+</div>
+"""
+
 @app.route("/clicked", methods=["POST"])
 def clicked():
     data = request.get_json() or {}
@@ -221,6 +234,8 @@ def clicked():
 
     details = f"Beds: {bedrooms}, Baths: {bathrooms}, Asking Price: {price}, Last Sold Amount: {last_sold_amount}"
 
+    assumptions = "Tax 1.2%, Insurance $120/mo, HOA $50/mo"
+    financing_assumptions = "Rates: Conventional 7.0%, FHA 6.5%, VA 6.5%. Credit: 700+. FHA/VA rules: as standard. Points: 0"
     today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     prompt = f"""
@@ -228,7 +243,7 @@ Create a property report in HTML format styled as a clean, printable “report c
 
 Required Sections & Order
 
-Header — property address, listed price, and an overall letter grade (A–F) which you must calculate and assign based on the facts provided.
+Header — property address, listed price and an overall letter grade (A–F) which you must calculate and assign based on the facts provided.
 
 Grade Explanation — add a section explaining why the property received its grade (A–F). Clearly describe the main factors that influenced this grade, both positive and negative, such as location, price, condition, comparables, and market trends. Use header: <h3><span class="material-icons">grade</span> Grade Explanation</h3>
 
@@ -255,10 +270,11 @@ Inside this section, show two boxes:
 </div>
 Do NOT repeat or add more than one header for pros/cons in this section.
 
-Financing Scenario (place above Analyze)
+Financing Scenarios (place above Summary)
 Use today’s average market rates as of {today_str}.
 If live rates are unavailable, use industry averages and clearly label them as assumptions.
-Show a Conventional 30-yr scenario, present a table with:
+Show Conventional 30-yr (and optional 15-yr), FHA 30-yr, and VA 30-yr scenarios.
+For each scenario, present a table with:
 Purchase price, down payment %, down payment $
 Interest rate (today’s average), APR (if available)
 Loan amount (after down payment; include FHA UFMIP or VA Funding Fee if applicable)
@@ -273,6 +289,11 @@ Add a sensitivity note: “Every 0.25% change in rate moves the payment by about
 Summary — section header. Give a plain-English summary that clearly states whether this is a good investment, average, or poor investment and why, based on the details above. Be explicit and direct in your judgement.
 
 Next Steps — section header. Present an actionable, ordered list of recommendations for the buyer, focusing specifically on what they should pay attention to during a property inspection (e.g., roof age, HVAC, plumbing, foundation, moisture, electrical, pest issues, permit status, neighborhood review, etc). Use this section: <h3><span class="material-icons">list_alt</span> Next Steps</h3>
+
+Fine Print (small text)
+Show the following, separated by one line feed:
+“Scoring: A = Excellent investment; B = Good; C = Average; D = Below average; F = Poor investment.”
+“Real estate investments, like all investments, involve inherent risks and are not guaranteed to be profitable. Any information or content provided regarding real estate investment is for informational purposes only and should not be construed as financial, legal, tax, or investment advice.”
 
 Additional Helpful Buyer Sections (Optional but Recommended)
 Property Taxes & Insurance Estimates — last year’s taxes + monthly insurance estimate (why this matters: ongoing costs impact affordability).
@@ -307,7 +328,7 @@ Example headers:
 <h3><span class="material-icons">build</span> Condition & Maintenance</h3>
 <h3><span class="material-icons">payments</span> Monthly Cost Snapshot</h3>
 <h3><span class="material-icons">compare</span> Pros & Cons</h3>
-<h3><span class="material-icons">calculate</span> Financing Scenario</h3>
+<h3><span class="material-icons">calculate</span> Financing Scenarios</h3>
 <h3><span class="material-icons">task_alt</span> Summary</h3>
 <h3><span class="material-icons">grade</span> Grade Explanation</h3>
 <h3><span class="material-icons">list_alt</span> Next Steps</h3>
@@ -318,6 +339,8 @@ Listed Price: {price}
 Last Sold Amount: {last_sold_amount}
 Property Facts/Upgrades: {details}
 Comparables (2–4): {comparables}
+Assumptions: {assumptions}
+Financing Assumptions: {financing_assumptions}
 """
 
     try:
