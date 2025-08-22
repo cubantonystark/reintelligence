@@ -261,7 +261,7 @@ Do NOT repeat or add more than one header for pros/cons in this section.
 Financing Scenarios (place above Summary)
 Use today’s average market rates as of {today_str}.
 If live rates are unavailable, use industry averages and clearly label them as assumptions.
-Show Conventional 30-yr (and optional 15-yr), FHA 30-yr, and VA 30-yr scenarios.
+Show Conventional 30-yr (and optional 15-yr) and FHA 30-yr scenarios.
 For each scenario, present a table with:
 Purchase price, down payment %, down payment $
 Interest rate (today’s average), APR (if available)
@@ -271,7 +271,7 @@ Mortgage insurance (PMI, FHA MIP, or VA $0 MI)
 Estimated Taxes, Homeowners Insurance, HOA
 Total estimated monthly payment (PITI + MI)
 Estimated cash to close (down + closing costs + prepaid items; show assumptions)
-Add a plain-English takeaway under each table (e.g., “FHA allows low down payment but adds mortgage insurance; VA is best for eligible buyers with $0 down and no MI; Conventional may be cheapest long-term with 20% down.”).
+Add a plain-English takeaway under each table (e.g., “FHA allows low down payment but adds mortgage insurance; Conventional may be cheapest long-term with 20% down.”).
 Add a sensitivity note: “Every 0.25% change in rate moves the payment by about $X/month.”
 
 Summary — section header. Give a plain-English summary that clearly states whether this is a good investment, average, or poor investment and why, based on the details above. Be explicit and direct in your judgement.
