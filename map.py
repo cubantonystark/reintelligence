@@ -333,7 +333,7 @@ Financing Assumptions: {financing_assumptions}
             max_tokens=5000
         )
         raw_report = response.choices[0].message.content
-        print(raw_report)  # Print out the raw ChatGPT output to the console
+        #print(raw_report)  # Print out the raw ChatGPT output to the console
         ai_report = extract_html_from_gpt_response(raw_report)
         ai_report = cleanup_pros_cons_section(ai_report)
         ai_report = ai_report.strip()
