@@ -134,6 +134,128 @@ A Flask web application for interactive property search, analysis, and visualiza
   - **Report**: OpenAI generates a graded (A–F) HTML investment report using subject data, **features**, **HOA/CDD**, and ≥5 **comps**; server sanitizes and wraps it.
   - **i18n**: Live EN/ES switching (UI, layers; report forced via system message).
   - **Mobile**: Leaflet controls & report actions always visible above the fixed header.
+# Changelog — Map & Report App
+
+## TL;DR
+- Added **/lookup**, **/refresh**, **/clicked** endpoints and robust Zillow/Nominatim integrations with **caching**, **rate limiting**, and **429 backoff**.  
+- Implemented **address vs. place** search logic, **close-in zoom** (city ~16, address 17), **property-focus** mode (no refresh while popup open).  
+- Added **geolocation on first load**, **Spanish/English** UI + **report localization**, and **mobile-safe** Leaflet controls & report modal.  
+- Report now shows **Investment Grade (A–F)** in header, includes **features**, **HOA/CDD**, and **≥5 comps** with expanded radius.  
+- Introduced **structured logging** (console + rotating file).  
+- Multiple UI/UX fixes: localized layer labels, spinner shown **only** for the “Good deal?” flow, better address rendering, sanitized model HTML.
+
+---
+
+## Backend (`map.py`)
+
+### New endpoints & flows
+- **`POST /lookup`**:  
+  - Detects **address vs. place** with heuristics.  
+  - **Address** → `/search?query=` to get **zpid**, fallback to fuzzy match via `/propertyExtendedSearch`, then `/property?zpid=` to get details; returns `{ mode: "property", center, home }`.  
+  - **Place** (city/state/ZIP) → forward geocode via **Nominatim** and returns `{ mode: "place", center, zoom }`.
+- **`POST /refresh`**:  
+  - Reverse geocodes map center to a friendly location (ZIP or `City, State`).  
+  - Fetches homes via **Zillow `propertyExtendedSearch`** for current bounds.  
+  - Includes **debounce** guard to avoid redundant queries (time & small-move threshold).
+- **`POST /clicked`**:  
+  - Builds **investment report** with OpenAI (first line `GRADE: X`, then HTML only).  
+  - Ensures **≥5 comps** by progressively expanding radius; injects **features** and **HOA/CDD** when available.  
+  - **Language** is enforced via an OpenAI **system message** (EN/ES).
+- **`GET /debug/ping`**: health check with UTC timestamp.
+
+### Zillow & geocoding integration
+- Added `_zillow_http_get()` with:
+  - **Minimum interval** between calls (`ZILLOW_MIN_INTERVAL`).  
+  - **429** handling with a **cooldown backoff** (`ZILLOW_429_BACKOFF`).  
+  - Response logging (status/bytes/preview).  
+- Introduced **caching** buckets:
+  - `props_by_location` (extended search payloads).  
+  - `zpid_by_query` (normalized query → zpid/address).  
+  - `property_by_zpid` (property details).  
+- Added **address normalization** + fuzzy matching to improve ZPID discovery.  
+- Added **Nominatim** helpers: `geocode_place()` (returns lat/lon/zoom tuned per place type), `reverse_geocode()` (produces ZIP or `City, State` strings).
+
+### Report generation
+- **Language enforcement** (ES/EN) via OpenAI **system** role.  
+- Report HTML is **sanitized**: code fences removed, then wrapped in a **responsive** shell.  
+- **Grade chip** moved to the report **header**; “Investment Analysis” label removed.  
+- Injects **subject features**, **HOA/CDD** (best-effort from Zillow shapes).  
+- Comp selection: **expand radius** until ≥5 comps (cap 12).  
+- Wrapper injects a **bilingual rubric + disclaimer** (fine print).
+
+### Reliability & robustness
+- **Debounce** for `/refresh` using last center/zoom + time guard.  
+- **Structured logging**:
+  - `logging` with **StreamHandler** (console) + **RotatingFileHandler** to `logs/app.log`.  
+  - Consistent tags: `[ZILLOW][REQ]`, `[ZILLOW][RES]`, `[REFRESH]`, `[LOOKUP]`, `[OPENAI]`, etc.  
+- **Env-driven config**: API keys, cache TTLs, rate limits, debounce thresholds.  
+- Address rendering fixed: **`address_to_string()`** to avoid `[object Object]` in popups.  
+- Defensive parsing for varied Zillow payload shapes (lat/lon/price/images/features, etc.).
+
+---
+
+## Frontend (`templates/base.html`)
+
+### Search & map behavior
+- **Search box** submits to `/lookup`:
+  - **Address** → centers on property at **zoom 17**, shows **only that marker**, opens popup, and **suppresses area refresh** until popup closes.  
+  - **Place (city/state/ZIP)** → centers with a **close-in zoom ~16** and **runs normal refresh**.
+- **Debounced refresh** (`moveend`/`zoomend`) calls `/refresh` after a short delay.  
+- **Geolocation** on first load (desktop & mobile):
+  - Attempts `navigator.geolocation` to center map near the user; **Tampa** fallback.
+
+### UI/UX & mobile fixes
+- **Leaflet controls** (zoom & layers) now **stay below the fixed header** on phones:  
+  - `.leaflet-control-container { z-index: 10000 }`  
+  - Mobile breakpoint shifts `.leaflet-top { top: 66px !important }`.  
+- **Report modal** (print/close) z-index and sticky header ensure buttons are **always visible** on mobile.  
+- **Spinner** limited to **“Good deal?”** flow only (removed during property lookups).
+
+### Internationalization (i18n)
+- **Live EN/ES toggle** updates:
+  - Input placeholder, Search text, spinner label, popup action text, **layer names** (“Streets/Satellite” ↔ “Calles/Satélite”).  
+- **Report language** is **fully aligned** with UI toggle via backend system message.  
+- Layer control labels rebuild when language changes to update text.
+
+### Marker & popup rendering
+- Unified popup template with localized labels and link to Zillow detail URL.  
+- **Keep-open behavior**: while focused on a single property, area refresh is disabled; popup close **re-enables** refresh.
+
+---
+
+## Configuration (new/used environment variables)
+- `OPENAI_API_KEY` — OpenAI access.  
+- `RAPIDAPI_KEY` — Zillow RapidAPI key.  
+- `TTL_PROPS_BY_LOCATION` — cache seconds for extended search payloads (default **600**).  
+- `TTL_ZPID_BY_QUERY` — cache seconds for zpid lookup (default **3600**).  
+- `TTL_PROP_BY_ZPID` — cache seconds for property details (default **3600**).  
+- `ZILLOW_MIN_INTERVAL` — minimum seconds between Zillow calls (default **1.5**).  
+- `ZILLOW_429_BACKOFF` — cooldown seconds after 429 (default **8.0**).  
+- `MIN_REFRESH_INTERVAL` — debounce window for `/refresh` (default **4.0**).  
+- `MIN_CENTER_DELTA_DEG` — minimal delta in degrees to treat as a new center (default **0.01**).
+
+---
+
+## Potentially breaking changes
+- **Layer control** is rebuilt on language toggle; custom third-party overlays would need to be re-registered after rebuild if added later.  
+- **Report HTML contract**: OpenAI response must start with `GRADE: X`. Server strips any code fences and wraps content, so any previous consumer expecting raw Markdown/HTML fences will differ.  
+- **Refresh behavior** is now **debounced** and **skips tiny moves**, which changes the frequency of calls to `/refresh`.
+
+---
+
+## Suggested commit bullets
+- feat(api): add `/lookup`, `/refresh`, `/clicked`, `/debug/ping` endpoints  
+- feat(search): address vs place detection; address→ZPID→property; place→geocode + close-in zoom  
+- feat(map): initial geolocation (desktop/mobile), close-in city zoom (16), address zoom (17)  
+- feat(cache): add in-memory caches for props-by-location, zpid-by-query, property-by-zpid with TTLs  
+- feat(rate): add Zillow min-interval pacing + 429 cooldown backoff  
+- feat(report): OpenAI-generated HTML report with `GRADE: X` header chip; includes features + HOA/CDD; ≥5 comps radius expansion; EN/ES via system role  
+- fix(ui/mobile): keep Leaflet zoom/layer controls below fixed header; ensure report modal buttons stay visible  
+- fix(lookup): prevent area refresh while focused on a single property; resume after popup close  
+- fix(address): render human-readable addresses (`address_to_string`) instead of `[object Object]`  
+- chore(logging): add structured console + rotating file logs under `logs/app.log`  
+- chore(i18n): localize layer labels; hook language toggle to rebuild layer control  
+- chore(style): sanitize OpenAI output; responsive report wrapper with Material Icons; spinner only for “Good deal?” flow
 
 
 **Project by cubantonystark**
