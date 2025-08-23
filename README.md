@@ -272,6 +272,19 @@ A Flask web application for interactive property search, analysis, and visualiza
 - When a cached report is not present for the selected language, the app generates a fresh report and caches it (as before).
 - Cached report *body* HTML is wrapped with the standard report shell before returning, preserving grade badge and layout.
 
+# Changelog
+
+## [Unreleased] - Property cache-first on map + 30-day TTL
+### Added
+- **Map refresh uses cached properties first:** `/refresh` → `fetch_homes` now preloads properties from the local cache (≤30 days old) that fall within the current bounds and returns them **before** merging in any Zillow results. This yields instant pins on the map from prior sessions.
+
+### Changed
+- **Property cache TTL** (`TTL_PROP_BY_ZPID`) default increased to **30 days (2,592,000 seconds)**.
+- **Zillow responses are cached per-property** as they arrive, enabling future cache-first renders.
+
+### Implementation notes
+- Cached items are filtered by the requested bounds and de-duplicated by address.
+- Each Zillow listing parsed is stored via `_store_property_by_zpid(zpid, payload)` when available.
 
 
 **Project by cubantonystark**
