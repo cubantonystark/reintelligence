@@ -1,690 +1,380 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Properties</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <!-- Google Material Icons for section headers and animated splash -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            box-sizing: border-box;
-            background: #f8f8fb;
-            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-        }
-        body {
-            min-height: 100vh;
-            width: 100vw;
-            box-sizing: border-box;
-        }
-        #header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100vw;
-            background: rgba(248,248,251,0.85);
-            box-shadow: 0 2px 16px rgba(0,0,0,0.09);
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 10001;
-            height: 54px;
-            font-size: 0.93em;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        #header-inner {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            width: 100vw;
-            max-width: 100vw;
-            margin: 0;
-            padding: 0 10px;
-            gap: 0;
-        }
-        #lookup-form {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            flex: 1 1 auto;
-            min-width: 0;
-            width: 0;
-        }
-        #lookup-input {
-            font-size: 0.95em;
-            padding: 6px 10px;
-            border-radius: 7px;
-            border: 1px solid #ccc;
-            min-width: 50px;
-            width: 100%;
-            background: #fff;
-            box-sizing: border-box;
-            height: 36px;
-        }
-        #lookup-btn {
-            padding: 6px 18px;
-            border-radius: 7px;
-            background: #0078D4;
-            color: #fff;
-            border: none;
-            font-size: 1em;
-            cursor: pointer;
-            min-width: 80px;
-            transition: background 0.2s;
-            white-space: nowrap;
-            margin-left: 6px;
-            height: 38px;
-            display: flex;
-            align-items: center;
-        }
-        #lookup-btn:hover {
-            background: #005fa3;
-        }
-        #lang-toggle {
-            flex: 0 0 auto;
-            padding: 4px 12px;
-            border-radius: 7px;
-            background: #273469;
-            color: #fff;
-            border: none;
-            font-size: 0.93em;
-            cursor: pointer;
-            min-width: 48px;
-            max-width: 72px;
-            transition: background 0.2s;
-            white-space: nowrap;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            margin-left: 36px;
-        }
-        #lang-toggle:hover {
-            background: #1a216b;
-        }
-        #map {
-            position: absolute;
-            top: 54px;
-            left: 0;
-            width: 100vw;
-            height: calc(100vh - 54px);
-            min-height: 320px;
-            z-index: 1;
-        }
-        #splashScreen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(255,255,255,0.8);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
-        }
-        #splashScreenContent {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.17);
-            padding: 14px 18px;
-            text-align: center;
-            font-size: 0.97em;
-            color: #0078D4;
-        }
-        .splash-spinner {
-            display: inline-block;
-            width: 2.1em;
-            height: 2.1em;
-            border: 0.32em solid #e0e7ef;
-            border-top: 0.32em solid #0078D4;
-            border-radius: 50%;
-            animation: splash-spin 1s linear infinite;
-            margin-bottom: 10px;
-            vertical-align: middle;
-        }
-        @keyframes splash-spin {
-            0% { transform: rotate(0deg);}
-            100% { transform: rotate(360deg);}
-        }
-        #report-overlay-bg {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(30,40,63,.20);
-            z-index: 4999;
-            display: none;
-        }
-        .gpt-popup {
-            position: fixed;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5000;
-            background: #f8f8fb;
-            border-radius: 16px;
-            box-shadow: 0 4px 32px rgba(0,0,0,0.17);
-            box-sizing: border-box;
-            padding: 10px 12px 16px 12px;
-            margin: 0;
-            overflow-y: auto;
-            overflow-x: auto;
-            font-family: 'Nunito', 'Quicksand', 'Arial', sans-serif;
-            font-size: 0.78rem;
-            max-width: 440px;
-            width: 95vw;
-            max-height: calc(100vh - 80px);
-        }
-        @media (max-width: 650px) {
-            .gpt-popup {
-                position: fixed;
-                top: 0;
-                left: 0;
-                transform: none;
-                width: 100vw;
-                max-width: 100vw;
-                min-width: 0;
-                height: 100vh;
-                max-height: 100vh;
-                padding: 11px 2vw 12px 2vw;
-                border-radius: 0;
-                font-size: 0.76rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .gpt-popup {
-                font-size: 0.74rem;
-                padding: 7px 1vw 8px 1vw;
-            }
-        }
-        .report-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            margin-bottom: 10px;
-            font-size: 0.72em;
-            overflow-x: auto;
-            display: block;
-        }
-        .report-table th, .report-table td {
-            padding: 3px 5px;
-            text-align: left;
-        }
-        .report-table th {
-            background: #e8eaf6;
-            color: #273469;
-        }
-        .report-table tr:nth-child(even) {
-            background: #f7f7fc;
-        }
-        .report-table tr:nth-child(odd) {
-            background: #fff;
-        }
-        .gpt-popup-btns {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            width: 100%;
-            margin-bottom: 5px;
-        }
-        .gpt-popup-close-btn, .gpt-popup-print-btn {
-            background: #273469;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 5px 12px;
-            cursor: pointer;
-            font-size: 0.74em;
-            min-width: 54px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-        }
-        .gpt-popup-print-btn {
-            background: #0078D4;
-        }
-        .gpt-popup-close-btn:active, .gpt-popup-print-btn:active {
-            background: #1a216b;
-        }
-        /* Responsive header bar */
-        @media (max-width: 650px) {
-            #header-inner {
-                flex-direction: column;
-                align-items: stretch;
-                justify-content: flex-start;
-                gap: 8px;
-                padding: 0 2vw;
-            }
-            #lookup-form, #lang-toggle {
-                width: 100%;
-                min-width: 0;
-                margin-left: 0 !important;
-            }
-            #lang-toggle {
-                margin-top: 6px;
-            }
-        }
-        @media (max-width: 480px) {
-            #header-inner {
-                padding: 0 1vw;
-            }
-            #lookup-input, #lookup-btn, #lang-toggle {
-                font-size: 0.90em;
-                min-width: 44px;
-            }
-            #lookup-btn {
-                height: 32px;
-                min-width: 68px;
-                padding: 5px 13px;
-            }
-            #lang-toggle {
-                height: 26px;
-                padding: 3px 7px;
-                min-width: 35px;
-                max-width: 50px;
-                font-size: 0.87em;
-            }
-        }
-    </style>
+  <title>Properties</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    html,body{margin:0;padding:0;height:100%;width:100%;box-sizing:border-box;background:#f8f8fb;font-family:Inter,Arial,system-ui,sans-serif;}
+    #header-bar{display:flex;align-items:center;justify-content:center;width:100vw;background:rgba(248,248,251,.92);backdrop-filter:saturate(1.2) blur(6px);box-shadow:0 2px 16px rgba(0,0,0,.08);position:fixed;top:0;left:0;z-index:10001;height:56px;font-size:.95em;padding:0 10px}
+    #header-inner{display:flex;flex-direction:row;align-items:center;justify-content:center;width:100%;gap:8px;max-width:1200px}
+    #lookup-form{display:flex;align-items:center;gap:6px;flex:1}
+    #lookup-input{font-size:.98em;padding:8px 10px;border-radius:9px;border:1px solid #cdd6e1;min-width:60px;width:100%;background:#fff;height:38px}
+    #lookup-btn{padding:8px 16px;border-radius:9px;background:#0078D4;color:#fff;border:none;font-size:.96em;cursor:pointer;min-width:86px;transition:background .2s;height:38px;display:flex;align-items:center;gap:6px}
+    #lookup-btn:hover{background:#005fa3}
+    #lang-toggle{padding:6px 12px;border-radius:9px;background:#273469;color:#fff;border:none;font-size:.93em;cursor:pointer;min-width:56px;transition:background .2s;height:34px;display:flex;align-items:center}
+    #map{position:absolute;top:56px;left:0;width:100vw;height:calc(100vh - 56px);min-height:320px;z-index:1}
+    /* Spinner only for "Good deal?" */
+    #splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.85);z-index:19999;display:none;align-items:center;justify-content:center;padding:12px}
+    #splashScreenContent{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.17);padding:16px 18px;text-align:center;font-size:.97em;color:#0078D4;max-width:320px}
+    .splash-spinner{display:inline-block;width:2.1em;height:2.1em;border:.32em solid #e0e7ef;border-top:.32em solid #0078D4;border-radius:50%;animation:splash-spin 1s linear infinite;margin-bottom:10px;vertical-align:middle}
+    @keyframes splash-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    #report-overlay-bg{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,40,63,.25);z-index:19998;display:none}
+    .gpt-popup{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:20000;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.18);box-sizing:border-box;padding:10px 12px 16px;margin:0;overflow-y:auto;overflow-x:hidden;font-family:Inter,Arial,sans-serif;font-size:.92rem;max-width:920px;width:96vw;max-height:calc(100vh - 90px)}
+    .gpt-popup-btns{position:sticky;top:0;z-index:1;background:linear-gradient(#fff,#fff 85%,transparent);display:flex;gap:10px;justify-content:flex-end;margin-bottom:6px;padding-top:6px}
+    .gpt-popup-close-btn,.gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.86em;min-width:64px;height:32px;display:flex;align-items:center;gap:6px}
+    .gpt-popup-print-btn{background:#0078D4}
+    @media (max-width:650px){
+      .gpt-popup{ top:56px; left:0; transform:none; width:100vw; max-width:100vw; height:calc(100vh - 56px); max-height:calc(100vh - 56px); border-radius:0 }
+      .gpt-popup-btns{padding:8px}
+    }
+    .good-deal-btn{padding:6px 10px;border-radius:8px;border:1px solid #cdd6e1;background:#fff;cursor:pointer}
+  </style>
 </head>
 <body>
-    <div id="header-bar">
-        <div id="header-inner">
-            <form id="lookup-form" onsubmit="propertyLookup(event)">
-                <input id="lookup-input" type="text" placeholder="Lookup address or city..." autocomplete="off" />
-                <button id="lookup-btn" type="submit">Search</button>
-            </form>
-            <button id="lang-toggle">ES</button>
-        </div>
+  <div id="header-bar">
+    <div id="header-inner">
+      <form id="lookup-form" onsubmit="propertyLookup(event)">
+        <input id="lookup-input" type="text" placeholder="Lookup address or city..." autocomplete="off"/>
+        <button id="lookup-btn" type="submit"><span class="material-icons" style="font-size:18px">search</span><span id="lookup-btn-text">Search</span></button>
+      </form>
+      <button id="lang-toggle" onclick="toggleLanguage()">ES</button>
     </div>
-    <div id="map"></div>
-    <div id="splashScreen">
-        <div id="splashScreenContent">
-            <span class="splash-spinner"></span><br>
-            <span id="splash-text">Analyzing...</span>
-        </div>
+  </div>
+  <div id="map"></div>
+
+  <!-- Spinner kept ONLY for “Good deal?” flow -->
+  <div id="splashScreen">
+    <div id="splashScreenContent">
+      <span class="splash-spinner"></span><br>
+      <span id="splash-text">Analyzing...</span>
     </div>
-    <div id="report-overlay-bg"></div>
-    <script>
-        var currentLanguage = "en";
-        var UI_TEXT = {
-            en: {
-                search_placeholder: "Lookup address or city...",
-                search_button: "Search",
-                splash: "Analyzing...",
-                print: "🖨️ Print",
-                good_deal: "Good deal?",
-                not_found: "No properties found.",
-                error: "Search error.",
-                error_report: "Error generating report. Please try again.",
-                price: "Price",
-                beds: "Beds",
-                baths: "Baths",
-                view_listing: "View Listing",
-                close: "Close"
-            },
-            es: {
-                search_placeholder: "Buscar dirección o ciudad...",
-                search_button: "Buscar",
-                splash: "Analizando...",
-                print: "🖨️ Imprimir",
-                good_deal: "¿Buena oferta?",
-                not_found: "No se encontraron propiedades.",
-                error: "Error en la búsqueda.",
-                error_report: "Error generando el informe. Intenta de nuevo.",
-                price: "Precio",
-                beds: "Habitaciones",
-                baths: "Baños",
-                view_listing: "Ver propiedad",
-                close: "Cerrar"
-            }
+  </div>
+  <div id="report-overlay-bg"></div>
+
+  <script>
+    // --------- i18n (UI + Layers) ----------
+    var currentLanguage = "en";
+    const I18N = {
+      en: {
+        placeholder: "Lookup address or city...",
+        search: "Search",
+        analyzing: "Analyzing...",
+        goodDeal: "Good deal?",
+        print: "Print",
+        close: "Close",
+        price: "Price",
+        beds: "Beds",
+        baths: "Baths",
+        viewListing: "View Listing",
+        notFound: "Sorry, we couldn't find a valid property for that input.",
+        searchError: "Search error.",
+        reportError: "Error generating report.",
+        layerStreets: "Streets",
+        layerSatellite: "Satellite"
+      },
+      es: {
+        placeholder: "Buscar dirección o ciudad...",
+        search: "Buscar",
+        analyzing: "Analizando...",
+        goodDeal: "¿Buena oferta?",
+        print: "Imprimir",
+        close: "Cerrar",
+        price: "Precio",
+        beds: "Recámaras",
+        baths: "Baños",
+        viewListing: "Ver en Zillow",
+        notFound: "No pudimos encontrar una propiedad válida para esa entrada.",
+        searchError: "Error en la búsqueda.",
+        reportError: "Error generando el informe.",
+        layerStreets: "Calles",
+        layerSatellite: "Satélite"
+      }
+    };
+
+    function applyLang(renderMarkersToo = false){
+      const t = I18N[currentLanguage];
+      const $ = (id)=>document.getElementById(id);
+      $('lookup-input').placeholder = t.placeholder;
+      $('lookup-btn-text').innerText = t.search;
+      $('splash-text').innerText = t.analyzing;
+      const printBtn = document.querySelector('.gpt-popup-print-btn'); if (printBtn) printBtn.innerText = "🖨️ " + t.print;
+      const closeBtn = document.querySelector('.gpt-popup-close-btn'); if (closeBtn) closeBtn.innerText = t.close;
+
+      // Rebuild layer control with localized labels
+      relabelLayers();
+
+      if (renderMarkersToo) {
+        updateHouseIcons(true);
+      } else {
+        document.querySelectorAll('button[data-good-deal]').forEach(btn => btn.innerText = t.goodDeal);
+      }
+    }
+
+    function toggleLanguage(){
+      currentLanguage = currentLanguage === "en" ? "es" : "en";
+      document.getElementById('lang-toggle').innerText = currentLanguage === "en" ? "ES" : "EN";
+      applyLang(true);
+    }
+
+    // --------- Map + Layers + Markers ----------
+    window._propertyFocus = false;
+    var markers = [];
+    var markerData = [];
+    var refreshTimeout = null;
+    var REFRESH_DELAY_MS = 1800;
+
+    var satelliteLayer = null;
+    var streetsLayer = null;
+    var layersControl = null;
+
+    function makeHouseIcon(){
+      return L.divIcon({
+        html:"<span style='font-size:2em;'>&#127968;</span>",
+        iconSize:[32,32], iconAnchor:[16,32], className:"leaflet-house-icon"
+      });
+    }
+
+    function getLeafletMap(){
+      if (window._mobile_map_ref) return window._mobile_map_ref;
+      for (var k in window){
+        if(k.startsWith('map_') && window[k] && typeof window[k]==='object' && typeof window[k].getCenter==='function') return window[k];
+      }
+      return null;
+    }
+
+    function createLeafletMap(lat,lng,zoom){
+      satelliteLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution:'Tiles © Esri', maxZoom:19 }
+      );
+      streetsLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { attribution:'© OpenStreetMap', maxZoom:19 }
+      );
+
+      var map = L.map('map', { center:[lat,lng], zoom:zoom, layers:[streetsLayer] });
+      window._mobile_map_ref = map;
+
+      buildLayersControl();
+
+      map.on('popupclose', function(){
+        if (window._propertyFocus) {
+          window._propertyFocus = false;
+          if (typeof immediateRefresh === 'function') immediateRefresh();
+        }
+      });
+      return map;
+    }
+
+    function buildLayersControl(){
+      var map = getLeafletMap();
+      if (!map) return;
+      if (layersControl) {
+        try { map.removeControl(layersControl); } catch(e){}
+      }
+      const t = I18N[currentLanguage];
+      const baseLayers = {};
+      baseLayers[t.layerSatellite] = satelliteLayer;
+      baseLayers[t.layerStreets] = streetsLayer;
+      layersControl = L.control.layers(baseLayers, {}).addTo(map);
+    }
+
+    function relabelLayers(){
+      var map = getLeafletMap();
+      if (!map) return;
+      const active = map.hasLayer(satelliteLayer) ? 'sat' : 'str';
+      buildLayersControl();
+      if (active === 'sat') {
+        if (!map.hasLayer(satelliteLayer)) {
+          map.addLayer(satelliteLayer);
+          if (map.hasLayer(streetsLayer)) map.removeLayer(streetsLayer);
+        }
+      } else {
+        if (!map.hasLayer(streetsLayer)) {
+          map.addLayer(streetsLayer);
+          if (map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer);
+        }
+      }
+    }
+
+    function htmlEscape(str){
+      return (''+str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function updateHouseIcons(keepPopup=false){
+      const t = I18N[currentLanguage];
+      var map = getLeafletMap();
+      let openLatLng = null;
+      if (keepPopup && map && map._popup && map._popup._latlng) {
+        openLatLng = map._popup._latlng;
+      }
+      markers.forEach(m => map.removeLayer(m)); markers = [];
+      markerData.forEach(function(home){
+        var icon = makeHouseIcon();
+        var priceLabel = typeof home.price === 'number' ? home.price.toLocaleString() : home.price;
+        const addr = htmlEscape(home.address);
+        const detailsUrl = home.detail_url ? `https://www.zillow.com${home.detail_url}` : null;
+        var html = `
+          <div style="max-width:260px">
+            <span style='font-size:1.5em;'>&#127968;</span> <b>${addr}</b><br>
+            ${priceLabel && priceLabel!=='No price' ? `${t.price}: $${priceLabel}<br>` : ``}
+            ${t.beds}: ${home.bedrooms} | ${t.baths}: ${home.bathrooms}<br>
+            ${detailsUrl ? `<a href='${detailsUrl}' target='_blank'>${t.viewListing}</a><br>` : ``}
+            ${home.img_url ? `<img src='${home.img_url}' width='150' style='max-width:90vw;border-radius:8px;margin-top:6px;'>` : ``}
+            <div style="margin-top:8px">
+              <button data-good-deal class="good-deal-btn" onclick="sendClickedInfo('${addr}', '${priceLabel}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}', ${home.lat}, ${home.lon})">${t.goodDeal}</button>
+            </div>
+          </div>
+        `;
+        var marker = L.marker([home.lat, home.lon], {icon}); marker.addTo(map).bindPopup(html);
+        markers.push(marker);
+      });
+      if (keepPopup && openLatLng){
+        const found = markers.find(m => m.getLatLng() && m.getLatLng().lat===openLatLng.lat && m.getLatLng().lng===openLatLng.lng);
+        if (found) found.openPopup();
+      }
+    }
+
+    function setupMapRefresh(retry=0){
+      var map = getLeafletMap();
+      if(!map){
+        if(retry<20){ setTimeout(()=>setupMapRefresh(retry+1),400); }
+        else { alert("Leaflet Map not found!"); }
+        return;
+      }
+      function clearMarkers(){ markers.forEach(m => map.removeLayer(m)); markers = []; }
+
+      function refreshHomes(){
+        if (window._propertyFocus) return;
+        var b = map.getBounds(), c = map.getCenter();
+        var payload = {
+          sw_lat:b.getSouthWest().lat, sw_lng:b.getSouthWest().lng,
+          ne_lat:b.getNorthEast().lat, ne_lng:b.getNorthEast().lng,
+          center_lat:c.lat, center_lng:c.lng,
+          zoom: map.getZoom()
         };
-
-        function updateUIText() {
-            document.getElementById('lookup-input').placeholder = UI_TEXT[currentLanguage].search_placeholder;
-            document.getElementById('lookup-btn').innerText = UI_TEXT[currentLanguage].search_button;
-            document.getElementById('splash-text').innerText = UI_TEXT[currentLanguage].splash;
-            document.getElementById('lang-toggle').innerText = currentLanguage === "en" ? "ES" : "EN";
-            if (typeof updateHouseIcons === "function") updateHouseIcons();
-        }
-
-        function toggleLanguage() {
-            currentLanguage = currentLanguage === "en" ? "es" : "en";
-            updateUIText();
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            updateUIText();
-            document.getElementById('lang-toggle').onclick = toggleLanguage;
-            if (isMobileDevice()) {
-                mobileInit();
-            } else {
-                createLeafletMap(25.7617, -80.1918, 12);
-                setupMapRefresh();
-            }
+        axios.post('/refresh', payload).then(function(r){
+          clearMarkers();
+          markerData = r.data || [];
+          updateHouseIcons();
+          applyLang(); // ensure current language on UI bits
+        }).catch(function(err){
+          console.error("Refresh error", err);
         });
+      }
 
-        var markers = [];
-        var markerData = [];
-        var refreshTimeout = null;
-        var REFRESH_DELAY_MS = 2200;
-        var _tileLayers = {};
-        var _activeLayer = "streets";
+      function immediateRefresh(){
+        var b = map.getBounds(), c = map.getCenter();
+        var payload = {
+          sw_lat:b.getSouthWest().lat, sw_lng:b.getSouthWest().lng,
+          ne_lat:b.getNorthEast().lat, ne_lng:b.getNorthEast().lng,
+          center_lat:c.lat, center_lng:c.lng,
+          zoom: map.getZoom()
+        };
+        axios.post('/refresh', payload).then(function(r){
+          markers.forEach(m => map.removeLayer(m)); markers=[];
+          markerData = r.data || [];
+          updateHouseIcons();
+          applyLang();
+        }).catch(function(err){
+          console.error("Refresh error", err);
+        });
+      }
+      window.immediateRefresh = immediateRefresh;
 
-        function makeHouseIcon(colorClass) {
-            return L.divIcon({
-                html: "<span class='house-" + colorClass + "' style='font-size:2em;'>&#127968;</span>",
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                className: "leaflet-house-icon"
-            });
-        }
+      function delayed(){ if(refreshTimeout) clearTimeout(refreshTimeout); refreshTimeout = setTimeout(refreshHomes, REFRESH_DELAY_MS); }
+      map.on('moveend', delayed);
+      map.on('zoomend', delayed);
+      refreshHomes();
+    }
 
-        function getHouseIconForLayer() {
-            return _activeLayer === "satellite"
-                ? makeHouseIcon("red")
-                : makeHouseIcon("blue");
-        }
+    function propertyLookup(e){
+      e.preventDefault();
+      var val = document.getElementById('lookup-input').value.trim();
+      if (!val) return;
+      axios.post('/lookup', { q: val })
+        .then(function(res){
+          var data = res.data || {};
+          var map = getLeafletMap();
+          if (data.mode === 'property' && data.home) {
+            window._propertyFocus = true;
+            map.setView([data.center.lat, data.center.lng], 17); // address-level
+            markerData = [data.home];
+            updateHouseIcons();
+            applyLang();
+            if (markers[0]) markers[0].openPopup();
+          } else if (data.mode === 'place' && data.center) {
+            window._propertyFocus = false;
+            map.setView([data.center.lat, data.center.lng], data.zoom || 16); // city-level close
+            setTimeout(function(){ if (typeof immediateRefresh === 'function') immediateRefresh(); }, 50);
+          } else {
+            alert(I18N[currentLanguage].notFound);
+          }
+        })
+        .catch(function(err){
+          const msg = err?.response?.data?.message || I18N[currentLanguage].searchError;
+          alert(msg);
+        });
+    }
 
-        function createLeafletMap(lat, lng, zoom) {
-            var satellite = L.tileLayer(
-                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-                maxZoom: 19
-            });
-            var streets = L.tileLayer(
-                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors',
-                maxZoom: 19
-            });
-            _tileLayers["satellite"] = satellite;
-            _tileLayers["streets"] = streets;
+    // Spinner helpers (ONLY for “Good deal?”)
+    function showSplash(){ document.getElementById('splashScreen').style.display='flex'; }
+    function hideSplash(){ document.getElementById('splashScreen').style.display='none'; }
 
-            var map = L.map('map', {
-                center: [lat, lng],
-                zoom: zoom,
-                layers: [streets]
-            });
-            var baseLayers = {
-                "Satellite": satellite,
-                "Streets": streets
-            };
-            var layerControl = L.control.layers(baseLayers).addTo(map);
+    // GPT analysis popup
+    function sendClickedInfo(address, price, bedrooms, bathrooms, last_sold_amount, lat, lon) {
+      showSplash();
+      axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage, lat, lon })
+        .then(function(response){
+          hideSplash();
+          var html = response.data.report || "<div>Error generating report.</div>";
+          var overlayBg = document.getElementById("report-overlay-bg");
+          overlayBg.style.display = "block";
+          var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove();
+          var popupDiv = document.createElement("div"); popupDiv.className="gpt-popup"; popupDiv.id="floating-gpt-popup";
 
-            map.on('baselayerchange', function(e) {
-                if (e.name === "Satellite") {
-                    _activeLayer = "satellite";
-                } else {
-                    _activeLayer = "streets";
-                }
-                updateHouseIcons();
-            });
+          var btnBar = document.createElement("div"); btnBar.className="gpt-popup-btns";
+          var closeBtn = document.createElement("button"); closeBtn.className="gpt-popup-close-btn"; closeBtn.innerText=I18N[currentLanguage].close;
+          closeBtn.onclick=function(){ overlayBg.style.display = "none"; popupDiv.remove(); };
+          var printBtn = document.createElement("button"); printBtn.className="gpt-popup-print-btn"; printBtn.innerText="🖨️ " + I18N[currentLanguage].print;
+          printBtn.onclick=function(){ var w=window.open('','','width=900,height=700'); w.document.write(html); w.document.close(); w.focus(); setTimeout(function(){ w.print(); }, 250); };
 
-            window._mobile_map_ref = map;
-            return map;
-        }
+          btnBar.appendChild(printBtn); btnBar.appendChild(closeBtn);
+          popupDiv.appendChild(btnBar);
 
-        function updateHouseIcons() {
-            var map = getLeafletMap();
-            markers.forEach(function(marker) { map.removeLayer(marker); });
-            markers = [];
-            markerData.forEach(function(home) {
-                var icon = getHouseIconForLayer();
-                var popupHtml = `<span style='font-size:1.5em;'>&#127968;</span> <b>${home.address}</b><br>
-                    ${UI_TEXT[currentLanguage].price}: $${home.price}<br>
-                    ${UI_TEXT[currentLanguage].beds}: ${home.bedrooms} | ${UI_TEXT[currentLanguage].baths}: ${home.bathrooms}<br>
-                    <a href='https://www.zillow.com${home.detail_url}' target='_blank'>${UI_TEXT[currentLanguage].view_listing}</a><br>
-                    <img src='${home.img_url}' width='150' style='max-width:90vw;'><br>
-                    <button onclick="sendClickedInfo('${home.address}', '${home.price}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}')">${UI_TEXT[currentLanguage].good_deal}</button>`;
-                var marker = L.marker([home.lat, home.lon], {icon: icon}).addTo(map);
-                marker.bindPopup(popupHtml);
-                markers.push(marker);
-            });
-        }
+          var content=document.createElement("div"); content.innerHTML=html; popupDiv.appendChild(content);
+          document.body.appendChild(popupDiv);
 
-        function getLeafletMap() {
-            if (window._mobile_map_ref) return window._mobile_map_ref;
-            for (var key in window) {
-                if (
-                    key.startsWith('map_') &&
-                    window[key] &&
-                    typeof window[key] === 'object' &&
-                    typeof window[key].getCenter === 'function' &&
-                    typeof window[key].on === 'function'
-                ) {
-                    return window[key];
-                }
-            }
-            return null;
-        }
+          overlayBg.onclick=function(){ overlayBg.style.display="none"; var floating=document.getElementById("floating-gpt-popup"); if(floating) floating.remove(); };
+        })
+        .catch(function(){
+          hideSplash();
+          alert(I18N[currentLanguage].reportError);
+        });
+    }
 
-        function setupMapRefresh(retryCount = 0) {
-            var map = getLeafletMap();
-            if (!map) {
-                if (retryCount < 20) {
-                    setTimeout(function() { setupMapRefresh(retryCount + 1); }, 500);
-                } else {
-                    alert("Leaflet Map not found!");
-                }
-                return;
-            }
-            function clearMarkers() {
-                markers.forEach(function(marker) { map.removeLayer(marker); });
-                markers = [];
-            }
-            function refreshHomes() {
-                var bounds = map.getBounds();
-                var center = map.getCenter();
-                var payload = {
-                    sw_lat: bounds.getSouthWest().lat,
-                    sw_lng: bounds.getSouthWest().lng,
-                    ne_lat: bounds.getNorthEast().lat,
-                    ne_lng: bounds.getNorthEast().lng,
-                    center_lat: center.lat,
-                    center_lng: center.lng
-                };
-                axios.post('/refresh', payload)
-                    .then(function(response) {
-                        clearMarkers();
-                        markerData = response.data || [];
-                        updateHouseIcons();
-                    });
-            }
-            function delayedRefresh() {
-                if (refreshTimeout) {
-                    clearTimeout(refreshTimeout);
-                }
-                refreshTimeout = setTimeout(refreshHomes, REFRESH_DELAY_MS);
-            }
-            map.on('moveend', delayedRefresh);
-            map.on('zoomend', delayedRefresh);
-            refreshHomes();
-        }
-
-        function showSplash() {
-            document.getElementById('splashScreen').style.display = 'flex';
-            // Restart animation
-            var spinner = document.querySelector('.splash-spinner');
-            if (spinner) {
-                spinner.style.animation = 'none';
-                spinner.offsetHeight; // force reflow
-                spinner.style.animation = null;
-            }
-        }
-        function hideSplash() {
-            document.getElementById('splashScreen').style.display = 'none';
-        }
-
-        function printPopupReport(popupDiv, address) {
-            var printWindow = window.open('', '', 'width=800,height=600');
-            var clone = popupDiv.cloneNode(true);
-            var printLinks = clone.getElementsByClassName('print-link');
-            if (printLinks.length > 0) printLinks[0].parentNode.removeChild(printLinks[0]);
-            printWindow.document.write('<html><head><title>' + (address || 'Investment Report') + '</title>');
-            printWindow.document.write('<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">');
-            printWindow.document.write('<style>body{font-family:Nunito,Quicksand,Arial,sans-serif;padding:2vw;background:#f8f8fb;} .gpt-popup{max-width:900px;width:100%;margin:0 auto;background:#f8f8fb;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.17);padding:12px 18px;box-sizing:border-box;font-size:0.80rem;} .report-table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:10px;font-size:0.75em;overflow-x:auto;display:block;} .report-table th, .report-table td{padding:3px 5px;text-align:left;} .report-table th{background:#e8eaf6;color:#273469;} .report-table tr:nth-child(even){background:#f7f7fc;} .report-table tr:nth-child(odd){background:#fff;} .gpt-popup-btns{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;width:100%;margin-bottom:5px;} .gpt-popup-close-btn, .gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:0.78em;min-width:54px;height:28px;display:flex;align-items:center;} .gpt-popup-print-btn{background:#0078D4;} .gpt-popup-close-btn:active, .gpt-popup-print-btn:active{background:#1a216b;}@media(max-width:650px){.gpt-popup{width:98vw;padding:7px 2vw 10px 2vw;font-size:0.78rem;}.report-table th, .report-table td{padding:3px 4px;font-size:0.75em;}}@media(max-width:480px){.gpt-popup{width:99vw;padding:5px 1vw 8px 1vw;font-size:0.75rem;}}</style>');
-            printWindow.document.write('</head><body>');
-            printWindow.document.write(clone.innerHTML);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.focus();
-            setTimeout(function(){ printWindow.print(); }, 250);
-        }
-
-        function sendClickedInfo(address, price, bedrooms, bathrooms, last_sold_amount) {
-            showSplash();
-            if (isMobileDevice()) {
-                axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage })
-                    .then(function(response) {
-                        hideSplash();
-                        var html = response.data.report;
-                        html = html.replace(/<div class="fine-print[\s\S]*?<\/div>/gi, "");
-                        html = html.replace(/<div class="fine-print-wrapper[\s\S]*?<\/div>/gi, "");
-                        var mobileWin = window.open("", "_blank");
-                        mobileWin.document.write(`
-                            <html>
-                            <head>
-                                <title>${address}</title>
-                                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-                                <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-                                <style>
-                                    body{background:#f8f8fb;margin:0;padding:0;font-family:'Nunito','Quicksand',Arial,sans-serif;}
-                                    .gpt-popup{width:100vw;max-width:100vw;margin:0;background:#f8f8fb;box-sizing:border-box;overflow-y:auto;overflow-x:auto;font-size:0.75rem;padding:7px 0 7px 0;}
-                                    .gpt-popup-btns{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;width:100%;margin-bottom:5px;}
-                                    .gpt-popup-close-btn, .gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:0.74em;min-width:54px;height:28px;display:flex;align-items:center;}
-                                    .gpt-popup-print-btn{background:#0078D4;}
-                                    .gpt-popup-close-btn:active, .gpt-popup-print-btn:active{background:#1a216b;}
-                                    .report-table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:10px;font-size:0.72em;overflow-x:auto;display:block;}
-                                    .report-table th, .report-table td{padding:3px 5px;text-align:left;}
-                                    .report-table th{background:#e8eaf6;color:#273469;}
-                                    .report-table tr:nth-child(even){background:#f7f7fc;}
-                                    .report-table tr:nth-child(odd){background:#fff;}
-                                </style>
-                            </head>
-                            <body>
-                                <div class="gpt-popup">
-                                    <div class="gpt-popup-btns">
-                                        <button class="gpt-popup-close-btn" onclick="window.close()">${UI_TEXT[currentLanguage].close}</button>
-                                        <button class="gpt-popup-print-btn" onclick="window.print()">${UI_TEXT[currentLanguage].print}</button>
-                                    </div>
-                                    <div>${html}</div>
-                                </div>
-                            </body>
-                            </html>
-                        `);
-                        mobileWin.document.close();
-                    }).catch(function() {
-                        hideSplash();
-                        alert(UI_TEXT[currentLanguage].error_report);
-                    });
-            } else {
-                axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage })
-                    .then(function(response) {
-                        hideSplash();
-                        var html = response.data.report;
-                        html = html.replace(/<div class="fine-print[\s\S]*?<\/div>/gi, "");
-                        html = html.replace(/<div class="fine-print-wrapper[\s\S]*?<\/div>/gi, "");
-                        var overlayBg = document.getElementById("report-overlay-bg");
-                        overlayBg.style.display = "block";
-                        var oldPopup = document.getElementById("floating-gpt-popup");
-                        if (oldPopup) oldPopup.remove();
-                        var popupDiv = document.createElement("div");
-                        popupDiv.className = "gpt-popup";
-                        popupDiv.id = "floating-gpt-popup";
-                        var btnBar = document.createElement("div");
-                        btnBar.className = "gpt-popup-btns";
-                        var closeBtn = document.createElement("button");
-                        closeBtn.className = "gpt-popup-close-btn";
-                        closeBtn.innerText = UI_TEXT[currentLanguage].close;
-                        closeBtn.onclick = function() {
-                            overlayBg.style.display = "none";
-                            popupDiv.remove();
-                        };
-                        var printBtn = document.createElement("button");
-                        printBtn.className = "gpt-popup-print-btn";
-                        printBtn.innerText = UI_TEXT[currentLanguage].print;
-                        printBtn.onclick = function(e) {
-                            e.preventDefault();
-                            printPopupReport(document.getElementById('floating-gpt-popup'), address);
-                        };
-                        btnBar.appendChild(printBtn);
-                        btnBar.appendChild(closeBtn);
-                        popupDiv.appendChild(btnBar);
-                        var reportContainer = document.createElement("div");
-                        reportContainer.innerHTML = html;
-                        popupDiv.appendChild(reportContainer);
-                        document.body.appendChild(popupDiv);
-                        overlayBg.onclick = function() {
-                            overlayBg.style.display = "none";
-                            var floating = document.getElementById("floating-gpt-popup");
-                            if (floating) floating.remove();
-                        };
-                    }).catch(function() {
-                        hideSplash();
-                        alert(UI_TEXT[currentLanguage].error_report);
-                    });
-            }
-        }
-
-        function propertyLookup(e) {
-            e.preventDefault();
-            var val = document.getElementById('lookup-input').value.trim();
-            if (!val) return;
-            axios.post('/refresh', { center_lat: null, center_lng: null, location: val })
-                .then(function(response) {
-                    var homes = response.data || [];
-                    if (homes.length > 0) {
-                        var map = getLeafletMap();
-                        var first = homes[0];
-                        map.setView([first.lat, first.lon], 15);
-                        markerData = homes;
-                        updateHouseIcons();
-                    } else {
-                        alert(UI_TEXT[currentLanguage].not_found);
-                    }
-                }).catch(function() {
-                    alert(UI_TEXT[currentLanguage].error);
-                });
-        }
-
-        function mobileInit() {
-            if (navigator.geolocation) {
-                showSplash();
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    hideSplash();
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
-                    var zoom = 14;
-                    createLeafletMap(lat, lng, zoom);
-                    setupMapRefresh();
-                }, function(error) {
-                    hideSplash();
-                    createLeafletMap(25.7617, -80.1918, 12);
-                    setupMapRefresh();
-                }, { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 });
-            } else {
-                createLeafletMap(25.7617, -80.1918, 12);
-                setupMapRefresh();
-            }
-        }
-
-        function isMobileDevice() {
-            return (
-                typeof window.orientation !== "undefined"
-                || navigator.userAgent.indexOf('IEMobile') !== -1
-                || /android|ipad|iphone|ipod/i.test(navigator.userAgent)
-            );
-        }
-    </script>
+    // Geolocation (desktop + mobile) on initial load
+    (function init(){
+      applyLang();
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(pos){
+          var lat = pos.coords.latitude, lng = pos.coords.longitude;
+          createLeafletMap(lat, lng, 15);
+          setupMapRefresh();
+        }, function(){
+          createLeafletMap(27.9506, -82.4572, 12); // Tampa fallback
+          setupMapRefresh();
+        }, { enableHighAccuracy:true, timeout:8000, maximumAge:30000 });
+      } else {
+        createLeafletMap(27.9506, -82.4572, 12);
+        setupMapRefresh();
+      }
+    })();
+  </script>
 </body>
 </html>
