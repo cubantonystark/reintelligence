@@ -286,5 +286,16 @@ A Flask web application for interactive property search, analysis, and visualiza
 - Cached items are filtered by the requested bounds and de-duplicated by address.
 - Each Zillow listing parsed is stored via `_store_property_by_zpid(zpid, payload)` when available.
 
+# Changelog
+
+## [Unreleased] - Disk-backed property cache + cache admin endpoints
+### Added
+- **Disk-backed property cache**: property payloads are now persisted under `CACHE_DIR/property_by_zpid` (default `./cache/property_by_zpid`) as JSON files. Fresh entries (≤ `TTL_PROP_BY_ZPID`) are loaded from disk on cache miss.
+- **/cache/stats (GET)**: returns counts for in-memory caches and number of on-disk property cache files.
+- **/cache/clear (POST)**: clears the property cache (disk + memory) by default; pass `{ "what": "all" }` to clear all caches.
+
+### Changed
+- `_store_property_by_zpid` writes to disk in addition to in-memory cache.
+- `_cached_property_by_zpid` falls back to disk if not in memory, and hydrates memory on hit.
 
 **Project by cubantonystark**
