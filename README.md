@@ -257,5 +257,21 @@ A Flask web application for interactive property search, analysis, and visualiza
 - chore(i18n): localize layer labels; hook language toggle to rebuild layer control  
 - chore(style): sanitize OpenAI output; responsive report wrapper with Material Icons; spinner only for “Good deal?” flow
 
+  
+# Changelog
+
+## [Unreleased] - Cache-first report + Spanish units (ft²)
+### Added
+- **Cache-first serve** in `/clicked`: if a fresh cached report exists for the given *address* **and** selected *language*, it is returned immediately for printing.
+
+### Changed
+- Spanish report prompt now uses **square feet** nomenclature:
+  - Replaced: `Precio por m²` ⟶ `Precio por pie² (ft²)` across the Spanish generation prompt.
+
+### Notes
+- When a cached report is not present for the selected language, the app generates a fresh report and caches it (as before).
+- Cached report *body* HTML is wrapped with the standard report shell before returning, preserving grade badge and layout.
+
+
 
 **Project by cubantonystark**
