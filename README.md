@@ -297,5 +297,18 @@ A Flask web application for interactive property search, analysis, and visualiza
 ### Changed
 - `_store_property_by_zpid` writes to disk in addition to in-memory cache.
 - `_cached_property_by_zpid` falls back to disk if not in memory, and hydrates memory on hit.
+- ## [Unreleased] - Report header + size enrichment
+
+### Added
+- Report header now shows **Asking Price** (EN) / **Precio de lista** (ES) beneath the address.
+- Enrichment helper to fill `[PROPERTY_SIZE]` and `[PRICE_PER_SQFT]` from Zillow details prior to prompt submission.
+
+### Changed
+- Spanish prompt label: `Precio por m²` → `Precio por pie² (ft²)`.
+- `zillow_property_details_by_zpid` now extracts `living_sqft`, `lot_area_sqft`, and `lot_unit` and normalizes units.
+
+### Fixed
+- Reports that previously showed `N/A` due to missing lot/size are now populated whenever Zillow provides details.
+
 
 **Project by cubantonystark**
