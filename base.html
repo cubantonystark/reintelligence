@@ -202,7 +202,15 @@
       }
     }
 
-    function htmlEscape(str){
+    function sanitizeHtml(txt){
+  if(!txt) return "";
+  // Remove Markdown code fences like ``` or ```html anywhere in the text
+  txt = txt.replace(/(^|\n)\s*```[a-zA-Z]*\s*\n?/g, '$1');
+  txt = txt.replace(/\n?\s*```\s*(\n|$)/g, '\n');
+  return txt;
+}
+
+function htmlEscape(str){
       return (''+str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
@@ -332,7 +340,8 @@
       axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage, lat, lon })
         .then(function(response){
           hideSplash();
-          var html = response.data.report || "<div>Error generating report.</div>";
+          var raw = response.data.html || response.data.report || "<div>Error generating report.</div>";
+          var html = sanitizeHtml(raw);
           var overlayBg = document.getElementById("report-overlay-bg");
           overlayBg.style.display = "block";
           var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove();
