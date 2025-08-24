@@ -6,8 +6,98 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js">function refreshCounterBar(){
+  try{
+    fetch('/counter').then(r=>r.json()).then(j=>{
+      var bar = document.getElementById('quota-bar');
+      if(!j || typeof j.count==='undefined'){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); return; }
+      var max = Number(j.max||5), cnt = Math.max(0, Number(j.count||0));
+      document.getElementById('quota-count').innerText = cnt + '/' + max;
+      bar.style.display='flex';
+      document.documentElement.style.setProperty('--quota-h','36px');
+    }).catch(_e=>{ var bar=document.getElementById('quota-bar'); if(bar){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); } });
+  }catch(_e){}
+}
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+function ensureQuotaBar(){
+  var bar = document.getElementById('quota-bar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'quota-bar';
+    bar.innerHTML = '<div id="quota-user"><span class="material-icons" style="font-size:18px">person</span><span>rey — <span id="quota-count">5/5</span></span></div>';
+    document.body.appendChild(bar);
+  }
+  return bar;
+}
+function refreshCounterBar(){
+  try{
+    fetch('/counter', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(j){
+        var bar = ensureQuotaBar();
+        if(!j || typeof j.count==='undefined'){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); return; }
+        var max = Number(j.max||5), cnt = Math.max(0, Number(j.count||0));
+        var el = document.getElementById('quota-count'); if(el) el.innerText = cnt + '/' + max;
+        bar.style.setProperty('display','flex','important');
+        document.documentElement.style.setProperty('--quota-h','40px');
+      })
+      .catch(function(_e){
+        var bar = document.getElementById('quota-bar'); if(bar){ bar.style.display='none'; }
+        document.documentElement.style.setProperty('--quota-h','0px');
+      });
+  }catch(_e){}
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ refreshCounterBar(); }catch(_e){} } });
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js">function refreshCounterBar(){
+  try{
+    fetch('/counter').then(r=>r.json()).then(j=>{
+      var bar = document.getElementById('quota-bar');
+      if(!j || typeof j.count==='undefined'){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); return; }
+      var max = Number(j.max||5), cnt = Math.max(0, Number(j.count||0));
+      document.getElementById('quota-count').innerText = cnt + '/' + max;
+      bar.style.display='flex';
+      document.documentElement.style.setProperty('--quota-h','36px');
+    }).catch(_e=>{ var bar=document.getElementById('quota-bar'); if(bar){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); } });
+  }catch(_e){}
+}
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+function ensureQuotaBar(){
+  var bar = document.getElementById('quota-bar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'quota-bar';
+    bar.innerHTML = '<div id="quota-user"><span class="material-icons" style="font-size:18px">person</span><span>rey — <span id="quota-count">5/5</span></span></div>';
+    document.body.appendChild(bar);
+  }
+  return bar;
+}
+function refreshCounterBar(){
+  try{
+    fetch('/counter', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(j){
+        var bar = ensureQuotaBar();
+        if(!j || typeof j.count==='undefined'){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); return; }
+        var max = Number(j.max||5), cnt = Math.max(0, Number(j.count||0));
+        var el = document.getElementById('quota-count'); if(el) el.innerText = cnt + '/' + max;
+        bar.style.setProperty('display','flex','important');
+        document.documentElement.style.setProperty('--quota-h','40px');
+      })
+      .catch(function(_e){
+        var bar = document.getElementById('quota-bar'); if(bar){ bar.style.display='none'; }
+        document.documentElement.style.setProperty('--quota-h','0px');
+      });
+  }catch(_e){}
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ refreshCounterBar(); }catch(_e){} } });
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+</script>
   <style>
     html,body{margin:0;padding:0;height:100%;width:100%;box-sizing:border-box;background:#f8f8fb;font-family:Inter,Arial,system-ui,sans-serif;}
     #header-bar{display:flex;align-items:center;justify-content:center;width:100vw;background:rgba(248,248,251,.92);backdrop-filter:saturate(1.2) blur(6px);box-shadow:0 2px 16px rgba(0,0,0,.08);position:fixed;top:0;left:0;z-index:10001;height:56px;font-size:.95em;padding:0 10px}
@@ -17,7 +107,7 @@
     #lookup-btn{padding:8px 16px;border-radius:9px;background:#0078D4;color:#fff;border:none;font-size:.96em;cursor:pointer;min-width:86px;transition:background .2s;height:38px;display:flex;align-items:center;gap:6px}
     #lookup-btn:hover{background:#005fa3}
     #lang-toggle{padding:6px 12px;border-radius:9px;background:#273469;color:#fff;border:none;font-size:.93em;cursor:pointer;min-width:56px;transition:background .2s;height:34px;display:flex;align-items:center}
-    #map{position:absolute;top:56px;left:0;width:100vw;height:calc(100vh - 56px);min-height:320px;z-index:1}
+    #map{position:absolute;top:56px;left:0;width:100vw;height:calc(100vh - 56px - var(--quota-h, 0px));min-height:320px;z-index:1}
     /* Spinner only for "Good deal?" */
     #splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.85);z-index:19999;display:none;align-items:center;justify-content:center;padding:12px}
     #splashScreenContent{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.17);padding:16px 18px;text-align:center;font-size:.97em;color:#0078D4;max-width:320px}
@@ -29,11 +119,15 @@
     .gpt-popup-close-btn,.gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.86em;min-width:64px;height:32px;display:flex;align-items:center;gap:6px}
     .gpt-popup-print-btn{background:#0078D4}
     @media (max-width:650px){
-      .gpt-popup{ top:56px; left:0; transform:none; width:100vw; max-width:100vw; height:calc(100vh - 56px); max-height:calc(100vh - 56px); border-radius:0 }
+      .gpt-popup{ top:56px; left:0; transform:none; width:100vw; max-width:100vw; height:calc(100vh - 56px - var(--quota-h, 0px)); max-height:calc(100vh - 56px - var(--quota-h, 0px)); border-radius:0 }
       .gpt-popup-btns{padding:8px}
     }
     .good-deal-btn{padding:6px 10px;border-radius:8px;border:1px solid #cdd6e1;background:#fff;cursor:pointer}
-  </style>
+  :root{--quota-h:0px}
+#quota-bar{position:fixed;left:0;right:0;bottom:0;height:36px;background:#0b63a6;color:#fff;display:none;align-items:center;gap:10px;padding:0 12px;z-index:10002;font-size:.92rem}
+#quota-user{display:flex;align-items:center;gap:6px}
+#quota-count{font-weight:700}
+</style>
 </head>
 <body>
   <div id="header-bar">
@@ -342,6 +436,7 @@ function htmlEscape(str){
           hideSplash();
           var raw = response.data.html || response.data.report || "<div>Error generating report.</div>";
           var html = sanitizeHtml(raw);
+          try{ refreshCounterBar(); }catch(_e){}
           var overlayBg = document.getElementById("report-overlay-bg");
           overlayBg.style.display = "block";
           var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove();
@@ -384,6 +479,54 @@ function htmlEscape(str){
         setupMapRefresh();
       }
     })();
-  </script>
+  function refreshCounterBar(){
+  try{
+    fetch('/counter').then(r=>r.json()).then(j=>{
+      var bar = document.getElementById('quota-bar');
+      if(!j || typeof j.count==='undefined'){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); return; }
+      var max = Number(j.max||5), cnt = Math.max(0, Number(j.count||0));
+      document.getElementById('quota-count').innerText = cnt + '/' + max;
+      bar.style.display='flex';
+      document.documentElement.style.setProperty('--quota-h','36px');
+    }).catch(_e=>{ var bar=document.getElementById('quota-bar'); if(bar){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); } });
+  }catch(_e){}
+}
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+function ensureQuotaBar(){
+  var bar = document.getElementById('quota-bar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'quota-bar';
+    bar.innerHTML = '<div id="quota-user"><span class="material-icons" style="font-size:18px">person</span><span>rey — <span id="quota-count">5/5</span></span></div>';
+    document.body.appendChild(bar);
+  }
+  return bar;
+}
+function refreshCounterBar(){
+  try{
+    fetch('/counter', {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(j){
+        var bar = ensureQuotaBar();
+        if(!j || typeof j.count==='undefined'){ bar.style.display='none'; document.documentElement.style.setProperty('--quota-h','0px'); return; }
+        var max = Number(j.max||5), cnt = Math.max(0, Number(j.count||0));
+        var el = document.getElementById('quota-count'); if(el) el.innerText = cnt + '/' + max;
+        bar.style.setProperty('display','flex','important');
+        document.documentElement.style.setProperty('--quota-h','40px');
+      })
+      .catch(function(_e){
+        var bar = document.getElementById('quota-bar'); if(bar){ bar.style.display='none'; }
+        document.documentElement.style.setProperty('--quota-h','0px');
+      });
+  }catch(_e){}
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ refreshCounterBar(); }catch(_e){} } });
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+</script>
+<div id="quota-bar">
+  <div id="quota-user"><span class="material-icons" style="font-size:18px">person</span><span>rey — <span id="quota-count">5/5</span></span></div>
+</div>
 </body>
 </html>
