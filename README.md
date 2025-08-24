@@ -310,5 +310,79 @@ A Flask web application for interactive property search, analysis, and visualiza
 ### Fixed
 - Reports that previously showed `N/A` due to missing lot/size are now populated whenever Zillow provides details.
 
+## Changelog — August 24, 2025
+
+### ✨ New & Improved
+
+- **Report header layout**
+  - Price now has a clear, labeled line **between** the address and the grade chip.  
+    - EN: `Asking Price:` / ES: `Precio de Venta:`
+  - `wrap_report_html(...)` accepts `asking_price` and renders with improved spacing.
+
+- **Investment Summary section**
+  - Guaranteed, first-class section at the top (if missing), with Material icon `trending_up`.  
+    - EN: **Investment Summary** / ES: **Resumen de Inversión**
+  - When available, shows a compact list with **Price** and **Grade**.
+
+- **Cross-language data consistency**
+  - A structured **Property Facts** section (EN/ES) is prepended from the same source data used to generate the report, reducing “N/A” mismatch between languages.
+
+- **Counter bar (bottom of viewport)**
+  - Persistent counter starts at **5** and **decrements once per unique property** (language doesn’t double-count).
+  - Bottom bar shows `rey — X/5` and updates dynamically after reports.
+  - Map height adjusts using a CSS var so the bar never overlaps content.
+
+- **Popup persistence**
+  - The “property at a glance” popup reopens on the **nearest** refreshed marker after a layer refresh, so it appears to stay open.
+
+- **Lookup UX**
+  - Pressing **Enter** in the address field behaves like **Search**, avoiding accidental reloads.
+
+---
+
+### 🛠 Fixes
+
+- **CSS leak in report**: Ensured all report styles live inside a single `<style>…</style>` block so raw CSS never renders in the HTML.
+- **Cross-language “Not specified”**: Stripped placeholder phrases (`"Not specified"`, `"No especificado/a"`, `"No disponible"`) from LLM prose and anchored critical facts in the structured sections.
+- **Windows console logging crash**: Replaced problematic Unicode (e.g., `→`) and made logging ASCII-safe to prevent `UnicodeEncodeError` on cp1252 terminals.
+- **Endpoint binding**: Ensured `/clicked` is routed to the correct handler (was previously mis-attached during edits).
+- **`/counter` 404 & JSON parse errors**: Added the route and hardened the client fetch to avoid parsing HTML 404s as JSON.
+- **Duplicate var redeclarations**: Avoided global name collisions (e.g., `openLatLng`) in frontend scripts.
+- **Misc syntax cleanup**: Removed stray escape sequences in f-strings and other minor syntax issues.
+
+---
+
+### 🧩 Developer Notes
+
+**Server**
+- New persistent files:
+  - `report_counter.json` — stores remaining count.
+  - `report_counter_used.json` — stores unique property IDs (e.g., `zpid` or address) to avoid double-charging on translations.
+- New functions:
+  - `register_report_consumption(report_id: str) -> bool`
+  - `_ensure_summary_section(body_html, language, details_html, price, grade) -> str`
+  - `_ensure_facts_section(body_html, language, details_html) -> str`
+- Route:
+  - `GET /counter` → `{"count": <int>, "max": 5}`
+- Existing handler now calls `register_report_consumption(...)` for **both** cached and fresh report paths.
+
+**Client**
+- New helpers:
+  - `ensureQuotaBar()` — creates bottom bar if missing.
+  - `refreshCounterBar()` — fetches `/counter` and updates `rey — X/5`.
+- Layout:
+  - Map uses `height: calc(100vh - 56px - var(--quota-h))`.
+  - Root var `--quota-h` toggles to reserve space for the bottom bar.
+- Popup logic:
+  - Reopen nearest marker to `openLatLng` after refresh.
+
+---
+
+### 🚀 Upgrade Steps
+
+1. Replace `map.py` and `base.html` with the latest versions.
+2. **Restart** the app:
+   ```bash
+   python map.py
 
 **Project by cubantonystark**
