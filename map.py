@@ -39,12 +39,75 @@ RAPIDAPI_KEY = os.getenv("RAPIDAPI_KEY", "a21f37a14emsh4a6f745b07a0863p130fc3jsn
 
 TTL_PROPS_BY_LOCATION = int(os.getenv("TTL_PROPS_BY_LOCATION", "600"))
 TTL_ZPID_BY_QUERY     = int(os.getenv("TTL_ZPID_BY_QUERY", "3600"))
-TTL_PROP_BY_ZPID      = int(os.getenv("TTL_PROP_BY_ZPID", "3600"))
+TTL_PROP_BY_ZPID      = int(os.getenv("TTL_PROP_BY_ZPID", "2592000"))
 
 ZILLOW_MIN_INTERVAL   = float(os.getenv("ZILLOW_MIN_INTERVAL", "1.5"))
 ZILLOW_429_BACKOFF    = float(os.getenv("ZILLOW_429_BACKOFF", "8.0"))
 
+
+# ---------- Disk persistence for property cache ----------
+PROPERTY_CACHE_FILE = pathlib.Path("property_cache.json")
+
+def _load_property_cache_disk():
+    try:
+        if PROPERTY_CACHE_FILE.exists():
+            with PROPERTY_CACHE_FILE.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, dict):
+                with _cache_lock:
+                    _cache["property_by_zpid"] = data
+            log(f"[DISK_CACHE] loaded {len(_cache['property_by_zpid'])} property entries from disk")
+    except Exception as e:
+        log(f"[DISK_CACHE] load error: {e}")
+
+def _save_property_cache_disk():
+    try:
+        with _cache_lock:
+            data = _cache.get("property_by_zpid", {})
+            with PROPERTY_CACHE_FILE.open("w", encoding="utf-8") as f:
+                json.dump(data, f)
+        log(f"[DISK_CACHE] saved {len(data)} property entries to disk")
+    except Exception as e:
+        log(f"[DISK_CACHE] save error: {e}")
+
+# Load existing property cache at startup
+_load_property_cache_disk()
+
 # ---------- Cache & Rate limiting ----------
+
+# ---------- Disk Cache ----------
+CACHE_DIR = os.getenv("CACHE_DIR", "./cache")
+PROP_CACHE_DIR = os.path.join(CACHE_DIR, "property_by_zpid")
+os.makedirs(PROP_CACHE_DIR, exist_ok=True)
+
+def _prop_disk_path(zpid: str) -> str:
+    safe = re.sub(r"[^0-9A-Za-z_-]", "_", str(zpid))
+    return os.path.join(PROP_CACHE_DIR, f"{safe}.json")
+
+def _prop_disk_write(zpid: str, payload: dict):
+    try:
+        path = _prop_disk_path(zpid)
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump({"ts": _now(), "payload": payload}, f)
+    except Exception as e:
+        log(f"[DISK][WRITE][ERR] zpid={zpid} e={e}")
+
+def _prop_disk_read(zpid: str, ttl: int):
+    try:
+        path = _prop_disk_path(zpid)
+        if not os.path.exists(path): return None
+        with open(path, "r", encoding="utf-8") as f:
+            obj = json.load(f)
+        ts = obj.get("ts", 0)
+        if _now() - ts > ttl:
+            # expired on disk -> remove
+            try: os.remove(path)
+            except Exception: pass
+            return None
+        return obj  # {"ts":..., "payload":...}
+    except Exception as e:
+        log(f"[DISK][READ][ERR] zpid={zpid} e={e}")
+        return None
 _cache_lock = Lock()
 _cache = {
     "props_by_location": {},
@@ -196,9 +259,19 @@ def _store_zpid_for_query(query: str, zpid: str, address: str):
 def _cached_property_by_zpid(zpid: str):
     entry = _cache_get("property_by_zpid", zpid, TTL_PROP_BY_ZPID)
     if entry: return entry.get("payload")
+    # try disk
+    disk = _prop_disk_read(zpid, TTL_PROP_BY_ZPID)
+    if disk:
+        payload = disk.get("payload")
+        if payload is not None:
+            # hydrate memory for faster subsequent lookups
+            _cache_set("property_by_zpid", zpid, {"payload": payload})
+            return payload
     return None
 def _store_property_by_zpid(zpid: str, payload: dict):
     _cache_set("property_by_zpid", zpid, {"payload": payload})
+    _prop_disk_write(zpid, payload)
+    _save_property_cache_disk()
 
 def zillow_search_get_zpid(query: str):
     zpid, addr = _cached_zpid_for_query(query)
@@ -333,24 +406,88 @@ def zillow_property_details_by_zpid(zpid: str):
 
 def fetch_homes(location, sw_lat=None, sw_lng=None, ne_lat=None, ne_lng=None):
     loc_key = (location or "").strip().lower()
+
+    # --- Preload cached properties (<= TTL_PROP_BY_ZPID) that fall within bounds ---
+    def _within_bounds(latv, lngv, sw_lat, sw_lng, ne_lat, ne_lng):
+        try:
+            if sw_lat is None or sw_lng is None or ne_lat is None or ne_lng is None:
+                return True
+            return (latv >= sw_lat) and (latv <= ne_lat) and (lngv >= sw_lng) and (lngv <= ne_lng)
+        except Exception:
+            return False
+
+    cached_first = []
+    try:
+        with _cache_lock:
+            for _zpid_key, _entry in (_cache.get("property_by_zpid") or {}).items():
+                _payload = (_entry or {}).get("payload") or {}
+                _lat = (_payload.get("latitude") or _payload.get("lat") or (_payload.get("property") or {}).get("latitude"))
+                _lon = (_payload.get("longitude") or _payload.get("lng") or (_payload.get("property") or {}).get("longitude"))
+                if _lat is None or _lon is None: 
+                    continue
+                try:
+                    _lat = float(_lat); _lon = float(_lon)
+                except Exception:
+                    continue
+                if not _within_bounds(_lat, _lon, sw_lat, sw_lng, ne_lat, ne_lng):
+                    continue
+
+                _address = (_payload.get("address") or _payload.get("streetAddress") or (_payload.get("property") or {}).get("address") or "")
+                _price = (_payload.get("price") or _payload.get("priceRaw") or "")
+                _beds = (_payload.get("bedrooms") or (_payload.get("property") or {}).get("bedrooms") or "")
+                _baths = (_payload.get("bathrooms") or (_payload.get("property") or {}).get("bathrooms") or "")
+                _img = (_payload.get("imgSrc") or _payload.get("img_url") or (_payload.get("property") or {}).get("imgSrc") or "")
+                _detail = (_payload.get("detailUrl") or _payload.get("detail_url") or (_payload.get("property") or {}).get("url") or "")
+                _last = (_payload.get("lastSoldPrice") or (_payload.get("property") or {}).get("lastSoldPrice") or "N/A")
+                try:
+                    if _last not in (None, "N/A"):
+                        _last = f"${int(float(str(_last).replace('$','').replace(',',''))):,}"
+                except Exception:
+                    _last = str(_last)
+
+                cached_first.append({
+                    "lat": _lat, "lon": _lon, "address": _address, "price": _price,
+                    "bedrooms": _beds, "bathrooms": _baths, "img_url": _img, "detail_url": _detail,
+                    "last_sold_amount": _last
+                })
+        if cached_first:
+            log(f"[FETCH_HOMES][CACHE_FIRST] {len(cached_first)} cached homes in bounds")
+    except Exception as _e:
+        cached_first = []
+    
     payload = None
     cached = _cache_get("props_by_location", loc_key, TTL_PROPS_BY_LOCATION)
     if cached:
-        payload = cached.get("payload"); log(f"[FETCH_HOMES] using cached payload for '{location}'")
-    else:
+        payload = cached.get("payload")
+        log(f"[FETCH_HOMES] using cached payload for '{location}'")
+    # We'll derive props from cached payload first
+    props = (payload or {}).get("props") or []
+    if not props:
+        # Try live attempts only if cache had no props
         location_encoded = quote(location)
-        path = f"/propertyExtendedSearch?location={location_encoded}&status_type=ForSale&home_type=Houses&limit=150"
-        status, payload = _zillow_http_get(path)
-        if status == 200 and isinstance(payload, dict):
-            _cache_set("props_by_location", loc_key, {"payload": payload})
-        else:
-            log(f"[FETCH_HOMES] FAIL location={location} status={status}")
-            return []
-
+        attempts = [
+            f"/propertyExtendedSearch?location={location_encoded}&status_type=ForSale&home_type=Houses&limit=200",
+            f"/propertyExtendedSearch?location={location_encoded}&status_type=ForSale&home_type=AllHomes&limit=200",
+            f"/propertyExtendedSearch?location={location_encoded}&home_type=AllHomes&limit=200",
+            f"/propertyExtendedSearch?location={location_encoded}&limit=200",
+        ]
+        status = 0; payload = None
+        for idx, path in enumerate(attempts, 1):
+            status, payload = _zillow_http_get(path)
+            if status != 200 or not isinstance(payload, dict):
+                log(f"[FETCH_HOMES][TRY{idx}] status={status}; skipping")
+                continue
+            props = (payload or {}).get("props") or []
+            log(f"[FETCH_HOMES][TRY{idx}] props={len(props)}")
+            if len(props) > 0:
+                _cache_set("props_by_location", loc_key, {"payload": payload})
+                break
+        # If still nothing and we have cached_first (preloaded below), we'll at least return those later.
     props = (payload or {}).get("props") or []
     log(f"[FETCH_HOMES] raw_props={len(props)} for location={location}")
 
-    listings = []
+    listings = list(cached_first)
+    seen_keys = set([ (h.get('address') or '').lower() for h in listings ])
     for home in props:
         lat = home.get('latitude'); lon = home.get('longitude')
         if lat is None or lon is None: continue
@@ -376,9 +513,20 @@ def fetch_homes(location, sw_lat=None, sw_lng=None, ne_lat=None, ne_lng=None):
                 last_sold_amount = f"${int(float(str(last_sold_amount).replace('$', '').replace(',', ''))):,}"
             except Exception:
                 last_sold_amount = str(last_sold_amount)
-        else:
             last_sold_amount = "N/A"
 
+            # de-dup by address or zpid
+        key_addr = (address or '').strip().lower()
+        if key_addr in seen_keys:
+            continue
+        seen_keys.add(key_addr)
+        # store lightweight cache by zpid if available
+        try:
+            zpid_val = str(zpid) if 'zpid' in locals() else str(home.get('zpid') or '')
+            if zpid_val:
+                _store_property_by_zpid(zpid_val, home)
+        except Exception:
+            pass
         listings.append({
             'lat': lat, 'lon': lon, 'address': address, 'price': price,
             'bedrooms': bedrooms, 'bathrooms': bathrooms,
@@ -420,6 +568,27 @@ def geocode_place(q: str):
 _last_refresh = {"lat": None, "lng": None, "zoom": None, "ts": 0.0}
 MIN_REFRESH_INTERVAL = float(os.getenv("MIN_REFRESH_INTERVAL", "4.0"))
 MIN_CENTER_DELTA_DEG = float(os.getenv("MIN_CENTER_DELTA_DEG", "0.01"))
+
+
+@app.route("/cache/stats", methods=["GET"])
+def cache_stats():
+    with _cache_lock:
+        stats = {bucket: len(entries) for bucket, entries in _cache.items()}
+    return jsonify(stats)
+
+@app.route("/cache/clear", methods=["POST"])
+def cache_clear():
+    which = (request.get_json() or {}).get("bucket")
+    with _cache_lock:
+        if which and which in _cache:
+            _cache[which].clear()
+            if which == "property_by_zpid":
+                _save_property_cache_disk()
+            return jsonify({"status":"cleared","bucket":which})
+        for bucket in _cache:
+            _cache[bucket].clear()
+        _save_property_cache_disk()
+    return jsonify({"status":"cleared_all"})
 
 # ---------- Routes ----------
 @app.route("/")
@@ -566,6 +735,113 @@ def wrap_report_html(address, content_html, language="en", grade=None):
 </div>
 """
 
+# =====================
+# Cache Utilities (merged, 30-day TTL)
+# =====================
+import re as _re_cacheutils
+import hashlib as _hashlib_cacheutils
+import time as _time_cacheutils
+from datetime import datetime as _dt_cacheutils
+from typing import Optional as _Optional_cacheutils, Tuple as _Tuple_cacheutils, Dict as _Dict_cacheutils
+import os as _os_cacheutils
+import json as _json_cacheutils
+
+_CACHE_DIR = "report_cache"
+_META_SUFFIX = ".meta.json"
+_HTML_SUFFIX = ".html"
+_MAX_AGE_DAYS_DEFAULT = 30
+
+def _ensure_cache_dir_cacheutils(path: str = _CACHE_DIR) -> None:
+    _os_cacheutils.makedirs(path, exist_ok=True)
+
+def _slugify_cacheutils(text: str) -> str:
+    text = text.strip().lower()
+    text = _re_cacheutils.sub(r"\s+", " ", text)
+    text = _re_cacheutils.sub(r"[^a-z0-9\s,#\-]", "", text)
+    text = text.replace(" ", "_").replace(",", "").replace("#", "unit")
+    return _re_cacheutils.sub(r"_+", "_", text).strip("_")
+
+def _cache_basename_cacheutils(address: str, lang: _Optional_cacheutils[str] = None) -> str:
+    slug = _slugify_cacheutils(address)
+    lang_part = f".{lang.lower()}" if lang else ""
+    return f"{slug}{lang_part}"
+
+def _html_path_cacheutils(address: str, lang: _Optional_cacheutils[str] = None) -> str:
+    _ensure_cache_dir_cacheutils()
+    return _os_cacheutils.path.join(_CACHE_DIR, _cache_basename_cacheutils(address, lang) + _HTML_SUFFIX)
+
+def _meta_path_cacheutils(address: str, lang: _Optional_cacheutils[str] = None) -> str:
+    _ensure_cache_dir_cacheutils()
+    return _os_cacheutils.path.join(_CACHE_DIR, _cache_basename_cacheutils(address, lang) + _META_SUFFIX)
+
+def _now_ts_cacheutils() -> float:
+    return _time_cacheutils.time()
+
+def _is_fresh_cacheutils(ts: float, max_age_days: int) -> bool:
+    return (_now_ts_cacheutils() - ts) <= max_age_days * 86400
+
+def save_report_to_cache(address: str, html: str, lang: _Optional_cacheutils[str] = None, extras: _Optional_cacheutils[_Dict_cacheutils] = None) -> str:
+    """Persist raw HTML and metadata. Returns the HTML file path. (Merged utility)"""
+    _ensure_cache_dir_cacheutils()
+    html_file = _html_path_cacheutils(address, lang)
+    meta_file = _meta_path_cacheutils(address, lang)
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(html)
+    meta = {
+        "address": address,
+        "language": lang or "",
+        "saved_at": _dt_cacheutils.utcnow().isoformat() + "Z",
+        "timestamp": _now_ts_cacheutils(),
+        "sha256": _hashlib_cacheutils.sha256(html.encode("utf-8")).hexdigest(),
+    }
+    if extras:
+        meta.update(extras)
+    with open(meta_file, "w", encoding="utf-8") as f:
+        _json_cacheutils.dump(meta, f, ensure_ascii=False, indent=2)
+    return html_file
+
+def load_cached_report(address: str, lang: _Optional_cacheutils[str] = None, max_age_days: int = _MAX_AGE_DAYS_DEFAULT) -> _Optional_cacheutils[_Tuple_cacheutils[str, _Dict_cacheutils]]:
+    """Return (html, meta) if a fresh cached report exists; else None. (Merged utility)"""
+    html_file = _html_path_cacheutils(address, lang)
+    meta_file = _meta_path_cacheutils(address, lang)
+    if not (_os_cacheutils.path.exists(html_file) and _os_cacheutils.path.exists(meta_file)):
+        return None
+    try:
+        with open(meta_file, "r", encoding="utf-8") as f:
+            meta = _json_cacheutils.load(f)
+        if not _is_fresh_cacheutils(meta.get("timestamp", 0), max_age_days):
+            return None
+        with open(html_file, "r", encoding="utf-8") as f:
+            html = f.read()
+        sha = _hashlib_cacheutils.sha256(html.encode("utf-8")).hexdigest()
+        if sha != meta.get("sha256"):
+            return None
+        return html, meta
+    except Exception:
+        return None
+
+def get_or_generate_report(address: str, lang: _Optional_cacheutils[str], generator_func, *gen_args, max_age_days: int = _MAX_AGE_DAYS_DEFAULT, **gen_kwargs):
+    """
+    If a fresh cache exists, return it.
+    Otherwise, call generator_func(address=..., lang=..., *gen_args, **gen_kwargs) which must
+    return a dict with at least {"html": "..."} and optional metadata (e.g., grade, price).
+    The result is cached and returned as (html, meta).
+    (Merged utility)
+    """
+    cached = load_cached_report(address, lang, max_age_days=max_age_days)
+    if cached:
+        return cached  # (html, meta)
+
+    result = generator_func(address=address, lang=lang, *gen_args, **gen_kwargs)
+    if not isinstance(result, dict) or "html" not in result:
+        raise ValueError("generator_func must return a dict with an 'html' key.")
+    html = result["html"]
+    extras = {k: v for k, v in result.items() if k != "html"}
+    save_report_to_cache(address, html, lang=lang, extras=extras)
+    maybe = load_cached_report(address, lang, max_age_days=max_age_days)
+    return maybe if maybe else (html, extras)
+
+# End of Cache Utilities
 # ---------- OpenAI report ----------
 @app.route("/clicked", methods=["POST"])
 def clicked():
@@ -576,7 +852,21 @@ def clicked():
     bathrooms = data.get("bathrooms","N/A")
     last_sold_amount = data.get("last_sold_amount","N/A")
     lat = float(data.get("lat", 27.9506)); lon = float(data.get("lon", -82.4572))
-    language = data.get("language","en")
+    language = (data.get("language","en") or "en").strip().lower()
+    language = "es" if language.startswith("es") else ("en" if language.startswith("en") else "en")
+    # --- Cache-first: if a fresh report exists for this address+language, serve it immediately ---
+    try:
+        cached = load_cached_report(address, lang=language)
+    except Exception as _e:
+        cached = None
+    if cached:
+        cached_html, cached_meta = cached
+        # Wrap the cached body HTML with the shell so the UI/printing looks consistent
+        grade_cached = cached_meta.get("grade")
+        full_cached = wrap_report_html(address, cached_html, language, grade=grade_cached)
+        return jsonify({"status":"success", "info": f"{address},{price}", "report": full_cached, "html": full_cached})
+    
+    
 
     log(f"[OPENAI]/clicked address={address} price={price} lat={lat} lon={lon} lang={language}")
 
@@ -586,8 +876,11 @@ def clicked():
     cdd = data.get("cdd") or ""
 
     def price_num(p):
-        try: return float(str(p).replace('$','').replace(',',''))
-        except Exception: return 0.0
+        try:
+            return float(str(p).replace('$','').replace(',',''))
+        except Exception:
+            return 0.0
+
     subject_price = price_num(price)
 
     def comps_with_radius(r_delta):
@@ -608,6 +901,29 @@ def clicked():
             break
     comps_sorted = comps_sorted[:12]
 
+    # Build HTML table for provided comparables/benchmarks
+    def _esc(x):
+        return (str(x).replace('&','&amp;').replace('<','&lt;').replace('>','&gt;') if x is not None else '')
+    def _comps_table_html_from_sorted(items):
+        if not items:
+            return "<p><i>No nearby comparables available from source at this time.</i></p>"
+        rows = [
+            "<table><thead><tr><th>Address</th><th>Beds</th><th>Baths</th><th>Price</th><th>Last Sold</th><th>Link</th></tr></thead><tbody>",
+        ]
+        for h in items:
+            addr=_esc(h.get('address',''))
+            beds=_esc(h.get('bedrooms',''))
+            baths=_esc(h.get('bathrooms',''))
+            price=_esc(h.get('price',''))
+            sold=_esc(h.get('last_sold_amount',''))
+            link=(f"https://www.zillow.com{h.get('detail_url','')}" if h.get('detail_url') else '')
+            link_html=(f"<a href='{_esc(link)}' target='_blank'>View</a>" if link else '')
+            rows.append(f"<tr><td>{addr}</td><td>{beds}</td><td>{baths}</td><td>{price}</td><td>{sold}</td><td>{link_html}</td></tr>")
+        rows.append("</tbody></table>")
+        return ''.join(rows)
+    comps_table_html = _comps_table_html_from_sorted(comps_sorted)
+
+
     comps_text = "\n".join(
         f"{h['address']} | {h['bedrooms']} bd/{h['bathrooms']} ba | {h['price']} | Last Sold: {h['last_sold_amount']}"
         for h in comps_sorted
@@ -616,66 +932,168 @@ def clicked():
     feature_lines = "\n".join(f"- {f}" for f in subject_features) if subject_features else "None listed."
     hoa_line = (f"HOA: {hoa} {('(' + hoa_freq + ')') if hoa_freq else ''}".strip()) if hoa else "HOA: N/A"
     cdd_line = f"CDD: {cdd}" if cdd else "CDD: N/A"
-    details = f"Beds: {bedrooms}, Baths: {bathrooms}, Asking Price: {price}, Last Sold Amount: {last_sold_amount}\n{hoa_line} | {cdd_line}\nFeatures:\n{feature_lines}"
+    facts = {
+        'Address': address,
+        'Asking Price': str(price),
+        'Bedrooms': bedrooms,
+        'Bathrooms': bathrooms,
+        'Latitude': lat,
+        'Longitude': lon,
+        'HOA': (hoa_line if hoa_line else 'N/A'),
+        'CDD': (cdd_line if cdd_line else 'N/A'),
+    }
+    details_html = '<ul>' + ''.join([f"<li><b>{k}:</b> {v}</li>" for k,v in facts.items() if v and v!='N/A']) + '</ul>'
+
 
     if language == "es":
         sys_text = "Responde SIEMPRE en español. Devuelve la primera línea como 'GRADE: X' y el resto como HTML solamente."
-        prompt = f"""
-Devuelve en la PRIMERA línea SOLO 'GRADE: X' (X ∈ A,B,C,D,F). En las líneas siguientes devuelve SOLO HTML (sin <html>/<head>).
-
-Propiedad: {address} (lat {lat}, lon {lon})
-Datos:
-{details}
-
-Comparables cercanos (al menos 5 si hay suficientes; puedes ir más lejos si hace falta):
-{comps_text}
-
-REQUISITOS:
-- Sección de comparables (.table) con ≥5 filas cuando sea posible: Dirección, BD/BA, Precio, Precio/ft² (si infieres), Última venta (si hay).
-- Resumen de “cómo se compara”: mediana de comparables, diferencia absoluta y % vs precio del sujeto, percentil del sujeto.
-- Calificación de inversión A–F (A=excelente valor, F=malo/sobreprecio) y muéstrala claramente en “Conclusión”.
-- Incluir cerca del inicio una sección con características (Features) y HOA/CDD si están disponibles.
-- Estructura EXACTA con estas secciones/clases:
-<section class="card" id="summary"> ... </section>
-<section class="card" id="keyfacts"> ... </section>
-<section class="card" id="pnl"> ... </section>
-<section class="card" id="financing"> ... </section>
-<section class="card" id="rent-comps"> ... </section>
-<section class="card" id="sale-comps"> ... </section>
-<section class="card" id="neighborhood"> ... </section>
-<section class="card" id="risks"> ... </section>
-<section class="card" id="bottom-line"> ... </section>
-<section class="card" id="next-steps"> ... </section>
-"""
-    else:
-        sys_text = "Always respond in English. Return the first line as 'GRADE: X' and the rest as HTML only."
-        prompt = f"""
-On the FIRST line return ONLY 'GRADE: X' (X ∈ A,B,C,D,F). On subsequent lines return HTML ONLY (no <html>/<head>).
+        prompt = f"""Eres un analista de inversiones inmobiliarias.  
+Genera un **Informe de Inversión Inmobiliaria** profesional para la siguiente propiedad:
 
 Property: {address} (lat {lat}, lon {lon})
-Details:
-{details}
+Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
 
-Nearby comps (at least 5 if possible; reach farther if needed):
-{comps_text}
+### Requisitos de salida:
+- Devuelve el informe **solo como HTML** (HTML5 válido).  
+- Cada encabezado de sección debe incluir un **icono de la librería Material Icons de Google** usando la etiqueta `<span class="material-icons">`.  
+  Ejemplo: `<h2><span class="material-icons">home</span> Aspectos Fundamentales de la Propiedad</h2>`.  
+- Usar `<h2>` para secciones, `<p>` para texto, `<ul>/<li>` para listas, y `<table>` para comparables y escenarios de financiamiento.  
+- El estilo debe ser limpio y moderno, adecuado para mostrar en una aplicación web.  
 
-REQUIREMENTS:
-- Comps section (.table) with ≥5 rows when possible: Address, BD/BA, Price, Price/ft² (if inferred), Last Sold (if available).
-- “How it stacks up”: comps median, absolute & % delta vs subject price, subject price percentile.
-- Investment GRADE A–F (A=outstanding value, F=poor/overpriced) shown clearly in Bottom Line.
-- Include an early section for Features and HOA/CDD when available.
-- Keep EXACT sections/classes:
-<section class="card" id="summary"> ... </section>
-<section class="card" id="keyfacts"> ... </section>
-<section class="card" id="pnl"> ... </section>
-<section class="card" id="financing"> ... </section>
-<section class="card" id="rent-comps"> ... </section>
-<section class="card" id="sale-comps"> ... </section>
-<section class="card" id="neighborhood"> ... </section>
-<section class="card" id="risks"> ... </section>
-<section class="card" id="bottom-line"> ... </section>
-<section class="card" id="next-steps"> ... </section>
+### Estructura del informe:
+1. **Calificación de Inversión (A–F)**  
+   - Mostrar al inicio en una insignia o encabezado estilizado.  
+   - Ejemplo: `<div class="badge">Calificación de Inversión: [INVESTMENT_GRADE]</div>`  
+
+2. **Aspectos Fundamentales de la Propiedad** (`home`)  
+   - Tamaño: [PROPERTY_SIZE]  
+   - Precio por pie² (ft²): [PRICE_PER_SQFT]  
+   - Estado, distribución, características únicas: [PROPERTY_FEATURES]  
+   - Análisis de comparables en tabla HTML con al menos 5 propiedades:  
+     [COMPARABLES_TABLE]  
+
+3. **Ubicación y Vecindario** (`location_on`)  
+   - Escuelas: [SCHOOL_INFO]  
+   - Seguridad: [CRIME_INFO]  
+   - Servicios y tendencias de desarrollo: [NEIGHBORHOOD_INFO]  
+
+4. **Indicadores Financieros** (`attach_money`)  
+   - Impuestos estimados: [ESTIMATED_TAXES]  
+   - Seguro: [INSURANCE_COST]  
+   - Rango de renta: [RENT_RANGE]  
+   - NOI: [NOI]  
+   - Tasa de capitalización: [CAP_RATE]  
+   - Retorno sobre efectivo: [COC_RETURN]  
+
+5. **Escenarios de Financiamiento** (`calculate`)  
+   - Tabla comparativa lado a lado: Convencional 20%, Convencional 5% (PMI), FHA 3.5% (MIP), VA 0% (cuota de financiación).  
+   - La tabla debe incluir: Enganche, Monto del préstamo, PI mensual, PMI/MIP, y PITI estimado a 6.25%, 6.75%, 7.25%.  
+   - Insertar tabla aquí: [FINANCING_TABLE]  
+
+6. **Indicadores de Riesgo** (`warning`)  
+   - Vacancia: [VACANCY_RISK]  
+   - Seguro/Inundación: [INSURANCE_RISK]  
+   - Condición/Inspección: [INSPECTION_RISK]  
+   - HOA/Restricciones: [HOA_RISK]  
+   - Ciclo del mercado: [MARKET_CYCLE]  
+
+7. **Estrategia de Salida** (`trending_up`)  
+   - Potencial de reventa: [RESALE_POTENTIAL]  
+   - Flexibilidad de renta: [RENTAL_FLEXIBILITY]  
+   - Proyección de apreciación: [APPRECIATION_OUTLOOK]  
+
+8. **Próximos Pasos / Lista de Diligencia** (`checklist`)  
+   - Lista de viñetas: [CHECKLIST_ITEMS]  
+
+9. **Justificación de la Calificación** (`grading`)  
+   - Viñetas: [GRADE_RATIONALE]  
+
+### Guías de estilo:
+- HTML limpio con etiquetas semánticas.  
+- Usar `<table>` para comparables y financiamiento.  
+- Usar listas con viñetas para checklist y justificación.  
+- Lenguaje claro y conciso para principiantes.  
+- Terminar con un resumen: [INVESTMENT_SUMMARY]  
+
+Devuelve únicamente la **salida en HTML**.
+Return only the **HTML output**.
 """
+        # Inject concrete comparables so the model does NOT invent them
+        prompt = prompt.replace('[COMPARABLES_TABLE]', comps_table_html)
+        prompt += "\n\nNOTE: Use only the comparables provided above; do not fabricate addresses or prices."
+    else:
+        sys_text = "Always respond in English. Return the first line as 'GRADE: X' and the rest as HTML only."
+        prompt = f"""You are a real estate investment analyst.  
+Generate a professional **Property Investment Report** for the following subject property:
+
+Property: {address} (lat {lat}, lon {lon})
+Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
+
+### Output requirements:
+- Return the report **only as HTML** (valid HTML5).  
+- Each section heading should include an **icon from Google’s Material Icons library** using the `<span class="material-icons">` tag.  
+  Example: `<h2><span class="material-icons">home</span> Property-Specific Fundamentals</h2>`.  
+- Use `<h2>` for main sections, `<p>` for body text, `<ul>/<li>` for bullet points, and `<table>` for comparables and financing scenarios.  
+- Style should be clean and modern, suitable for rendering in a web app.  
+
+### Report structure:
+1. **Investment Grade (A–F)**  
+   - Show prominently at the top in a badge or styled header.  
+   - Example: `<div class="badge">Investment Grade: [INVESTMENT_GRADE]</div>`  
+
+2. **Property-Specific Fundamentals** (`home`)  
+   - Size: [PROPERTY_SIZE]  
+   - Price per square foot: [PRICE_PER_SQFT]  
+   - Condition, layout, unique features: [PROPERTY_FEATURES]  
+   - Comparable sales analysis with at least 5 comps in a clean HTML table:  
+     [COMPARABLES_TABLE]  
+
+3. **Location & Neighborhood** (`location_on`)  
+   - Schools: [SCHOOL_INFO]  
+   - Crime/Safety: [CRIME_INFO]  
+   - Amenities & Development Trends: [NEIGHBORHOOD_INFO]  
+
+4. **Financial Indicators** (`attach_money`)  
+   - Estimated Taxes: [ESTIMATED_TAXES]  
+   - Insurance: [INSURANCE_COST]  
+   - Rent Range: [RENT_RANGE]  
+   - NOI: [NOI]  
+   - Cap Rate: [CAP_RATE]  
+   - Cash-on-Cash Return: [COC_RETURN]  
+
+5. **Financing Scenarios** (`calculate`)  
+   - Side-by-side table for: Conventional 20%, Conventional 5% (PMI), FHA 3.5% (MIP), VA 0% (funding fee).  
+   - Table must include: Down Payment, Loan Amount, Monthly PI, PMI/MIP, and Estimated PITI at 6.25%, 6.75%, 7.25%.  
+   - Insert formatted table here: [FINANCING_TABLE]  
+
+6. **Risk Indicators** (`warning`)  
+   - Vacancy: [VACANCY_RISK]  
+   - Insurance/Flood: [INSURANCE_RISK]  
+   - Inspection/Condition: [INSPECTION_RISK]  
+   - HOA Restrictions: [HOA_RISK]  
+   - Market Cycle: [MARKET_CYCLE]  
+
+7. **Exit Strategy** (`trending_up`)  
+   - Resale Potential: [RESALE_POTENTIAL]  
+   - Rental Flexibility: [RENTAL_FLEXIBILITY]  
+   - Appreciation Outlook: [APPRECIATION_OUTLOOK]  
+
+8. **Next Steps / Due Diligence Checklist** (`checklist`)  
+   - Bullet list: [CHECKLIST_ITEMS]  
+
+9. **Grade Rationale** (`grading`)  
+   - Bullet points: [GRADE_RATIONALE]  
+
+### Style guidelines:
+- Clean, semantic HTML with headings, tables, and bullet points.  
+- Beginner-friendly explanations.  
+- End with a short summary: [INVESTMENT_SUMMARY]  
+"""
+        # Inject concrete comparables so the model does NOT invent them
+        prompt = prompt.replace('[COMPARABLES_TABLE]', comps_table_html)
+        # Strong instruction to avoid fabricating comps
+        prompt += "\n\nNOTE: Use only the comparables provided above; do not fabricate addresses or prices."
+
 
     try:
         start = time.time()
@@ -693,6 +1111,11 @@ REQUIREMENTS:
         log(f"[OPENAI] completion ok in {took:.2f}s, chars={len(raw)}")
         grade, body_html = extract_grade_and_html(raw)
         full_html = wrap_report_html(address, body_html, language, grade=grade)
+        try:
+            save_report_to_cache(address, body_html, lang=language, extras={"grade": grade, "asking_price": price})
+        except Exception as _e:
+            log(f"[CACHE][WARN] {str(_e)}")
+
     except Exception as e:
         log(f"[OPENAI][ERR] {e}")
         full_html = wrap_report_html(
@@ -701,7 +1124,7 @@ REQUIREMENTS:
             language, grade=None
         )
 
-    return jsonify({"status":"success", "info": f"{address},{price}", "report": full_html})
+    return jsonify({"status":"success", "info": f"{address},{price}", "report": full_html, "html": full_html})
 
 # ---------- Health ----------
 @app.get("/debug/ping")
@@ -710,3 +1133,67 @@ def ping():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+
+
+
+# --- Cache: make directory absolute + create on import ---
+try:
+    import os as _os_cacheutils2, pathlib as _pl_cacheutils2
+    _BASE_DIR_CACHEUTILS2 = _pl_cacheutils2.Path(__file__).resolve().parent
+    _CACHE_DIR_ABS = str(_BASE_DIR_CACHEUTILS2 / _CACHE_DIR)
+    if _CACHE_DIR != _CACHE_DIR_ABS:
+        _CACHE_DIR = _CACHE_DIR_ABS  # redirect to absolute path
+    _ensure_cache_dir_cacheutils()  # create folder on import
+except Exception:
+    pass
+
+
+# ---------- Cache Admin Routes ----------
+@app.route("/cache/stats", methods=["GET"])
+def cache_stats():
+    try:
+        # count disk files
+        try:
+            disk_files = os.listdir(PROP_CACHE_DIR)
+        except Exception:
+            disk_files = []
+        resp = {
+            "ttl_prop_by_zpid": TTL_PROP_BY_ZPID,
+            "in_memory_counts": {
+                "property_by_zpid": len(_cache.get("property_by_zpid", {})),
+                "zpid_by_query": len(_cache.get("zpid_by_query", {})),
+                "props_by_location": len(_cache.get("props_by_location", {})),
+            },
+            "disk_counts": {
+                "property_by_zpid_files": len([f for f in disk_files if f.endswith(".json")]),
+            }
+        }
+        return jsonify(resp)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/cache/clear", methods=["POST"])
+def cache_clear():
+    data = request.get_json(silent=True) or {}
+    what = (data.get("what") or "properties").lower()
+    cleared = {}
+    if what in ("properties", "all"):
+        # clear in-memory
+        with _cache_lock:
+            _cache.get("property_by_zpid", {}).clear()
+        # clear disk
+        try:
+            for fn in os.listdir(PROP_CACHE_DIR):
+                if fn.endswith(".json"):
+                    try: os.remove(os.path.join(PROP_CACHE_DIR, fn))
+                    except Exception: pass
+            cleared["property_by_zpid"] = "cleared"
+        except Exception as e:
+            cleared["property_by_zpid"] = f"error: {e}"
+    if what == "all":
+        with _cache_lock:
+            _cache.get("zpid_by_query", {}).clear()
+            _cache.get("props_by_location", {}).clear()
+        cleared["others"] = "cleared"
+    return jsonify({"status": "ok", "cleared": cleared, "scope": what})
+
