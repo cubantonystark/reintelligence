@@ -12,6 +12,79 @@ from urllib.parse import quote
 
 import requests
 from flask import Flask, jsonify, render_template, request
+# ---------- Report Counter (persistent) ----------
+from threading import Lock as _CounterLock
+COUNTER_MAX = 5
+COUNTER_FILE = os.path.join(BASE_DIR, "report_counter.json") if "BASE_DIR" in globals() else os.path.join(os.path.dirname(__file__), "report_counter.json")
+COUNTER_USED_FILE = os.path.join(BASE_DIR, "report_counter_used.json") if "BASE_DIR" in globals() else os.path.join(os.path.dirname(__file__), "report_counter_used.json")
+_COUNTER_LOCK = _CounterLock()
+
+def _counter_init():
+    try:
+        if not os.path.exists(COUNTER_FILE):
+            with open(COUNTER_FILE, "w", encoding="utf-8") as f:
+                json.dump({"count": COUNTER_MAX}, f)
+        if not os.path.exists(COUNTER_USED_FILE):
+            with open(COUNTER_USED_FILE, "w", encoding="utf-8") as f:
+                json.dump({"used": []}, f)
+    except Exception as e:
+        try: logger.warning(f"[COUNTER][init] {e}")
+        except Exception: pass
+
+def _counter_load():
+    try:
+        with open(COUNTER_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f) or {}
+            c = int(data.get("count", COUNTER_MAX))
+            return max(0, min(COUNTER_MAX, c))
+    except Exception:
+        return COUNTER_MAX
+
+def _counter_save(val: int):
+    try:
+        with open(COUNTER_FILE, "w", encoding="utf-8") as f:
+            json.dump({"count": max(0, min(COUNTER_MAX, int(val)))}, f)
+    except Exception as e:
+        try: logger.warning(f"[COUNTER][save] {e}")
+        except Exception: pass
+
+def _used_load() -> set:
+    try:
+        with open(COUNTER_USED_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f) or {}
+            return set(data.get("used", []))
+    except Exception:
+        return set()
+
+def _used_save(s: set):
+    try:
+        with open(COUNTER_USED_FILE, "w", encoding="utf-8") as f:
+            json.dump({"used": list(s)}, f)
+    except Exception as e:
+        try: logger.warning(f"[COUNTER][used-save] {e}")
+        except Exception: pass
+
+def register_report_consumption(report_id: str) -> bool:
+    """Decrement the counter once per unique property id (zpid or address)."""
+    try:
+        if not report_id: return False
+        _counter_init()
+        with _COUNTER_LOCK:
+            used = _used_load()
+            if report_id in used:
+                return False
+            used.add(report_id)
+            _used_save(used)
+            cnt = _counter_load()
+            _counter_save(max(0, cnt-1))
+        try: logger.info(f"[COUNTER] -> {_counter_load()} id={report_id}")
+        except Exception: pass
+        return True
+    except Exception as e:
+        try: logger.warning(f"[COUNTER][register] {e}")
+        except Exception: pass
+        return False
+
 
 # ---------- OpenAI ----------
 from openai import OpenAI
@@ -864,6 +937,11 @@ def clicked():
         # Wrap the cached body HTML with the shell so the UI/printing looks consistent
         grade_cached = cached_meta.get("grade")
         full_cached = wrap_report_html(address, cached_html, language, grade=grade_cached)
+        try:
+            _rid = data.get('zpid') or address
+            register_report_consumption(str(_rid))
+        except Exception:
+            pass
         return jsonify({"status":"success", "info": f"{address},{price}", "report": full_cached, "html": full_cached})
     
     
@@ -1124,12 +1202,24 @@ Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
             language, grade=None
         )
 
+    try:
+        _rid = (locals().get('zpid') or data.get('zpid') or address)
+        register_report_consumption(str(_rid))
+    except Exception:
+        pass
     return jsonify({"status":"success", "info": f"{address},{price}", "report": full_html, "html": full_html})
 
 # ---------- Health ----------
 @app.get("/debug/ping")
 def ping():
     return jsonify({"ok": True, "ts": datetime.now(timezone.utc).isoformat()})
+
+@app.route("/counter", methods=["GET"])
+def counter_state():
+    try:
+        return jsonify({"count": _counter_load(), "max": COUNTER_MAX})
+    except Exception as e:
+        return jsonify({"count": 0, "max": COUNTER_MAX, "error": str(e)}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
