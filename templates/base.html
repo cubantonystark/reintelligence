@@ -1,377 +1,599 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+// --- Safe stub to avoid early ReferenceError ---
+if (typeof renderQuotaBar !== 'function') {
+  function renderQuotaBar(_state){ /* stub: real impl is defined later */ }
+}
+</script>
+
+  <title>Properties</title>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-  <title>reintelligence · Property Explorer</title>
-
-  <!-- Icons & Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <!-- Leaflet Core -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <!-- Axios -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
   <style>
-    :root {
-      --bg: #ffffff;
-      --panel: #ffffff;
-      --muted: #64748b;
-      --ink: #0b1220;
-      --brand: #2563eb;
-      --brand-2: #60a5fa;
-      --accent: #16a34a;
-      --shadow: 0 10px 30px rgba(2,6,23,.08);
-      --header-h: 60px;
-      --quota-h: 0px;
+    html,body{margin:0;padding:0;height:100%;width:100%;box-sizing:border-box;background:#f8f8fb;font-family:Inter,Arial,system-ui,sans-serif;}
+    #header-bar{display:flex;align-items:center;justify-content:center;width:100vw;background:rgba(248,248,251,.92);backdrop-filter:saturate(1.2) blur(6px);box-shadow:0 2px 16px rgba(0,0,0,.08);position:fixed;top:0;left:0;z-index:10001;height:56px;font-size:.95em;padding:0 10px}
+    #header-inner{display:flex;flex-direction:row;align-items:center;justify-content:center;width:100%;gap:8px;max-width:1200px}
+    #lookup-form{display:flex;align-items:center;gap:6px;flex:1}
+    #lookup-input{font-size:.98em;padding:8px 10px;border-radius:9px;border:1px solid #cdd6e1;min-width:60px;width:100%;background:#fff;height:38px}
+    #lookup-btn{padding:8px 16px;border-radius:9px;background:#0078D4;color:#fff;border:none;font-size:.96em;cursor:pointer;min-width:86px;transition:background .2s;height:38px;display:flex;align-items:center;gap:6px}
+    #lookup-btn:hover{background:#005fa3}
+    #lang-toggle{padding:6px 12px;border-radius:9px;background:#273469;color:#fff;border:none;font-size:.93em;cursor:pointer;min-width:56px;transition:background .2s;height:34px;display:flex;align-items:center}
+    #map{position:absolute;top:56px;left:0;width:100vw;height:calc(100vh - 56px - var(--quota-h, 0px));min-height:320px;z-index:1}
+    /* Spinner only for "Good deal?" */
+    #splashScreen{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,.85);z-index:19999;display:none;align-items:center;justify-content:center;padding:12px}
+    #splashScreenContent{background:#fff;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,.17);padding:16px 18px;text-align:center;font-size:.97em;color:#0078D4;max-width:320px}
+    .splash-spinner{display:inline-block;width:2.1em;height:2.1em;border:.32em solid #e0e7ef;border-top:.32em solid #0078D4;border-radius:50%;animation:splash-spin 1s linear infinite;margin-bottom:10px;vertical-align:middle}
+    @keyframes splash-spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+    #report-overlay-bg{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(30,40,63,.25);z-index:19998;display:none}
+    .gpt-popup{position:fixed;top:64px;left:50%;transform:translateX(-50%);z-index:20000;background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(0,0,0,.18);box-sizing:border-box;padding:10px 12px 16px;margin:0;overflow-y:auto;overflow-x:hidden;font-family:Inter,Arial,sans-serif;font-size:.92rem;max-width:920px;width:96vw;max-height:calc(100vh - 90px)}
+    .gpt-popup-btns{position:sticky;top:0;z-index:1;background:linear-gradient(#fff,#fff 85%,transparent);display:flex;gap:10px;justify-content:flex-end;margin-bottom:6px;padding-top:6px}
+    .gpt-popup-close-btn,.gpt-popup-print-btn{background:#273469;color:#fff;border:none;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.86em;min-width:64px;height:32px;display:flex;align-items:center;gap:6px}
+    .gpt-popup-print-btn{background:#0078D4}
+    @media (max-width:650px){
+      .gpt-popup{ top:56px; left:0; transform:none; width:100vw; max-width:100vw; height:calc(100vh - 56px - var(--quota-h, 0px)); max-height:calc(100vh - 56px - var(--quota-h, 0px)); border-radius:0 }
+      .gpt-popup-btns{padding:8px}
     }
-    * { box-sizing: border-box; }
-    html, body { margin:0; padding:0; height:100%; width:100%; background:var(--bg); color:var(--ink); font-family: Inter, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
-
-    /* Header */
-    #header-bar {
-      position:fixed; z-index:10001; top:0; left:0; right:0; height:var(--header-h);
-      display:flex; align-items:center; justify-content:center;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.85));
-      backdrop-filter: saturate(1.15) blur(8px);
-      border-bottom: 1px solid rgba(2,6,23,.08);
-      box-shadow: var(--shadow);
-    }
-    #header-inner { width:100%; max-width:1200px; display:flex; align-items:center; gap:.6rem; padding:0 .8rem; }
-    #brand {
-      display:flex; align-items:center; gap:.4rem; padding:.35rem .55rem; border-radius:.75rem;
-      background: rgba(37,99,235,.08); color:#0b1220; font-weight:700; letter-spacing:.2px; user-select:none;
-      border:1px solid rgba(2,6,23,.06);
-    }
-    #brand .material-icons { font-size:20px; color:#1d4ed8; }
-
-    /* Search */
-    #lookup-form { display:flex; align-items:center; gap:.5rem; flex:1; }
-    #lookup-input {
-      flex:1; min-width:120px;
-      height:40px; padding:.55rem .75rem .55rem 2.2rem;
-      background:#ffffff; color:var(--ink);
-      border:1px solid rgba(2,6,23,.12);
-      border-radius:12px; outline:none; transition:border .15s ease;
-      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="%236b7280" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M10 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" stroke="%236b7280" stroke-width="2" fill="none" stroke-linecap="round"/></svg>');
-      background-repeat:no-repeat; background-position:.6rem center;
-    }
-    #lookup-input:focus { border-color:#60a5fa; }
-    #lookup-btn {
-      height:40px; min-width:96px; padding:.55rem .9rem; border:none; border-radius:12px;
-      background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:white; font-weight:600; cursor:pointer;
-      display:inline-flex; align-items:center; gap:.4rem; transition: transform .08s ease;
-    }
-    #lookup-btn:hover { transform: translateY(-1px); }
-    #lookup-btn .material-icons { font-size:18px; }
-
-    /* Language toggle */
-    #lang-toggle {
-      height:36px; min-width:64px; padding:.4rem .7rem; border:none; border-radius:10px; cursor:pointer;
-      background:#e2e8f0; color:#0b1220; font-weight:700; letter-spacing:.3px;
-      display:flex; align-items:center; justify-content:center;
-      border:1px solid rgba(2,6,23,.06);
-    }
-
-    /* Map */
-    #map {
-      position:absolute; top:var(--header-h); left:0; width:100vw;
-      height: calc(100vh - var(--header-h) - var(--quota-h));
-      z-index:1;
-    }
-    .leaflet-control-container .leaflet-top, .leaflet-control-container .leaflet-bottom { z-index: 500; }
-
-    /* Bottom bar */
-    #quota-bar {
-      position:fixed; left:0; right:0; bottom:0; height:36px; display:none;
-      align-items:center; gap:10px; padding:0 12px; z-index:10002; font-size:.92rem;
-      background: linear-gradient(90deg, #0b63a6, #2563eb); color:#fff;
-      border-top: 1px solid rgba(255,255,255,.2);
-    }
-    #quota-user { display:flex; align-items:center; gap:6px; }
-    #quota-count { font-weight:700; }
-
-    /* Report modal */
-    #report-overlay-bg { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(2,6,23,.45); z-index:19998; display:none; }
-    .gpt-popup {
-      position:fixed; top:calc(var(--header-h) + 10px); left:50%; transform:translateX(-50%);
-      z-index:20000; background:var(--panel); color:var(--ink); border:1px solid rgba(2,6,23,.08);
-      border-radius:16px; box-shadow: var(--shadow);
-      padding:12px 14px 16px; margin:0; overflow-y:auto; overflow-x:hidden;
-      font-size:.94rem; max-width:980px; width:96vw; max-height: calc(100vh - var(--header-h) - 60px);
-    }
-    .gpt-popup .hdr {
-      display:flex; justify-content:flex-end; gap:10px; position:sticky; top:-12px; padding-top:6px;
-      background:linear-gradient(var(--panel), var(--panel) 85%, transparent);
-      z-index:1;
-    }
-    .gpt-popup-btn { border:none; border-radius:10px; height:34px; padding:0 12px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:.4rem; }
-    .gpt-popup-close-btn { background:#f1f5f9; color:var(--ink); border:1px solid rgba(2,6,23,.08); }
-    .gpt-popup-print-btn { background:linear-gradient(135deg, var(--brand), var(--brand-2)); color:white; }
-
-    /* Splash spinner */
-    #splashScreen { position:fixed; inset:0; background:rgba(2,6,17,.35); z-index:19999; display:none; align-items:center; justify-content:center; padding:12px; }
-    #splashScreenContent { background:var(--panel); border:1px solid rgba(2,6,23,.08); border-radius:14px; box-shadow:var(--shadow); padding:16px 18px; text-align:center; font-size:.97em; color:#0f172a; max-width:320px; }
-    .splash-spinner { display:inline-block; width:2.1em; height:2.1em; border:.32em solid #e2e8f0; border-top:.32em solid #60a5fa; border-radius:50%; animation:splash-spin 1s linear infinite; margin-bottom:10px; vertical-align:middle; }
-    @keyframes splash-spin { 0%{ transform:rotate(0) } 100%{ transform:rotate(360deg) } }
-
-    /* Leaflet popup styling */
-    .leaflet-popup-content-wrapper { background:var(--panel); color:var(--ink); border:1px solid rgba(2,6,23,.08); border-radius:12px; }
-    .leaflet-popup-tip { background:var(--panel); }
-    .good-deal-btn { padding:6px 10px; border-radius:10px; border:1px solid rgba(2,6,23,.12); background:#f1f5f9; color:var(--ink); cursor:pointer; font-weight:600; }
-    .good-deal-btn:hover { border-color:#60a5fa; }
-
-    @media (max-width: 720px) {
-      :root { --header-h: 56px; }
-      #header-inner { gap:.5rem; }
-      #lookup-btn { min-width:80px; }
-      #brand { display:none; }
-      .gpt-popup { left:0; transform:none; width:100vw; border-radius:0; top:var(--header-h); max-height: calc(100vh - var(--header-h) - var(--quota-h)); }
-    }
-  </style>
+    .good-deal-btn{padding:6px 10px;border-radius:8px;border:1px solid #cdd6e1;background:#fff;cursor:pointer}
+  :root{--quota-h:0px}
+#quota-bar{position:fixed;left:0;right:0;bottom:0;height:36px;background:#0b63a6;color:#fff;display:none;align-items:center;gap:10px;padding:0 12px;z-index:10002;font-size:.92rem}
+#quota-user{display:flex;align-items:center;gap:6px}
+#quota-count{font-weight:700}
+</style>
 </head>
 <body>
-  <header id="header-bar" role="banner">
+  <div id="header-bar">
     <div id="header-inner">
-      <div id="brand" aria-label="Brand">
-        <span class="material-icons">maps_home_work</span>
-        <span>reintelligence</span>
-      </div>
-
-      <form id="lookup-form" onsubmit="propertyLookup(event)" role="search" aria-label="Address or City Search">
-        <input id="lookup-input" type="text" placeholder="Lookup address or city..." autocomplete="off" aria-label="Search for address or city"/>
-        <button id="lookup-btn" type="submit" aria-label="Search"><span class="material-icons">search</span><span id="lookup-btn-text">Search</span></button>
+      <form id="lookup-form" onsubmit="propertyLookup(event)">
+        <input id="lookup-input" type="text" placeholder="Lookup address or city..." autocomplete="off"/>
+        <button id="lookup-btn" type="submit"><span class="material-icons" style="font-size:18px">search</span><span id="lookup-btn-text">Search</span></button>
       </form>
-
-      <button id="lang-toggle" type="button" onclick="toggleLanguage()" aria-live="polite" aria-label="Toggle language">ES</button>
-    </div>
-  </header>
-
-  <main id="map" role="application" aria-label="Interactive property map"></main>
-
-  <!-- Splash for “Good deal?” -->
-  <div id="splashScreen"><div id="splashScreenContent"><span class="splash-spinner"></span><br><span id="splash-text">Analyzing...</span></div></div>
-
-  <div id="report-overlay-bg" onclick="closeReportOverlay()"></div>
-
-  <!-- Bottom bar -->
-  <div id="quota-bar"><div id="quota-user"><span class="material-icons" style="font-size:18px">person</span><span id="quota-user-name">Guest</span></div><span id="quota-count" style="display:none"></span></div>
-
-  <!-- Auth Modal -->
-  <div id="auth-overlay" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,.45); z-index:21000;" onclick="closeAuthModal()"></div>
-  <div id="auth-modal" class="gpt-popup" style="display:none; z-index:21001;">
-    <div class="hdr">
-      <button class="gpt-popup-btn gpt-popup-close-btn" onclick="closeAuthModal()">Close</button>
-    </div>
-    <div style="display:flex; gap:10px; margin-bottom:10px;">
-      <button id="tab-login" class="gpt-popup-btn gpt-popup-print-btn" onclick="switchAuthTab('login')">Login</button>
-      <button id="tab-register" class="gpt-popup-btn" style="background:#f1f5f9; border:1px solid rgba(2,6,23,.08); color:#0b1220;" onclick="switchAuthTab('register')">Register</button>
-    </div>
-    <div id="auth-error" style="display:none; color:#b91c1c; font-weight:600; margin-bottom:8px;"></div>
-    <div style="display:grid; grid-template-columns: 1fr; gap:8px;">
-      <label>Username <input id="auth-username" type="text" placeholder="username" style="width:100%; height:38px; border:1px solid rgba(2,6,23,.12); border-radius:10px; padding:0 10px;"></label>
-      <label>Password <input id="auth-password" type="password" placeholder="password" style="width:100%; height:38px; border:1px solid rgba(2,6,23,.12); border-radius:10px; padding:0 10px;"></label>
-      <div id="auth-hint" style="font-size:.9em; color:#64748b;">Dev test user: <b>rey</b> / <b>R34n3l.2025</b> (5 reports)</div>
-      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
-        <button class="gpt-popup-btn gpt-popup-print-btn" onclick="submitAuth()">Submit</button>
-      </div>
+      <button id="lang-toggle" onclick="toggleLanguage()">ES</button>
     </div>
   </div>
+  <div id="map"></div>
+
+  <!-- Spinner kept ONLY for “Good deal?” flow -->
+  <div id="splashScreen">
+    <div id="splashScreenContent">
+      <span class="splash-spinner"></span><br>
+      <span id="splash-text">Analyzing...</span>
+    </div>
+  </div>
+  <div id="report-overlay-bg"></div>
 
   <script>
-    /* i18n */
+    // --------- i18n (UI + Layers) ----------
     var currentLanguage = "en";
     const I18N = {
-      en: { placeholder:"Lookup address or city...", search:"Search", analyzing:"Analyzing...", goodDeal:"Good deal?", print:"Print", close:"Close", price:"Price", beds:"Beds", baths:"Baths", viewListing:"View Listing", notFound:"Sorry, we couldn't find a valid property for that input.", searchError:"Search error.", reportError:"Error generating report.", layerStreets:"Streets", layerSatellite:"Satellite" },
-      es: { placeholder:"Buscar dirección o ciudad...", search:"Buscar", analyzing:"Analizando...", goodDeal:"¿Buena oferta?", print:"Imprimir", close:"Cerrar", price:"Precio", beds:"Recámaras", baths:"Baños", viewListing:"Ver en Zillow", notFound:"No pudimos encontrar una propiedad válida para esa entrada.", searchError:"Error en la búsqueda.", reportError:"Error generando el informe.", layerStreets:"Calles", layerSatellite:"Satélite" }
+      en: {
+        placeholder: "Lookup address or city...",
+        search: "Search",
+        analyzing: "Analyzing...",
+        goodDeal: "Good deal?",
+        print: "Print",
+        close: "Close",
+        price: "Price",
+        beds: "Beds",
+        baths: "Baths",
+        viewListing: "View Listing",
+        notFound: "Sorry, we couldn't find a valid property for that input.",
+        searchError: "Search error.",
+        reportError: "Error generating report.",
+        layerStreets: "Streets",
+        layerSatellite: "Satellite"
+      },
+      es: {
+        placeholder: "Buscar dirección o ciudad...",
+        search: "Buscar",
+        analyzing: "Analizando...",
+        goodDeal: "¿Buena oferta?",
+        print: "Imprimir",
+        close: "Cerrar",
+        price: "Precio",
+        beds: "Recámaras",
+        baths: "Baños",
+        viewListing: "Ver en Zillow",
+        notFound: "No pudimos encontrar una propiedad válida para esa entrada.",
+        searchError: "Error en la búsqueda.",
+        reportError: "Error generando el informe.",
+        layerStreets: "Calles",
+        layerSatellite: "Satélite"
+      }
     };
-    function applyLang(renderMarkersToo=false){
+
+    function applyLang(renderMarkersToo = false){
       const t = I18N[currentLanguage];
       const $ = (id)=>document.getElementById(id);
       $('lookup-input').placeholder = t.placeholder;
       $('lookup-btn-text').innerText = t.search;
       $('splash-text').innerText = t.analyzing;
-      document.querySelectorAll('button[data-good-deal]').forEach(btn => btn.innerText = t.goodDeal);
-      relabelLayers(); if (renderMarkersToo) updateHouseIcons(true);
-    }
-    function toggleLanguage(){ currentLanguage = currentLanguage === "en" ? "es" : "en"; document.getElementById('lang-toggle').innerText = currentLanguage === "en" ? "ES" : "EN"; applyLang(true); }
+      const printBtn = document.querySelector('.gpt-popup-print-btn'); if (printBtn) printBtn.innerText = "🖨️ " + t.print;
+      const closeBtn = document.querySelector('.gpt-popup-close-btn'); if (closeBtn) closeBtn.innerText = t.close;
 
-    /* Quota bar */
-    function ensureQuotaBar(){
-      var bar = document.getElementById('quota-bar');
-      if(!bar){
-        bar = document.createElement('div'); bar.id="quota-bar"; bar.innerHTML='<div id="quota-user"><span class="material-icons" style="font-size:18px">person</span><span id="quota-user-name">Guest</span></div><span id="quota-count" style="display:none"></span>';
-        document.body.appendChild(bar);
-      }
-      return bar;
-    }
-    function renderQuotaBar(state){
-      var bar = ensureQuotaBar();
-      var userSpan = document.getElementById('quota-user');
-      var countSpan = document.getElementById('quota-count');
-      if(state && state.is_logged_in){
-        userSpan.innerHTML = '<span class="material-icons" style="font-size:18px">person</span><span id="quota-user-name"></span> — <span id="quota-count"></span> — <a href="#" id="quota-logout-link">Logout</a>';
-        document.getElementById('quota-user-name').innerText = state.user || 'user';
-        document.getElementById('quota-count').innerText = (state.count||0) + '/' + (state.max||0);
-        var lo = document.getElementById('quota-logout-link'); if(lo){ lo.onclick=function(ev){ ev.preventDefault(); authLogout(); }; }
-        if(countSpan) countSpan.style.display = '';
+      // Rebuild layer control with localized labels
+      relabelLayers();
+
+      if (renderMarkersToo) {
+        updateHouseIcons(true);
       } else {
-        userSpan.innerHTML = '<span class="material-icons" style="font-size:18px">person</span>Guest - <a href="#" id="quota-login-link">Login/Register</a>';
-        var ln = document.getElementById('quota-login-link'); if(ln){ ln.onclick=function(ev){ ev.preventDefault(); openAuthModal("login"); }; }
-        if(countSpan) countSpan.style.display = 'none';
+        document.querySelectorAll('button[data-good-deal]').forEach(btn => btn.innerText = t.goodDeal);
       }
-      bar.style.display = 'flex';
-      document.documentElement.style.setProperty('--quota-h','40px');
     }
-    function refreshCounterBar(){
-      fetch('/counter', {cache:'no-store'})
-        .then(r => r.ok ? r.json() : {is_logged_in:false})
-        .then(j => { if(j && typeof j.is_logged_in !== 'undefined'){ renderQuotaBar(j); } else { renderQuotaBar({is_logged_in:false}); } })
-        .catch(_e => { renderQuotaBar({is_logged_in:false}); });
-    }
-    document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ refreshCounterBar(); }catch(_e){} } });
 
-    /* Map + layers */
+    function toggleLanguage(){
+      currentLanguage = currentLanguage === "en" ? "es" : "en";
+      document.getElementById('lang-toggle').innerText = currentLanguage === "en" ? "ES" : "EN";
+      applyLang(true);
+    }
+
+    // --------- Map + Layers + Markers ----------
     window._propertyFocus = false;
-    var markers = [], markerData = [], refreshTimeout = null, REFRESH_DELAY_MS = 1200;
-    var satelliteLayer=null, streetsLayer=null, layersControl=null;
-    function makeHouseIcon(){ return L.divIcon({ html:"<span style='font-size:1.6rem; line-height:1;'>&#127968;</span>", iconSize:[28,28], iconAnchor:[14,28], className:"leaflet-house-icon" }); }
-    function getLeafletMap(){ if (window._mobile_map_ref) return window._mobile_map_ref; for (var k in window){ try{ if(k.startsWith('map_') && window[k] && typeof window[k].getCenter==='function') return window[k]; }catch(_e){} } return null; }
+    var markers = [];
+    var markerData = [];
+    var refreshTimeout = null;
+    var REFRESH_DELAY_MS = 1800;
+
+    var satelliteLayer = null;
+    var streetsLayer = null;
+    var layersControl = null;
+
+    function makeHouseIcon(){
+      return L.divIcon({
+        html:"<span style='font-size:2em;'>&#127968;</span>",
+        iconSize:[32,32], iconAnchor:[16,32], className:"leaflet-house-icon"
+      });
+    }
+
+    function getLeafletMap(){
+      if (window._mobile_map_ref) return window._mobile_map_ref;
+      for (var k in window){
+        if(k.startsWith('map_') && window[k] && typeof window[k]==='object' && typeof window[k].getCenter==='function') return window[k];
+      }
+      return null;
+    }
+
     function createLeafletMap(lat,lng,zoom){
-      satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution:'Tiles © Esri', maxZoom:19 });
-      streetsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution:'© OpenStreetMap', maxZoom:19 });
-      var map = L.map('map', { center:[lat,lng], zoom:zoom, layers:[streetsLayer], zoomControl:true });
-      window._mobile_map_ref = map; buildLayersControl();
-      map.on('popupclose', function(){ if (window._propertyFocus) { window._propertyFocus = false; if (typeof immediateRefresh === 'function') immediateRefresh(); } });
+      satelliteLayer = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution:'Tiles © Esri', maxZoom:19 }
+      );
+      streetsLayer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { attribution:'© OpenStreetMap', maxZoom:19 }
+      );
+
+      var map = L.map('map', { center:[lat,lng], zoom:zoom, layers:[streetsLayer] });
+      window._mobile_map_ref = map;
+
+      buildLayersControl();
+
+      map.on('popupclose', function(){
+        if (window._propertyFocus) {
+          window._propertyFocus = false;
+          if (typeof immediateRefresh === 'function') immediateRefresh();
+        }
+      });
       return map;
     }
-    function buildLayersControl(){ var map = getLeafletMap(); if (!map) return; if (layersControl) { try { map.removeControl(layersControl); } catch(e){} } const t = I18N[currentLanguage]; const baseLayers = {}; baseLayers[t.layerSatellite] = satelliteLayer; baseLayers[t.layerStreets] = streetsLayer; layersControl = L.control.layers(baseLayers, {}).addTo(map); }
-    function relabelLayers(){ var map = getLeafletMap(); if (!map) return; const active = map.hasLayer(satelliteLayer) ? 'sat' : 'str'; buildLayersControl(); if (active === 'sat') { if (!map.hasLayer(satelliteLayer)) { map.addLayer(satelliteLayer); if (map.hasLayer(streetsLayer)) map.removeLayer(streetsLayer);} } else { if (!map.hasLayer(streetsLayer)) { map.addLayer(streetsLayer); if (map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer);} } }
-    function htmlEscape(str){ return (''+str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-    function sanitizeHtml(txt){ if(!txt) return ""; txt = txt.replace(/(^|\n)\s*```[a-zA-Z]*\s*\n?/g, '$1'); txt = txt.replace(/\n?\s*```\s*(\n|$)/g, '\n'); return txt; }
+
+    function buildLayersControl(){
+      var map = getLeafletMap();
+      if (!map) return;
+      if (layersControl) {
+        try { map.removeControl(layersControl); } catch(e){}
+      }
+      const t = I18N[currentLanguage];
+      const baseLayers = {};
+      baseLayers[t.layerSatellite] = satelliteLayer;
+      baseLayers[t.layerStreets] = streetsLayer;
+      layersControl = L.control.layers(baseLayers, {}).addTo(map);
+    }
+
+    function relabelLayers(){
+      var map = getLeafletMap();
+      if (!map) return;
+      const active = map.hasLayer(satelliteLayer) ? 'sat' : 'str';
+      buildLayersControl();
+      if (active === 'sat') {
+        if (!map.hasLayer(satelliteLayer)) {
+          map.addLayer(satelliteLayer);
+          if (map.hasLayer(streetsLayer)) map.removeLayer(streetsLayer);
+        }
+      } else {
+        if (!map.hasLayer(streetsLayer)) {
+          map.addLayer(streetsLayer);
+          if (map.hasLayer(satelliteLayer)) map.removeLayer(satelliteLayer);
+        }
+      }
+    }
+
+    function sanitizeHtml(txt){
+  if(!txt) return "";
+  // Remove Markdown code fences like ``` or ```html anywhere in the text
+  txt = txt.replace(/(^|\n)\s*```[a-zA-Z]*\s*\n?/g, '$1');
+  txt = txt.replace(/\n?\s*```\s*(\n|$)/g, '\n');
+  return txt;
+}
+
+function htmlEscape(str){
+      return (''+str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
     function updateHouseIcons(keepPopup=false){
-      const t = I18N[currentLanguage]; var map = getLeafletMap(); let openLatLng = null;
-      if (keepPopup && map && map._popup && map._popup._latlng) openLatLng = map._popup._latlng;
+      const t = I18N[currentLanguage];
+      var map = getLeafletMap();
+      let openLatLng = null;
+      if (keepPopup && map && map._popup && map._popup._latlng) {
+        openLatLng = map._popup._latlng;
+      }
       markers.forEach(m => map.removeLayer(m)); markers = [];
       markerData.forEach(function(home){
         var icon = makeHouseIcon();
-        var priceLabel = (typeof home.price === 'number') ? home.price.toLocaleString() : (home.price || '');
-        const addr = htmlEscape(home.address || ''); const detailsUrl = home.detail_url ? `https://www.zillow.com${home.detail_url}` : null;
-        var html = `<div style="max-width:280px">
-            <span style='font-size:1.4rem;'>&#127968;</span> <b>${addr}</b><br>
-            ${(priceLabel && priceLabel!=='No price') ? `${t.price}: $${priceLabel}<br>` : ``}
-            ${t.beds}: ${home.bedrooms ?? ''} | ${t.baths}: ${home.bathrooms ?? ''}<br>
-            ${detailsUrl ? `<a href='${detailsUrl}' target='_blank' rel='noopener'>${t.viewListing}</a><br>` : ``}
-            ${home.img_url ? `<img src='${home.img_url}' width='160' style='max-width:90vw;border-radius:10px;margin-top:6px;'>` : ``}
-            <div style="margin-top:10px"><button data-good-deal class="good-deal-btn" onclick="sendClickedInfo('${addr}', '${priceLabel}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}', ${home.lat}, ${home.lon})">${t.goodDeal}</button></div>
-          </div>`;
-        var marker = L.marker([home.lat, home.lon], {icon}); marker.addTo(map).bindPopup(html); markers.push(marker);
+        var priceLabel = typeof home.price === 'number' ? home.price.toLocaleString() : home.price;
+        const addr = htmlEscape(home.address);
+        const detailsUrl = home.detail_url ? `https://www.zillow.com${home.detail_url}` : null;
+        var html = `
+          <div style="max-width:260px">
+            <span style='font-size:1.5em;'>&#127968;</span> <b>${addr}</b><br>
+            ${priceLabel && priceLabel!=='No price' ? `${t.price}: $${priceLabel}<br>` : ``}
+            ${t.beds}: ${home.bedrooms} | ${t.baths}: ${home.bathrooms}<br>
+            ${detailsUrl ? `<a href='${detailsUrl}' target='_blank'>${t.viewListing}</a><br>` : ``}
+            ${home.img_url ? `<img src='${home.img_url}' width='150' style='max-width:90vw;border-radius:8px;margin-top:6px;'>` : ``}
+            <div style="margin-top:8px">
+              <button data-good-deal class="good-deal-btn" onclick="sendClickedInfo('${addr}', '${priceLabel}', '${home.bedrooms}', '${home.bathrooms}', '${home.last_sold_amount}', ${home.lat}, ${home.lon})">${t.goodDeal}</button>
+            </div>
+          </div>
+        `;
+        var marker = L.marker([home.lat, home.lon], {icon}); marker.addTo(map).bindPopup(html);
+        markers.push(marker);
       });
-      if (keepPopup && openLatLng){ const found = markers.find(m => m.getLatLng() && m.getLatLng().lat===openLatLng.lat && m.getLatLng().lng===openLatLng.lng); if (found) found.openPopup(); }
+      if (keepPopup && openLatLng){
+        const found = markers.find(m => m.getLatLng() && m.getLatLng().lat===openLatLng.lat && m.getLatLng().lng===openLatLng.lng);
+        if (found) found.openPopup();
+      }
     }
+
     function setupMapRefresh(retry=0){
-      var map = getLeafletMap(); if(!map){ if(retry<20){ setTimeout(()=>setupMapRefresh(retry+1),400); } else { alert("Leaflet Map not found!"); } return; }
+      var map = getLeafletMap();
+      if(!map){
+        if(retry<20){ setTimeout(()=>setupMapRefresh(retry+1),400); }
+        else { alert("Leaflet Map not found!"); }
+        return;
+      }
       function clearMarkers(){ markers.forEach(m => map.removeLayer(m)); markers = []; }
+
       function refreshHomes(){
         if (window._propertyFocus) return;
         var b = map.getBounds(), c = map.getCenter();
-        var payload = { sw_lat:b.getSouthWest().lat, sw_lng:b.getSouthWest().lng, ne_lat:b.getNorthEast().lat, ne_lng:b.getNorthEast().lng, center_lat:c.lat, center_lng:c.lng, zoom: map.getZoom() };
-        axios.post('/refresh', payload).then(function(r){ clearMarkers(); markerData = r.data || []; updateHouseIcons(); applyLang(); }).catch(function(err){ console.error("Refresh error", err); });
+        var payload = {
+          sw_lat:b.getSouthWest().lat, sw_lng:b.getSouthWest().lng,
+          ne_lat:b.getNorthEast().lat, ne_lng:b.getNorthEast().lng,
+          center_lat:c.lat, center_lng:c.lng,
+          zoom: map.getZoom()
+        };
+        axios.post('/refresh', payload).then(function(r){
+          clearMarkers();
+          markerData = r.data || [];
+          updateHouseIcons();
+          applyLang(); refreshCounterBar(); // ensure current language on UI bits
+        }).catch(function(err){
+          console.error("Refresh error", err);
+        });
       }
-      function immediateRefresh(){ var b = map.getBounds(), c = map.getCenter(); var payload = { sw_lat:b.getSouthWest().lat, sw_lng:b.getSouthWest().lng, ne_lat:b.getNorthEast().lat, ne_lng:b.getNorthEast().lng, center_lat:c.lat, center_lng:c.lng, zoom: map.getZoom() };
-        axios.post('/refresh', payload).then(function(r){ markers.forEach(m => map.removeLayer(m)); markers=[]; markerData = r.data || []; updateHouseIcons(); applyLang(); }).catch(function(err){ console.error("Refresh error", err); });
+
+      function immediateRefresh(){
+        var b = map.getBounds(), c = map.getCenter();
+        var payload = {
+          sw_lat:b.getSouthWest().lat, sw_lng:b.getSouthWest().lng,
+          ne_lat:b.getNorthEast().lat, ne_lng:b.getNorthEast().lng,
+          center_lat:c.lat, center_lng:c.lng,
+          zoom: map.getZoom()
+        };
+        axios.post('/refresh', payload).then(function(r){
+          markers.forEach(m => map.removeLayer(m)); markers=[];
+          markerData = r.data || [];
+          updateHouseIcons();
+          applyLang(); refreshCounterBar();
+        }).catch(function(err){
+          console.error("Refresh error", err);
+        });
       }
       window.immediateRefresh = immediateRefresh;
-      function queued(){ if(refreshTimeout) clearTimeout(refreshTimeout); refreshTimeout = setTimeout(refreshHomes, REFRESH_DELAY_MS); }
-      map.on('moveend', queued); map.on('zoomend', queued); refreshHomes();
-    }
-    function propertyLookup(e){
-      e.preventDefault(); var val = document.getElementById('lookup-input').value.trim(); if (!val) return;
-      axios.post('/lookup', { q: val }).then(function(res){
-        var data = res.data || {}; var map = getLeafletMap();
-        if (data.mode === 'property' && data.home) { window._propertyFocus = true; map.setView([data.center.lat, data.center.lng], 17); markerData = [data.home]; updateHouseIcons(); applyLang(); if (markers[0]) markers[0].openPopup(); }
-        else if (data.mode === 'place' && data.center) { window._propertyFocus = false; map.setView([data.center.lat, data.center.lng], data.zoom || 16); setTimeout(function(){ if (typeof immediateRefresh === 'function') immediateRefresh(); }, 50); }
-        else { alert(I18N[currentLanguage].notFound); }
-      }).catch(function(err){ const msg = err?.response?.data?.message || I18N[currentLanguage].searchError; alert(msg); });
+
+      function delayed(){ if(refreshTimeout) clearTimeout(refreshTimeout); refreshTimeout = setTimeout(refreshHomes, REFRESH_DELAY_MS); }
+      map.on('moveend', delayed);
+      map.on('zoomend', delayed);
+      refreshHomes();
     }
 
-    /* Report modal */
+    function propertyLookup(e){
+      e.preventDefault();
+      var val = document.getElementById('lookup-input').value.trim();
+      if (!val) return;
+      axios.post('/lookup', { q: val })
+        .then(function(res){
+          var data = res.data || {};
+          var map = getLeafletMap();
+          if (data.mode === 'property' && data.home) {
+            window._propertyFocus = true;
+            map.setView([data.center.lat, data.center.lng], 17); // address-level
+            markerData = [data.home];
+            updateHouseIcons();
+            applyLang(); refreshCounterBar();
+            if (markers[0]) markers[0].openPopup();
+          } else if (data.mode === 'place' && data.center) {
+            window._propertyFocus = false;
+            map.setView([data.center.lat, data.center.lng], data.zoom || 16); // city-level close
+            setTimeout(function(){ if (typeof immediateRefresh === 'function') immediateRefresh(); }, 50);
+          } else {
+            alert(I18N[currentLanguage].notFound);
+          }
+        })
+        .catch(function(err){
+          const msg = err?.response?.data?.message || I18N[currentLanguage].searchError;
+          alert(msg);
+        });
+    }
+
+    // Spinner helpers (ONLY for “Good deal?”)
     function showSplash(){ document.getElementById('splashScreen').style.display='flex'; }
     function hideSplash(){ document.getElementById('splashScreen').style.display='none'; }
-    function closeReportOverlay(){ var overlayBg = document.getElementById("report-overlay-bg"); overlayBg.style.display = "none"; var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove(); }
 
-    // Auth modal + helpers
-    var _authMode = 'login';
-    function openAuthModal(mode){ _authMode = mode || 'login'; document.getElementById('auth-overlay').style.display='block'; var m=document.getElementById('auth-modal'); m.style.display='block'; switchAuthTab(_authMode); }
-    function closeAuthModal(){ document.getElementById('auth-overlay').style.display='none'; var m=document.getElementById('auth-modal'); m.style.display='none'; }
-    function switchAuthTab(mode){ _authMode = mode; var tl=document.getElementById('tab-login'), tr=document.getElementById('tab-register'); if(mode==='login'){ tl.className='gpt-popup-btn gpt-popup-print-btn'; tr.className='gpt-popup-btn gpt-popup-close-btn'; } else { tr.className='gpt-popup-btn gpt-popup-print-btn'; tl.className='gpt-popup-btn gpt-popup-close-btn'; } }
-    function setAuthError(msg){ var el=document.getElementById('auth-error'); if(!msg){ el.style.display='none'; el.innerText=''; } else { el.style.display='block'; el.innerText=msg; } }
-    function submitAuth(){
-      setAuthError('');
-      var u = document.getElementById('auth-username').value.trim();
-      var p = document.getElementById('auth-password').value;
-      if(!u || !p){ setAuthError('Enter username and password.'); return; }
-      var url = _authMode==='login' ? '/auth/login' : '/auth/register';
-      var body = {username:u, password:p}; if(_authMode==='register'){ body.starting_quota = 5; }
-      fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}).then(r => r.json().then(j => ({ok:r.ok, j}))).then(({ok, j}) => {
-        if(!ok || j.ok===false){ setAuthError(j.error || 'Auth failed'); return; }
-        closeAuthModal(); try{ refreshCounterBar(); }catch(_e){};
-      }).catch(_e => setAuthError('Network error'));
-    }
-    function authLogout(){ fetch('/auth/logout', {method:'POST'}).then(_ => { try{ refreshCounterBar(); }catch(_e){}; }); }
-
-    // sendClickedInfo override with robust auth/quota enforcement and 403 handling
+    // GPT analysis popup
     async function sendClickedInfo(address, price, bedrooms, bathrooms, last_sold_amount, lat, lon) {
-      try{
-        const r = await fetch('/auth/status', {cache:'no-store'});
-        if(!r.ok){ openAuthModal('login'); return; }
-        const st = await r.json();
-        if(!st.is_logged_in){ openAuthModal('login'); return; }
-        if((st.count||0) <= 0){ alert("You’ve reached your monthly limit. Please upgrade or buy additional reports."); return; }
-      }catch(_e){ openAuthModal('login'); return; }
-
-      try{ showSplash(); }catch(_e){}
-      try {
-        const response = await axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: currentLanguage, lat, lon });
-        try{ hideSplash(); }catch(_e){}
-        var data = response.data || {};
-        var raw = data.html || data.report || "<div>Error generating report.</div>";
-        var html = sanitizeHtml(raw);
-        try{ refreshCounterBar(); }catch(_e){};
-        var overlayBg = document.getElementById("report-overlay-bg"); overlayBg.style.display = "block";
-        var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove();
-        var popupDiv = document.createElement("div"); popupDiv.className="gpt-popup"; popupDiv.id="floating-gpt-popup";
-        var hdr = document.createElement("div"); hdr.className="hdr";
-        var closeBtn = document.createElement("button"); closeBtn.className="gpt-popup-btn gpt-popup-close-btn"; closeBtn.innerText=I18N[currentLanguage].close; closeBtn.onclick=function(){ closeReportOverlay(); };
-        var printBtn = document.createElement("button"); printBtn.className="gpt-popup-btn gpt-popup-print-btn"; printBtn.innerText="🖨️ " + I18N[currentLanguage].print; printBtn.onclick=function(){ try{ window.print(); }catch(_e){} };
-        hdr.appendChild(closeBtn); hdr.appendChild(printBtn); popupDiv.appendChild(hdr);
-        var content = document.createElement("div"); content.innerHTML = html; popupDiv.appendChild(content);
-        document.body.appendChild(popupDiv);
-      } catch (err) {
-        try{ hideSplash(); }catch(_e){}
-        var status = err && err.response && err.response.status;
-        if (status === 403) {
-          const j = err.response.data || {};
-          const msg = (j && j.message) ? j.message : "Authentication required.";
-          if (String(msg).toLowerCase().includes("limit")) alert("You’ve reached your monthly limit. Please upgrade or buy additional reports.");
-          else openAuthModal('login');
-          return;
-        }
-        alert(I18N[currentLanguage].reportError);
-      }
+  try{
+    const r = await fetch('/auth/status', {cache:'no-store', credentials:'same-origin'});
+    if(!r.ok){ openAuthModal('login'); return; }
+    const st = await r.json();
+    if(!st.is_logged_in){ openAuthModal('login'); return; }
+    if((st.count||0) <= 0){
+      alert("You’ve reached your monthly limit. Please upgrade or buy additional reports.");
+      return;
     }
+  }catch(_e){ openAuthModal('login'); return; }
 
-    /* Boot */
-    document.addEventListener('DOMContentLoaded', function(){
-      var defaultLat = 27.9506, defaultLng = -82.4572, defaultZoom = 13;
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(pos){ var c = pos.coords; createLeafletMap(c.latitude, c.longitude, 13); setupMapRefresh(); applyLang(); refreshCounterBar(); },
-          function(){ createLeafletMap(defaultLat, defaultLng, defaultZoom); setupMapRefresh(); applyLang(); refreshCounterBar(); }, { maximumAge: 300000, timeout: 3000 });
-      } else { createLeafletMap(defaultLat, defaultLng, defaultZoom); setupMapRefresh(); applyLang(); refreshCounterBar(); }
-    });
-  </script>
+  try{ if(typeof showSplash==='function') showSplash(); }catch(_e){}
+  try {
+    const response = await axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: (window.currentLanguage||'en'), lat, lon });
+    try{ if(typeof hideSplash==='function') hideSplash(); }catch(_e){}
+    var data = response.data || {};
+    var raw = data.html || data.report || "<div>Error generating report.</div>";
+    var html = (typeof sanitizeHtml==='function') ? sanitizeHtml(raw) : raw;
+    try{ refreshCounterBar(); }catch(_e){};
+    var overlayBg = document.getElementById("report-overlay-bg"); if(overlayBg) overlayBg.style.display = "block";
+    var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove();
+    var popupDiv = document.createElement("div"); popupDiv.className="gpt-popup"; popupDiv.id="floating-gpt-popup";
+    var hdr = document.createElement("div"); hdr.className="hdr";
+    var closeBtn = document.createElement("button"); closeBtn.className="gpt-popup-btn gpt-popup-close-btn"; closeBtn.innerText=(window.I18N&&window.I18N[window.currentLanguage] ? I18N[currentLanguage].close : 'Close'); closeBtn.onclick=function(){ if(typeof closeReportOverlay==='function') closeReportOverlay(); };
+    var printBtn = document.createElement("button"); printBtn.className="gpt-popup-btn gpt-popup-print-btn"; printBtn.innerText='🖨️ ' + (window.I18N&&window.I18N[window.currentLanguage] ? I18N[currentLanguage].print : 'Print'); printBtn.onclick=function(){ try{ window.print(); }catch(_e){} };
+    hdr.appendChild(closeBtn); hdr.appendChild(printBtn); popupDiv.appendChild(hdr);
+    var content = document.createElement("div"); content.innerHTML = html; popupDiv.appendChild(content);
+    document.body.appendChild(popupDiv);
+  } catch (err) {
+    try{ if(typeof hideSplash==='function') hideSplash(); }catch(_e){}
+    var status = err && err.response && err.response.status;
+    if (status === 403) {
+      const j = err.response.data || {};
+      const msg = (j && j.message) ? j.message : "Authentication required.";
+      if (String(msg).toLowerCase().includes("limit")) alert("You’ve reached your monthly limit. Please upgrade or buy additional reports.");
+      else openAuthModal('login');
+      return;
+    }
+    alert((window.I18N&&window.I18N[window.currentLanguage]) ? I18N[currentLanguage].reportError : 'Error generating report.');
+  }
+}
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+function ensureQuotaBar(){
+  var bar = document.getElementById('quota-bar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id="quota-bar";
+    bar.style.cssText = "position:fixed;left:0;right:0;bottom:0;height:40px;background:#fff;border-top:1px solid rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;gap:10px;z-index:1000;";
+    bar.innerHTML='<div id="quota-user"><span class="material-icons" style="font-size:18px">person</span>Guest - <a href="#" id="quota-login-link">Login/Register</a></div><span id="quota-count" style="display:none"></span>';
+    document.body.appendChild(bar);
+  }
+  return bar;
+}
+function refreshCounterBar(){
+  fetch('/auth/status', {cache:'no-store', credentials:'same-origin'})
+    .then(r => r.ok ? r.json() : {is_logged_in:false})
+    .then(st => { if(typeof st.is_logged_in !== 'undefined'){ renderQuotaBar(st); } else { renderQuotaBar({is_logged_in:false}); } })
+    .catch(_e => { renderQuotaBar({is_logged_in:false}); });
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ refreshCounterBar(); }catch(_e){} } });
+document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+
+</script>
+
+<script>
+// ===== Quota bar + Auth wiring (authoritative implementation) =====
+(function(){
+  function ensureQuotaBar(){
+    var bar = document.getElementById('quota-bar');
+    if(!bar){
+      bar = document.createElement('div');
+      bar.id="quota-bar";
+      bar.style.cssText = "position:fixed;left:0;right:0;bottom:0;height:40px;background:#0b63a6;color:#fff;display:flex;align-items:center;gap:10px;padding:0 12px;z-index:10002;font-size:.92rem";
+      bar.innerHTML='<div id="quota-user"><span class="material-icons" style="font-size:18px">person</span>Guest - <a href="#" id="quota-login-link" style="color:#fff;text-decoration:underline">Login/Register</a></div><span id="quota-count" style="display:none"></span>';
+      document.body.appendChild(bar);
+    }
+    return bar;
+  }
+
+  // Overwrite any earlier stub
+  window.renderQuotaBar = function(state){
+    var bar = ensureQuotaBar();
+    var userSpan = document.getElementById('quota-user');
+    var countEl = document.getElementById('quota-count');
+    if(state && state.is_logged_in){
+      userSpan.innerHTML = '<span class="material-icons" style="font-size:18px">person</span><span id="quota-user-name"></span> — <span id="quota-count"></span> — <a href="#" id="quota-logout-link" style="color:#fff;text-decoration:underline">Logout</a>';
+      var nameEl = document.getElementById('quota-user-name');
+      if(nameEl) nameEl.innerText = state.user || 'user';
+      var ce = document.getElementById('quota-count');
+      if(ce) ce.innerText = String(state.count||0) + '/' + String(state.max||0);
+      var lo = document.getElementById('quota-logout-link');
+      if(lo){ lo.onclick=function(ev){ ev.preventDefault(); try{ authLogout(); }catch(_e){} }; }
+      if(countEl) countEl.style.display = '';
+    } else {
+      userSpan.innerHTML = '<span class="material-icons" style="font-size:18px">person</span>Guest - <a href="#" id="quota-login-link" style="color:#fff;text-decoration:underline">Login/Register</a>';
+      var ln = document.getElementById('quota-login-link'); if(ln){ ln.onclick=function(ev){ ev.preventDefault(); try{ openAuthModal('login'); }catch(_e){} }; }
+      if(countEl) countEl.style.display = 'none';
+    }
+    bar.style.display = 'flex';
+    document.documentElement.style.setProperty('--quota-h','40px');
+  };
+
+  window.refreshCounterBar = function(){
+    // New unified status endpoint
+    fetch('/auth/status', {cache:'no-store', credentials:'same-origin'})
+      .then(function(r){ return r.ok ? r.json() : {is_logged_in:false}; })
+      .then(function(st){ if(typeof st.is_logged_in !== 'undefined'){ renderQuotaBar(st); } else { renderQuotaBar({is_logged_in:false}); } })
+      .catch(function(){ renderQuotaBar({is_logged_in:false}); });
+  };
+
+  // Run after page fully parsed (in case earlier listeners fired too early)
+  document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar(); }catch(_e){} });
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden){ try{ refreshCounterBar(); }catch(_e){} } });
+})();
+</script>
+
+<script>
+(function(){
+  function ensureMapInit(){
+    try{
+      var hasContainer = document.getElementById('map');
+      if(!hasContainer) return;
+      var map = (typeof getLeafletMap === 'function') ? getLeafletMap() : (window._mobile_map_ref || null);
+      if(!map && typeof createLeafletMap === 'function'){
+        // Default to Tampa, FL
+        createLeafletMap(27.9506, -82.4572, 12);
+      }
+      // Wire refresh listeners and trigger an initial fetch so properties populate
+      setTimeout(function(){
+        try{ if (typeof setupMapRefresh === 'function') setupMapRefresh(); }catch(_e){}
+        try{ if (typeof immediateRefresh === 'function') immediateRefresh(); }catch(_e){}
+      }, 0);
+    }catch(_e){ /* swallow */ }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ensureMapInit);
+  } else {
+    ensureMapInit();
+  }
+})();
+</script>
+
+
+<!-- Single Auth Splash Modal -->
+<div id="auth-overlay" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,.45); z-index:21000;" onclick="closeAuthModal()"></div>
+<div id="auth-modal" class="gpt-popup" style="display:none; z-index:21001; max-width:420px; width:92%; border-radius:16px;" onclick="event.stopPropagation()">
+  <div class="hdr">
+    <button class="gpt-popup-btn gpt-popup-close-btn" onclick="closeAuthModal()">Close</button>
+  </div>
+  <div id="auth-title" style="font-weight:700; font-size:1.05rem; margin:2px 0 10px;">Login</div>
+  <div id="auth-error" style="display:none; color:#b91c1c; font-weight:600; margin-bottom:8px;"></div>
+  <div style="display:grid; grid-template-columns: 1fr; gap:8px;">
+    <label>Username <input id="auth-username" type="text" placeholder="username" style="width:100%; height:38px; border:1px solid rgba(2,6,23,.12); border-radius:10px; padding:0 10px;"></label>
+    <label>Password <input id="auth-password" type="password" placeholder="password" style="width:100%; height:38px; border:1px solid rgba(2,6,23,.12); border-radius:10px; padding:0 10px;"></label>
+    <div id="auth-hint" style="font-size:.9em; color:#64748b;">Dev test user: <b>rey</b> / <b>R34n3l.2025</b> (5 reports)</div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
+      <button id="auth-submit" class="gpt-popup-btn gpt-popup-print-btn" onclick="submitAuth()">Login</button>
+    </div>
+    <div id="auth-toggle-line" style="display:flex; gap:6px; justify-content:center; margin-top:6px; font-size:.9em; color:#64748b;">
+      <span id="auth-toggle-text">Don't have an account?</span>
+      <a href="#" id="auth-toggle-link">Register</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- Auth modal logic ----
+(function(){
+  window._authMode = 'login';
+
+  window.openAuthModal = function(mode){
+    window._authMode = (mode === 'register') ? 'register' : 'login';
+    document.getElementById('auth-overlay').style.display='block';
+    var m=document.getElementById('auth-modal'); m.style.display='block';
+    switchAuthTab(window._authMode);
+  };
+
+  window.closeAuthModal = function(){
+    document.getElementById('auth-overlay').style.display='none';
+    var m=document.getElementById('auth-modal'); m.style.display='none';
+  };
+
+  window.switchAuthTab = function(mode){
+    window._authMode = (mode === 'register') ? 'register' : 'login';
+    var title = document.getElementById('auth-title');
+    var hint = document.getElementById('auth-hint');
+    var submitBtn = document.getElementById('auth-submit');
+    var toggleText = document.getElementById('auth-toggle-text');
+    var toggleLink = document.getElementById('auth-toggle-link');
+    if(window._authMode === 'login'){
+      if(title) title.innerText = 'Login';
+      if(submitBtn) submitBtn.innerText = 'Login';
+      if(hint) hint.style.display = 'block';
+      if(toggleText) toggleText.innerText = "Don't have an account?";
+      if(toggleLink){ toggleLink.innerText = 'Register'; toggleLink.onclick = function(e){ e.preventDefault(); switchAuthTab('register'); }; }
+    } else {
+      if(title) title.innerText = 'Register';
+      if(submitBtn) submitBtn.innerText = 'Register';
+      if(hint) hint.style.display = 'none';
+      if(toggleText) toggleText.innerText = 'Already have an account?';
+      if(toggleLink){ toggleLink.innerText = 'Login'; toggleLink.onclick = function(e){ e.preventDefault(); switchAuthTab('login'); }; }
+    }
+    setAuthError('');
+  };
+
+  window.setAuthError = function(msg){
+    var el=document.getElementById('auth-error');
+    if(!el) return;
+    if(!msg){ el.style.display='none'; el.innerText=''; }
+    else { el.style.display='block'; el.innerText=msg; }
+  };
+
+  window.submitAuth = function(){
+    setAuthError('');
+    var u = document.getElementById('auth-username').value.trim();
+    var p = document.getElementById('auth-password').value;
+    if(!u || !p){ setAuthError('Enter username and password.'); return; }
+    var url = (window._authMode==='register') ? '/auth/register' : '/auth/login';
+    var body = {username:u, password:p}; if(window._authMode==='register'){ body.starting_quota = 5; }
+    fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin', body: JSON.stringify(body)})
+      .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+      .then(async function(res){
+        var ok = res.ok, j = res.j;
+        if(!ok || j.ok===false){ setAuthError(j.error || 'Auth failed'); return; }
+        closeAuthModal();
+        // Immediate optimistic update
+        if(typeof renderQuotaBar==='function'){ renderQuotaBar({is_logged_in:true, user:(j.user||u), count:(j.count||0), max:(j.max||0)}); }
+        // Confirm with server
+        try{
+          var s = await fetch('/auth/status', {cache:'no-store', credentials:'same-origin'});
+          if(s.ok){ var st = await s.json(); if(typeof renderQuotaBar==='function') renderQuotaBar(st); }
+        }catch(_e){}
+      })
+      .catch(function(){ setAuthError('Network error'); });
+  };
+
+  // Make sure bottom bar link opens modal
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t && t.id === 'quota-login-link'){
+      e.preventDefault();
+      if(typeof openAuthModal==='function') openAuthModal('login');
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
