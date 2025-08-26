@@ -1,10 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+\1
+<script>
+(function(){
+  window.I18N = window.I18N || {};
+  var en = Object.assign({}, I18N.en || {}, {
+    login: "Login",
+    register: "Register",
+    loginRegister: "Login/Register",
+    logout: "Logout",
+    dontHave: "Don't have an account?",
+    alreadyHave: "Already have an account?"
+  });
+  var es = Object.assign({}, I18N.es || {}, {
+    login: "Iniciar sesión",
+    register: "Registrarse",
+    loginRegister: "Iniciar/Registrarse",
+    logout: "Cerrar sesión",
+    dontHave: "¿No tienes cuenta?",
+    alreadyHave: "¿Ya tienes cuenta?"
+  });
+  I18N.en = en; I18N.es = es;
+})();
+</script>
+
 <script>
 // --- Safe stub to avoid early ReferenceError ---
 if (typeof renderQuotaBar !== 'function') {
-  function renderQuotaBar(_state){ /* stub: real impl is defined later */ }
+  
+function renderQuotaBar(state){
+  var bar = ensureQuotaBar();
+  var userSpan = document.getElementById('quota-user');
+  var countSpan = document.getElementById('quota-count');
+  var lang = (typeof window.currentLanguage === 'string') ? window.currentLanguage : 'en';
+  var t = (window.I18N && I18N[lang]) ? I18N[lang] : {login:"Login", register:"Register", loginRegister:"Login/Register", logout:"Logout"};
+  if(state && state.is_logged_in){
+    userSpan.innerHTML = '<span class="material-icons" style="font-size:18px">person</span><span id="quota-user-name"></span> — <span id="quota-count"></span> — <a href="#" id="quota-logout-link" style="text-decoration:underline">'+t.logout+'</a>';
+    document.getElementById('quota-user-name').innerText = state.user || 'user';
+    document.getElementById('quota-count').innerText = (state.count||0) + '/' + (state.max||0);
+    var lo = document.getElementById('quota-logout-link'); if(lo){ lo.onclick=function(ev){ ev.preventDefault(); authLogout(); }; }
+    if(countSpan) countSpan.style.display = '';
+  } else {
+    userSpan.innerHTML = '<span class="material-icons" style="font-size:18px">person</span>Guest - <a href="#" id="quota-login-link" style="text-decoration:underline">'+t.loginRegister+'</a>';
+    var ln = document.getElementById('quota-login-link'); if(ln){ ln.onclick=function(ev){ ev.preventDefault(); openAuthModal("login"); }; }
+    if(countSpan) countSpan.style.display = 'none';
+  }
+  bar.style.display = 'flex';
+}
+
 }
 </script>
 
@@ -493,10 +536,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar
 
 <!-- Single Auth Splash Modal -->
 <div id="auth-overlay" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,.45); z-index:21000;" onclick="closeAuthModal()"></div>
-<div id="auth-modal" class="gpt-popup" style="display:none; z-index:21001; max-width:420px; width:92%; border-radius:16px;" onclick="event.stopPropagation()">
-  <div class="hdr">
-    <button class="gpt-popup-btn gpt-popup-close-btn" onclick="closeAuthModal()">Close</button>
-  </div>
+<div id="auth-modal" class="gpt-popup" style="display:none; z-index:21001; max-width:420px; width:92%; border-radius:16px; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; padding:14px;" onclick="event.stopPropagation()"><button type="button" id="auth-close-x" aria-label="Close" onclick="closeAuthModal()" style="position:absolute;top:8px;right:10px;background:transparent;border:0;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px;">×</button>
   <div id="auth-title" style="font-weight:700; font-size:1.05rem; margin:2px 0 10px;">Login</div>
   <div id="auth-error" style="display:none; color:#b91c1c; font-weight:600; margin-bottom:8px;"></div>
   <div style="display:grid; grid-template-columns: 1fr; gap:8px;">
@@ -595,5 +635,62 @@ document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar
 })();
 </script>
 
+<script>
+(function(){
+  document.addEventListener('keydown', function(e){
+    if ((e.key || e.code) === 'Escape') {
+      try { closeAuthModal(); } catch(_) {}
+    }
+  });
+})();
+</script>
+<script>
+
+function ensureAuthModal(){
+  var overlay = document.getElementById('auth-overlay');
+  var modal = document.getElementById('auth-modal');
+  if(overlay && modal) return;
+  // Build overlay
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'auth-overlay';
+    overlay.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(2,6,23,.45); z-index:21000;';
+    overlay.onclick = function(){ try{ closeAuthModal(); }catch(_e){} };
+    document.body.appendChild(overlay);
+  }
+  // Build modal
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'auth-modal';
+    modal.className = 'gpt-popup';
+    modal.style.cssText = 'display:none; z-index:21001; max-width:420px; width:92%; border-radius:16px; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; padding:14px;';
+    modal.onclick = function(e){ e.stopPropagation(); };
+    // Close X
+    var closeX = document.createElement('button');
+    closeX.type = 'button';
+    closeX.id = 'auth-close-x';
+    closeX.setAttribute('aria-label','Close');
+    closeX.style.cssText = 'position:absolute;top:8px;right:10px;background:transparent;border:0;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px;';
+    closeX.innerText = '×';
+    closeX.onclick = function(){ try{ closeAuthModal(); }catch(_e){} };
+    modal.appendChild(closeX);
+    // Title
+    var title = document.createElement('div'); title.id='auth-title'; title.style.cssText='font-weight:700;font-size:1.05rem;margin:2px 0 10px;'; title.innerText='Login'; modal.appendChild(title);
+    // Error
+    var err = document.createElement('div'); err.id='auth-error'; err.style.cssText='display:none;color:#b91c1c;font-weight:600;margin-bottom:8px;'; modal.appendChild(err);
+    // Form
+    var wrap = document.createElement('div'); wrap.style.cssText='display:grid;grid-template-columns:1fr;gap:8px;';
+    wrap.innerHTML = ''
+      + '<label>Username <input id="auth-username" type="text" placeholder="username" style="width:100%;height:38px;border:1px solid rgba(2,6,23,.12);border-radius:10px;padding:0 10px;"></label>'
+      + '<label>Password <input id="auth-password" type="password" placeholder="password" style="width:100%;height:38px;border:1px solid rgba(2,6,23,.12);border-radius:10px;padding:0 10px;"></label>'
+      + '<div id="auth-hint" style="font-size:.9em;color:#64748b;">Dev test user: <b>rey</b> / <b>R34n3l.2025</b> (5 reports)</div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;"><button id="auth-submit" class="gpt-popup-btn gpt-popup-print-btn" onclick="submitAuth()">Login</button></div>'
+      + '<div id="auth-toggle-line" style="display:flex;gap:6px;justify-content:center;margin-top:6px;font-size:.9em;color:#64748b;"><span id="auth-toggle-text">Don\'t have an account?</span><a href="#" id="auth-toggle-link">Register</a></div>';
+    modal.appendChild(wrap);
+    document.body.appendChild(modal);
+  }
+}
+
+</script>
 </body>
 </html>
