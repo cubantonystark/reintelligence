@@ -11,9 +11,11 @@ from threading import Lock
 from urllib.parse import quote
 
 import requests
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, session
 # ---------- Report Counter (persistent) ----------
 from threading import Lock as _CounterLock
+from datetime import timedelta
+
 COUNTER_MAX = 5
 COUNTER_FILE = os.path.join(BASE_DIR, "report_counter.json") if "BASE_DIR" in globals() else os.path.join(os.path.dirname(__file__), "report_counter.json")
 COUNTER_USED_FILE = os.path.join(BASE_DIR, "report_counter_used.json") if "BASE_DIR" in globals() else os.path.join(os.path.dirname(__file__), "report_counter_used.json")
@@ -1221,6 +1223,241 @@ def counter_state():
     except Exception as e:
         return jsonify({"count": 0, "max": COUNTER_MAX, "error": str(e)}), 200
 
+
+def _override_counter_route():
+    """Replace the Flask view function bound to '/counter' so that it returns per-user state.
+    This preserves existing clients because we still return 'count' and 'max', but adds 'user' and 'is_logged_in'.
+    """
+    try:
+        for rule in app.url_map.iter_rules():
+            if str(rule.rule) == "/counter":
+                app.view_functions[rule.endpoint] = _counter_state_useraware
+                break
+    except Exception:
+        pass
+
+_override_counter_route()
+
+
+
+# ============= Lightweight Auth + Per-User Quota (non-breaking) =============
+USERS_DIR = pathlib.Path("users")
+USERS_DIR.mkdir(parents=True, exist_ok=True)
+
+if not getattr(app, "secret_key", None):
+    app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret-change-me")
+app.permanent_session_lifetime = timedelta(days=30)
+
+def _user_dir(username: str) -> pathlib.Path:
+    return USERS_DIR / re.sub(r"[^a-zA-Z0-9_.-]", "_", str(username))
+
+def _user_files(username: str):
+    ud = _user_dir(username)
+    pw = ud / "password.txt"
+    quota = ud / "quota.json"  # {"count": int, "max": int}
+    used = ud / "used.json"    # {"used": [ids]}
+    ud.mkdir(parents=True, exist_ok=True)
+    try:
+        if not used.exists():
+            used.write_text(json.dumps({"used": []}), encoding="utf-8")
+    except Exception:
+        pass
+    return pw, quota, used
+
+def _user_read_quota(username: str):
+    _, quota_file, _ = _user_files(username)
+    try:
+        data = json.loads(quota_file.read_text(encoding="utf-8"))
+        return int(max(0, data.get("count", 0))), int(max(0, data.get("max", 0)))
+    except Exception:
+        return 0, 0
+
+def _user_write_quota(username: str, count: int, maxv: int):
+    _, quota_file, _ = _user_files(username)
+    try:
+        quota_file.write_text(json.dumps({"count": int(max(0, count)), "max": int(max(0, maxv))}), encoding="utf-8")
+    except Exception:
+        pass
+
+def _user_read_used(username: str) -> set:
+    _, _, used_file = _user_files(username)
+    try:
+        data = json.loads(used_file.read_text(encoding="utf-8") or "{}")
+        return set(data.get("used", []))
+    except Exception:
+        return set()
+
+def _user_write_used(username: str, s: set):
+    _, _, used_file = _user_files(username)
+    try:
+        used_file.write_text(json.dumps({"used": list(s)}), encoding="utf-8")
+    except Exception:
+        pass
+
+def _ensure_test_user():
+    uname, pw_plain, start_max = "rey", "R34n3l.2025", 5
+    pw_file, quota_file, _ = _user_files(uname)
+    if not pw_file.exists():
+        try: pw_file.write_text(pw_plain, encoding="utf-8")
+        except Exception: pass
+    try:
+        if not quota_file.exists():
+            quota_file.write_text(json.dumps({"count": start_max, "max": start_max}), encoding="utf-8")
+    except Exception: pass
+_ensure_test_user()
+
+def _current_user():
+    u = session.get("user")
+    return str(u) if u else None
+
+def _current_user_state():
+    u = _current_user()
+    if not u:
+        return {"is_logged_in": False, "user": "Guest", "count": 0, "max": 0}
+    cnt, mx = _user_read_quota(u)
+    return {"is_logged_in": True, "user": u, "count": cnt, "max": mx}
+
+
+
+
+@app.before_request
+def _enforce_auth_quota_for_clicked():
+    try:
+        if request.path == "/clicked":
+            state = _current_user_state()
+            if not state["is_logged_in"]:
+                return jsonify({"status": "auth_required", "message": "Login required to generate reports."}), 403
+            if state["count"] <= 0:
+                return jsonify({"status": "quota_exhausted", "message": "You’ve reached your monthly limit. Please upgrade or buy additional reports."}), 403
+    except Exception:
+        pass
+
+
+
+
+@app.get("/auth/status")
+def auth_status():
+    return jsonify(_current_user_state())
+
+@app.post("/auth/login")
+def auth_login():
+    data = request.get_json(silent=True) or {}
+    u = (data.get("username") or "").strip()
+    p = data.get("password") or ""
+    if not u or not p:
+        return jsonify({"ok": False, "error": "missing_fields"}), 400
+    pw_file, quota_file, _ = _user_files(u)
+    if not pw_file.exists():
+        return jsonify({"ok": False, "error": "no_such_user"}), 404
+    try:
+        stored = pw_file.read_text(encoding="utf-8")
+    except Exception:
+        stored = ""
+    if stored != p:
+        return jsonify({"ok": False, "error": "wrong_password"}), 403
+    session.permanent = True
+    session["user"] = u
+    cnt, mx = _user_read_quota(u)
+    return jsonify({"ok": True, "user": u, "count": cnt, "max": mx})
+
+@app.post("/auth/register")
+def auth_register():
+    data = request.get_json(silent=True) or {}
+    u = (data.get("username") or "").strip()
+    p = data.get("password") or ""
+    start_max = int(data.get("starting_quota") or 5)
+    if not u or not p:
+        return jsonify({"ok": False, "error": "missing_fields"}), 400
+    pw_file, quota_file, _ = _user_files(u)
+    if pw_file.exists():
+        return jsonify({"ok": False, "error": "user_exists"}), 409
+    try:
+        pw_file.write_text(p, encoding="utf-8")
+        quota_file.write_text(json.dumps({"count": start_max, "max": start_max}), encoding="utf-8")
+    except Exception as e:
+        return jsonify({"ok": False, "error": f"fs_error: {e}"}), 500
+    session.permanent = True
+    session["user"] = u
+    return jsonify({"ok": True, "user": u, "count": start_max, "max": start_max})
+
+@app.post("/auth/logout")
+def auth_logout():
+    try:
+        session.pop("user", None)
+    except Exception:
+        pass
+    return jsonify({"ok": True})
+
+
+
+
+
+# ---- Override register_report_consumption to use per-user quota only ----
+try:
+    ORIG_register_report_consumption = register_report_consumption
+except Exception:
+    ORIG_register_report_consumption = None
+
+def register_report_consumption(report_id: str) -> bool:  # override
+    try:
+        u = _current_user()
+        # Guests are not allowed to consume; return False to block
+        if not u:
+            return False
+        if not report_id:
+            return False
+        # Avoid double-charge per user
+        used = _user_read_used(u)
+        if report_id in used:
+            return True
+        cnt, mx = _user_read_quota(u)
+        if cnt <= 0:
+            return False
+        used.add(report_id); _user_write_used(u, used)
+        _user_write_quota(u, cnt - 1, mx)
+        try:
+            logger.info(f"[QUOTA][{u}] consumed 1 for report_id={report_id}; remaining={cnt-1}/{mx}")
+        except Exception:
+            pass
+        return True
+    except Exception as e:
+        try: logger.warning(f"[QUOTA][override] {e}")
+        except Exception: pass
+        # fallback to original if anything odd happens
+        if ORIG_register_report_consumption:
+            return ORIG_register_report_consumption(report_id)
+        return False
+
+
+
+
+
+# ---- Override register_report_consumption to use per-user quota only ----
+OVERRIDE_register_report_consumption = True
+try:
+    ORIG_register_report_consumption = register_report_consumption
+except Exception:
+    ORIG_register_report_consumption = None
+
+def register_report_consumption(report_id: str) -> bool:  # override
+    try:
+        u = _current_user()
+        if not u or not report_id:
+            return False
+        used = _user_read_used(u)
+        if report_id in used:
+            return True
+        cnt, mx = _user_read_quota(u)
+        if cnt <= 0:
+            return False
+        used.add(report_id); _user_write_used(u, used)
+        _user_write_quota(u, cnt - 1, mx)
+        return True
+    except Exception:
+        return ORIG_register_report_consumption(report_id) if ORIG_register_report_consumption else False
+
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
 
@@ -1287,3 +1524,11 @@ def cache_clear():
         cleared["others"] = "cleared"
     return jsonify({"status": "ok", "cleared": cleared, "scope": what})
 
+
+
+def _counter_state_useraware():
+    try:
+        st = _current_user_state()
+        return jsonify({"count": st["count"], "max": st["max"], "user": st["user"], "is_logged_in": st["is_logged_in"]})
+    except Exception as e:
+        return jsonify({"count": 0, "max": 0, "user": "Guest", "is_logged_in": False, "error": str(e)}), 200
