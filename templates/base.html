@@ -37,7 +37,24 @@
     .btn-secondary:hover{background:#1d2750;border-color:#1a2347}
     .btn-ghost{background:transparent;border-color:#cdd6e1;color:#0b1324}
     .btn-ghost:hover{background:#f5f7fb}
-  </style>
+  
+    /* analyzing splash */
+    #analyzing-splash{
+      position:fixed; left:0; top:56px; right:0; bottom:var(--quota-h, 0px);
+      display:none; align-items:center; justify-content:center; z-index:19999;
+      pointer-events:none;
+    }
+    .analyzing-card{
+      background:#fff; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.15);
+      padding:16px 18px; font-size:1rem; display:flex; align-items:center; gap:10px;
+    }
+    .analyzing-spinner{
+      width:18px; height:18px; border-radius:50%; border:3px solid #e5e7eb; border-top-color:#0078D4;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{ to { transform: rotate(360deg); } }
+    </style>
+        
 </head>
 <body>
   <div id="header-bar">
@@ -51,6 +68,7 @@
   </div>
   <div id="map"></div>
   <div id="report-overlay-bg"></div>
+  <div id="analyzing-splash"><div class="analyzing-card"><div class="analyzing-spinner"></div><div id="analyzing-text">Analyzing...</div></div></div>
 
   <script>
   // --- i18n bootstrap ---
@@ -127,6 +145,8 @@
   <script>
   // --- Language application + map UI labels ---
   function applyLang(renderMarkersToo=false){
+    const splash = document.getElementById('analyzing-text');
+    if (splash) { try { splash.innerText = (getI18n().analyzing || 'Analyzing...'); } catch(_e){} }
     const t = getI18n();
     const $ = (id)=>document.getElementById(id);
 
@@ -315,10 +335,13 @@
         zoom: map.getZoom()
       };
       axios.post('/refresh', payload).then(function(r){
-        clearMarkers();
-        markerData = r.data || [];
-        updateHouseIcons();
-        applyLang();
+        var data = r.data || [];
+        if (Array.isArray(data) && data.length > 0){
+          clearMarkers();
+          markerData = data;
+          updateHouseIcons();
+          applyLang();
+        }
       }).catch(function(err){
         console.error("Refresh error", err);
       });
@@ -333,10 +356,14 @@
         zoom: map.getZoom()
       };
       axios.post('/refresh', payload).then(function(r){
-        markers.forEach(m => map.removeLayer(m)); markers=[];
-        markerData = r.data || [];
-        updateHouseIcons();
-        applyLang();
+        var data = r.data || [];
+        if (Array.isArray(data) && data.length > 0){
+          markers.forEach(m => map.removeLayer(m));
+          markers = [];
+          markerData = data;
+          updateHouseIcons();
+          applyLang();
+        }
       }).catch(function(err){
         console.error("Refresh error", err);
       });
@@ -378,6 +405,19 @@
       });
   }
 
+  function showAnalyzing(){
+    var overlayBg = document.getElementById("report-overlay-bg");
+    if (overlayBg) overlayBg.style.display = "block";
+    var splash = document.getElementById("analyzing-splash");
+    var txt = document.getElementById("analyzing-text");
+    if (txt) { try { txt.innerText = (getI18n().analyzing || 'Analyzing...'); } catch(_e){} }
+    if (splash) splash.style.display = "flex";
+  }
+  function hideAnalyzing(){
+    var splash = document.getElementById("analyzing-splash");
+    if (splash) splash.style.display = "none";
+  }
+
   async function sendClickedInfo(address, price, bedrooms, bathrooms, last_sold_amount, lat, lon){
     try{
       const r = await fetch('/auth/status', {cache:'no-store', credentials:'same-origin'});
@@ -388,6 +428,7 @@
     }catch(_e){ openAuthModal('login'); return; }
 
     try {
+      showAnalyzing();
       const response = await axios.post('/clicked', { address, price, bedrooms, bathrooms, last_sold_amount, language: (window.currentLanguage||'en'), lat, lon });
       var data = response.data || {};
       var raw = data.html || data.report || "<div>Error generating report.</div>";
@@ -401,6 +442,7 @@
       hdr.appendChild(closeBtn); hdr.appendChild(printBtn); popupDiv.appendChild(hdr);
       var content = document.createElement("div"); content.innerHTML = html; popupDiv.appendChild(content);
       document.body.appendChild(popupDiv);
+      hideAnalyzing();
     } catch (err) {
       var status = err && err.response && err.response.status;
       if (status === 403) {
@@ -410,6 +452,7 @@
         else openAuthModal('login');
         return;
       }
+      hideAnalyzing();
       alert(getI18n().reportError || 'Error generating report.');
     }
   }
@@ -432,7 +475,7 @@
       }
       bar.style.cssText = "position:fixed;left:0;right:0;bottom:0;height:40px;background:#0b63a6;color:#fff;display:flex;align-items:center;gap:10px;padding:0 12px;z-index:10002;font-size:.92rem";
       if (!bar.innerHTML || bar.innerHTML.indexOf('quota-user') === -1){
-        bar.innerHTML = '<div id="quota-user"></div><span id="quota-count" style="display:none"></span>';
+        bar.innerHTML = '<div id="quota-user"></div><span id="quota-count" style="display:none"></span>' + '<span id="quota-copyright" style="margin-left:auto">&copy; 2025 REintelligence.app</span>';
       }
       return bar;
     }

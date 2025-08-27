@@ -5,90 +5,15 @@ import os
 import pathlib
 import re
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from logging.handlers import RotatingFileHandler
 from threading import Lock
 from urllib.parse import quote
 
 import requests
 from flask import Flask, jsonify, render_template, request, session
-# ---------- Report Counter (persistent) ----------
-from threading import Lock as _CounterLock
-from datetime import timedelta
-
-COUNTER_MAX = 5
-COUNTER_FILE = os.path.join(BASE_DIR, "report_counter.json") if "BASE_DIR" in globals() else os.path.join(os.path.dirname(__file__), "report_counter.json")
-COUNTER_USED_FILE = os.path.join(BASE_DIR, "report_counter_used.json") if "BASE_DIR" in globals() else os.path.join(os.path.dirname(__file__), "report_counter_used.json")
-_COUNTER_LOCK = _CounterLock()
-
-def _counter_init():
-    try:
-        if not os.path.exists(COUNTER_FILE):
-            with open(COUNTER_FILE, "w", encoding="utf-8") as f:
-                json.dump({"count": COUNTER_MAX}, f)
-        if not os.path.exists(COUNTER_USED_FILE):
-            with open(COUNTER_USED_FILE, "w", encoding="utf-8") as f:
-                json.dump({"used": []}, f)
-    except Exception as e:
-        try: logger.warning(f"[COUNTER][init] {e}")
-        except Exception: pass
-
-def _counter_load():
-    try:
-        with open(COUNTER_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f) or {}
-            c = int(data.get("count", COUNTER_MAX))
-            return max(0, min(COUNTER_MAX, c))
-    except Exception:
-        return COUNTER_MAX
-
-def _counter_save(val: int):
-    try:
-        with open(COUNTER_FILE, "w", encoding="utf-8") as f:
-            json.dump({"count": max(0, min(COUNTER_MAX, int(val)))}, f)
-    except Exception as e:
-        try: logger.warning(f"[COUNTER][save] {e}")
-        except Exception: pass
-
-def _used_load() -> set:
-    try:
-        with open(COUNTER_USED_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f) or {}
-            return set(data.get("used", []))
-    except Exception:
-        return set()
-
-def _used_save(s: set):
-    try:
-        with open(COUNTER_USED_FILE, "w", encoding="utf-8") as f:
-            json.dump({"used": list(s)}, f)
-    except Exception as e:
-        try: logger.warning(f"[COUNTER][used-save] {e}")
-        except Exception: pass
-
-def register_report_consumption(report_id: str) -> bool:
-    """Decrement the counter once per unique property id (zpid or address)."""
-    try:
-        if not report_id: return False
-        _counter_init()
-        with _COUNTER_LOCK:
-            used = _used_load()
-            if report_id in used:
-                return False
-            used.add(report_id)
-            _used_save(used)
-            cnt = _counter_load()
-            _counter_save(max(0, cnt-1))
-        try: logger.info(f"[COUNTER] -> {_counter_load()} id={report_id}")
-        except Exception: pass
-        return True
-    except Exception as e:
-        try: logger.warning(f"[COUNTER][register] {e}")
-        except Exception: pass
-        return False
-
-
 # ---------- OpenAI ----------
+
 from openai import OpenAI
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 oi_client = OpenAI(api_key=OPENAI_API_KEY)
@@ -145,9 +70,6 @@ def _save_property_cache_disk():
     except Exception as e:
         log(f"[DISK_CACHE] save error: {e}")
 
-# Load existing property cache at startup
-_load_property_cache_disk()
-
 # ---------- Cache & Rate limiting ----------
 
 # ---------- Disk Cache ----------
@@ -189,21 +111,34 @@ _cache = {
     "zpid_by_query": {},
     "property_by_zpid": {},
 }
+# Load existing property cache at startup
+_load_property_cache_disk()
 _last_request_monotonic = 0.0
 _cooldown_until = 0.0
 def _now(): return time.time()
+
 def _cache_get(bucket: str, key: str, ttl: int):
-    with _cache_lock:
-        entry = _cache[bucket].get(key)
-        if not entry: log(f"[CACHE][MISS] {bucket}:{key}"); return None
-        if _now() - entry["ts"] > ttl:
+    try:
+        with _cache_lock:
+            entry = _cache[bucket].get(key)
+        if not entry:
+            log(f"[CACHE][MISS] {bucket}:{key}")
+            return None
+        if _now() - entry.get("ts", 0) > ttl:
             log(f"[CACHE][EXPIRED] {bucket}:{key}")
-            _cache[bucket].pop(key, None); return None
-        log(f"[CACHE][HIT] {bucket}:{key}"); return entry
+            with _cache_lock:
+                _cache[bucket].pop(key, None)
+            return None
+        log(f"[CACHE][HIT] {bucket}:{key}")
+        return entry
+    except Exception:
+        return None
+
 def _cache_set(bucket: str, key: str, value: dict):
     with _cache_lock:
         _cache[bucket][key] = {"ts": _now(), **value}
-        log(f"[CACHE][SET] {bucket}:{key}")
+    log(f"[CACHE][SET] {bucket}:{key}")
+
 def _rate_limit_wait():
     global _last_request_monotonic, _cooldown_until
     now = time.monotonic()
@@ -217,12 +152,12 @@ def _rate_limit_wait():
         log(f"[RATE] Spacing calls: sleeping {sleep_for:.2f}s")
         time.sleep(sleep_for)
     _last_request_monotonic = time.monotonic()
+
 def _trigger_backoff():
     global _cooldown_until
     _cooldown_until = max(_cooldown_until, time.monotonic() + ZILLOW_429_BACKOFF)
-    log(f"[RATE] 429 detected. Cooldown until { _cooldown_until :.2f} (monotonic)")
+    log(f"[RATE] 429 detected. Cooldown until {_cooldown_until:.2f} (monotonic)")
 
-# ---------- Helpers ----------
 def reverse_geocode(lat, lon):
     url = f"https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={lon}"
     headers = {'User-Agent': 'PropertyMapApp/1.0'}
@@ -534,9 +469,12 @@ def fetch_homes(location, sw_lat=None, sw_lng=None, ne_lat=None, ne_lng=None):
     cached = _cache_get("props_by_location", loc_key, TTL_PROPS_BY_LOCATION)
     if cached:
         payload = cached.get("payload")
+        # normalize legacy cache shape (list -> dict with props)
+        if isinstance(payload, list):
+            payload = {"props": payload}
         log(f"[FETCH_HOMES] using cached payload for '{location}'")
     # We'll derive props from cached payload first
-    props = (payload or {}).get("props") or []
+    props = (payload.get("props") if isinstance(payload, dict) else (payload if isinstance(payload, list) else []))
     if not props:
         # Try live attempts only if cache had no props
         location_encoded = quote(location)
@@ -552,13 +490,13 @@ def fetch_homes(location, sw_lat=None, sw_lng=None, ne_lat=None, ne_lng=None):
             if status != 200 or not isinstance(payload, dict):
                 log(f"[FETCH_HOMES][TRY{idx}] status={status}; skipping")
                 continue
-            props = (payload or {}).get("props") or []
+            props = (payload.get("props") if isinstance(payload, dict) else (payload if isinstance(payload, list) else []))
             log(f"[FETCH_HOMES][TRY{idx}] props={len(props)}")
             if len(props) > 0:
-                _cache_set("props_by_location", loc_key, {"payload": payload})
+                _cache_set("props_by_location", loc_key, {"payload": (payload if isinstance(payload, dict) else {"props": payload})})
                 break
         # If still nothing and we have cached_first (preloaded below), we'll at least return those later.
-    props = (payload or {}).get("props") or []
+    props = (payload.get("props") if isinstance(payload, dict) else (payload if isinstance(payload, list) else []))
     log(f"[FETCH_HOMES] raw_props={len(props)} for location={location}")
 
     listings = list(cached_first)
@@ -641,6 +579,7 @@ def geocode_place(q: str):
 
 # ---------- Refresh debounce ----------
 _last_refresh = {"lat": None, "lng": None, "zoom": None, "ts": 0.0}
+_last_results = {"homes": []}
 MIN_REFRESH_INTERVAL = float(os.getenv("MIN_REFRESH_INTERVAL", "4.0"))
 MIN_CENTER_DELTA_DEG = float(os.getenv("MIN_CENTER_DELTA_DEG", "0.01"))
 
@@ -699,6 +638,10 @@ def refresh():
         homes = fetch_homes(state, sw_lat, sw_lng, ne_lat, ne_lng)
 
     log(f"[REFRESH] returning {len(homes)} homes")
+    try:
+        _last_results["homes"] = homes
+    except Exception:
+        pass
     return jsonify(homes)
 
 @app.route("/lookup", methods=["POST"])
@@ -1401,49 +1344,18 @@ except Exception:
 def register_report_consumption(report_id: str) -> bool:  # override
     try:
         u = _current_user()
-        # Guests are not allowed to consume; return False to block
         if not u:
             return False
         if not report_id:
             return False
-        # Avoid double-charge per user
-        used = _user_read_used(u)
-        if report_id in used:
-            return True
         cnt, mx = _user_read_quota(u)
         if cnt <= 0:
             return False
-        used.add(report_id); _user_write_used(u, used)
         _user_write_quota(u, cnt - 1, mx)
-        try:
-            logger.info(f"[QUOTA][{u}] consumed 1 for report_id={report_id}; remaining={cnt-1}/{mx}")
-        except Exception:
-            pass
         return True
-    except Exception as e:
-        try: logger.warning(f"[QUOTA][override] {e}")
-        except Exception: pass
-        # fallback to original if anything odd happens
-        if ORIG_register_report_consumption:
-            return ORIG_register_report_consumption(report_id)
+    except Exception:
         return False
 
-
-
-
-
-# ---- Override register_report_consumption to use per-user quota only ----
-OVERRIDE_register_report_consumption = True
-try:
-    ORIG_register_report_consumption = register_report_consumption
-except Exception:
-    ORIG_register_report_consumption = None
-
-def register_report_consumption(report_id: str) -> bool:  # override
-    try:
-        u = _current_user()
-        if not u or not report_id:
-            return False
         used = _user_read_used(u)
         if report_id in used:
             return True
