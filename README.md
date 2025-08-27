@@ -408,7 +408,61 @@ A Flask web application for interactive property search, analysis, and visualiza
 - **`applyLang` not defined** race by ensuring a single, stable definition
 - **Button identity clashes** that made auth buttons morph into report buttons
 
-- ---
+---
+
+# Changelog
+
+## Changed
+- **Quota consumption**: Every generated report (from cache *or* fresh) now decrements the user’s quota by **1**.
+  - Implemented by simplifying `register_report_consumption(report_id)` to always subtract 1 from the current user’s quota and ignore prior “used” tracking.  
+  - Keeps existing `/clicked` integration; no other behavior was altered.  
+- **UI copy**: Updated auth modal helper text to show **“Dev test user: rey / R34n3l.2025 (10 reports)”**.
+
+## Notes
+- No other endpoints, data models, or UI elements were changed.
+- Existing client logic (pre-checking `/auth/status` and showing the report) remains intact.
+- ## [Unreleased] - Quota logic simplification
+
+### Changed
+- Every generated report now decrements user quota by **1** (regardless of cache hit or fresh generation).
+
+### Removed
+- Legacy `used.json` tracking and related helpers (`_report_was_used`, `_report_mark_used`, etc.) to reduce I/O and complexity.
+
+---
+
+# Changelog
+
+## Added
+- **Analyzing splash:** lightweight, localized overlay shown before `/clicked` and hidden on success/error.
+- **Branding:** `© 2025 REintelligence.app` on bottom bar (right-aligned) and appended under report fine print (EN/ES).
+
+## Changed
+- **Map markers:** Properties within the viewport persist across **all zoom levels**; refreshes do not clear markers unless new data arrives.
+- **Quota policy:** 
+  - Initial quota for new registrations is **10**.
+  - **Every** report generation (from cache or fresh) decrements the user’s quota by **1**.
+- **Dev hint:** Auth modal copy now reads: `Dev test user: rey / R34n3l.2025 (10 reports)`.
+
+## Fixed
+- **Payload shape robustness:** `fetch_homes` accepts both dict (`{"props":[...]}`) and legacy list payloads; no `AttributeError` or `NoneType` length errors.
+- **Syntax/Runtime issues:** 
+  - Repaired malformed f-strings and one-line `try:` statements.
+  - Restored clean `_cache_get` / `_cache_set`; removed duplicate signature line causing unmatched `)` errors.
+  - Ensured all `except Exception:` blocks have proper indented bodies.
+  - Moved disk cache load to occur **after** `_cache_lock/_cache` init; imported `timedelta` for session lifetime.
+
+## Removed
+- **Legacy used-tracking:** Eliminated `used.json` helpers and references; quota is now strictly count-based.
+
+## Migrations
+- **Quota migration:** On startup, overwrite `users/*/quota.json` to `{"count":10,"max":10}` for **all** users to standardize the new baseline.
+
+## Notes / Scope
+- Only targeted areas were changed; no unrelated functionality was modified.
+- Frontend changes limited to `base.html` (splash, branding, dev hint) and refresh handlers (conditional marker clearing).
+- Backend changes limited to `map.py` (quota, caching robustness, error fixes, init order).
+
 
 ### 🚀 Upgrade Steps
 
