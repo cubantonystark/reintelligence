@@ -4,23 +4,46 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b9d45ade-6de1-45f4-a3f3-2951acd4775d" name="Changes" comment="implement frontend logout handler&#10;&#10;- Add window.authLogout() in base.html:&#10;  - POST /auth/logout with credentials&#10;  - Optimistic UI update to Guest; call refreshCounterBar() to confirm&#10;- Leave backend /auth/logout as-is (already implemented)&#10;- Add window.authLogout(): POST /auth/logout, optimistically render Guest, refresh /auth/status&#10;- Add closeReportOverlay(); allow clicking the dim background to close report&#10;- Scope i18n updates to report popup only (#floating-gpt-popup) for print/close labels&#10;- Remove .gpt-popup-print-btn from auth modal submit; use .auth-primary-btn instead&#10;- Use .gpt-popup-btns on report header for correct sticky styling&#10;Blank screen fixed. Your previous file had two blockers:&#10;&#10;A stray literal \1 right after &lt;html lang=&quot;en&quot;&gt; (from a regex backreference) that confused parsing.&#10;&#10;Critical functions like applyLang(), createLeafletMap(), updateHouseIcons(), and setupMapRefresh() were missing, so the map never initialized and i18n couldn’t run.&#10;&#10;I rebuilt base.html cleanly with:&#10;&#10;Proper &lt;head&gt; tag and a tiny data-URL favicon (no more 404).&#10;&#10;Full EN/ES i18n dictionary + getI18n(), applyLang(), and toggleLanguage() wired so the property preview popup switches language instantly.&#10;&#10;Complete Leaflet setup (createLeafletMap, layers control, refresh loop, marker rendering).&#10;&#10;The “Good deal?” flow with report popup (print/close localized).&#10;&#10;Limit-reached modal (centered, styled, localized).&#10;&#10;Single, clean quota bar + auth wiring (Login/Register ↔ Logout works, localized).">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/2059106698.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/2059106698.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/2068626000.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/2068626000.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/246233138.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/246233138.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/295823777.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/295823777.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/295827100.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/295827100.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/332843784.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/332843784.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/337854912.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/337854912.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/338906112.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/338906112.json" afterDir="false" />
+    <list default="true" id="b9d45ade-6de1-45f4-a3f3-2951acd4775d" name="Changes" comment="full EN/ES localization, stable logout, centered limit modal, quota bar cleanup, live language toggle; expand modals; redirect buy/upgrade to root; enlarge popup image; fix parsing errors&#10;&#10;- i18n: Add comprehensive EN/ES strings (auth modal, limit modal, property popup, quota bar, Leaflet layers)&#10;- i18n: Map backend `user_exists` → localized message&#10;- auth: Optimistic logout + POST /auth/logout + /auth/status revalidate; show Guest instantly&#10;- ui(quota): Replace fragmented logic with a single clean IIFE; ensure blue styling; refresh on lang toggle&#10;- ui(limit): Replace browser alert with centered modal; increase padding/line-height/min-height&#10;- ui(auth): Beautify &amp; expand modal to fit content; keep buttons consistent with GUI&#10;- ui(popup): Increase property image to 280px; ensure Close/Print localized&#10;- lang toggle: Rebuild property popup + relabel “Good deal?” buttons + update quota bar labels immediately&#10;- nav: Change /upgrade and /buy actions to redirect to root (/)&#10;- fix: Remove stray tokens/extra braces/dangling catch blocks causing blank screen and missing functions&#10;- chore: Add data-URL favicon to silence 404">
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/114443871.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/114443871.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/123550698.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/123550698.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/166720555.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/166720555.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/2060140477.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/2060140477.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/295829617.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/295829617.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/295829917.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/295829917.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/307880266.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/307880266.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/307883266.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/307883266.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/337853833.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/337853833.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/338906632.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/338906632.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/440572003.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/440572003.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/443865701.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/443865701.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/444521851.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/444521851.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/448759913.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/448759913.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44848330.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44848330.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44848331.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44848331.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44850308.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44850308.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44850319.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44850319.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44850334.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44850334.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44850611.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44850611.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44851100.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44851100.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44851119.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44851119.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44852167.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44852167.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44852322.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44852322.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44852354.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44852354.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44852416.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44852416.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44852872.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44852872.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44854801.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44854801.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855049.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855049.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855234.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855234.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855246.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855246.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855292.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855292.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855470.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855470.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855860.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855860.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44855937.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44855937.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44856133.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44856133.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44887940.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44887940.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44898755.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44898755.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44900683.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44900683.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44900738.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44900738.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/44900962.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/44900962.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/449581116.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/449581116.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/450140453.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/450140453.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/450224798.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/450224798.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45043919.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45043919.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45043990.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45043990.json" afterDir="false" />
@@ -31,59 +54,7 @@
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45044913.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45044913.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45045367.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45045367.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45045675.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45045675.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45045889.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45045889.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45045906.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45045906.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046376.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046376.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046388.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046388.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046463.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046463.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046532.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046532.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046592.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046592.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046681.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046681.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046682.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046682.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046685.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046685.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046743.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046743.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046773.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046773.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046821.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046821.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046844.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046844.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45046909.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45046909.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45047117.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45047117.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45047460.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45047460.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45047486.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45047486.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45047613.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45047613.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45047895.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45047895.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048010.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048010.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048069.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048069.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048070.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048070.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048180.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048180.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048184.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048184.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048242.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048242.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048410.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048410.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048466.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048466.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048748.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048748.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048776.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048776.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45048802.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45048802.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45049532.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45049532.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45049854.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45049854.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45049875.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45049875.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45050792.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45050792.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45051132.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45051132.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45052011.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45052011.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/450776032.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/450776032.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45088883.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45088883.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45088897.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45088897.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45095703.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45095703.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45096290.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45096290.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45096310.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45096310.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45096352.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45096352.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45096397.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45096397.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099121.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099121.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099154.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099154.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099155.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099155.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099256.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099256.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099352.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099352.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099470.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099470.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45099556.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45099556.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45100245.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45100245.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45045793.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45045793.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45101655.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45101655.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45101907.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45101907.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45102408.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45102408.json" afterDir="false" />
@@ -99,117 +70,24 @@
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45103568.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45103568.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45103592.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45103592.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45104393.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45104393.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45104878.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45104878.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105339.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105339.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105357.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105357.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105361.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105361.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105414.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105414.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105780.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105780.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105836.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105836.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105855.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105855.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105929.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105929.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105967.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105967.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45105979.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45105979.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106126.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106126.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106129.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106129.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106211.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106211.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106238.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106238.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106267.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106267.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106279.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106279.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106296.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106296.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106303.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106303.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106337.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106337.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106360.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106360.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106381.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106381.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106392.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106392.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106416.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106416.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45106756.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45106756.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45107212.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45107212.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45107269.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45107269.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45107464.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45107464.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45107674.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45107674.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45107955.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45107955.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108320.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108320.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108361.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108361.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108472.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108472.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108497.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108497.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108510.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108510.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108538.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108538.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108552.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108552.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108613.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108613.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108657.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108657.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108703.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108703.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108821.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108821.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45108975.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45108975.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45109045.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45109045.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45109062.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45109062.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45109283.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45109283.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45109309.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45109309.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45109941.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45109941.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110027.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110027.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110050.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110050.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110052.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110052.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110232.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110232.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110242.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110242.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110282.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110282.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110363.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110363.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110440.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110440.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110503.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110503.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110718.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110718.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110745.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110745.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45110886.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45110886.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111011.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111011.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111194.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111194.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111232.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111232.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111331.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111331.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111334.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111334.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111342.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111342.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111482.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111482.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111535.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111535.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111611.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111611.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111628.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111628.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111660.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111660.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111735.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111735.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111772.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111772.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111845.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111845.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111904.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111904.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45111937.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45111937.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112265.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112265.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112271.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112271.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112280.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112280.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112289.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112289.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112385.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112385.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112408.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112408.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112416.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112416.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112568.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112568.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/45112677.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/45112677.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/453026000.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/453026000.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/455890829.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/455890829.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/455926850.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/455926850.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/454076651.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/454076651.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/456208646.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/456208646.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/51591108.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/51591108.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/58432361.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/58432361.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/58432890.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/58432890.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/58432932.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/58432932.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/58438799.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/58438799.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/66717475.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/66717475.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/66730121.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/66730121.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82034673.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82034673.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82035704.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82035704.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82035938.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82035938.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82041324.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82041324.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82052678.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82052678.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82985765.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82985765.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/82995979.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/82995979.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/83004384.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/83004384.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/89745177.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/89745177.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99610209.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99610209.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99610855.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99610855.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99617104.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99617104.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99618223.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99618223.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99628530.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99628530.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99641990.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99641990.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99643269.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99643269.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cache/property_by_zpid/99658793.json" beforeDir="false" afterPath="$PROJECT_DIR$/cache/property_by_zpid/99658793.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/app.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/app.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/property_cache.json" beforeDir="false" afterPath="$PROJECT_DIR$/property_cache.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -243,6 +121,7 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -302,7 +181,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1756140314851</updated>
-      <workItem from="1756140315927" duration="68910000" />
+      <workItem from="1756140315927" duration="69501000" />
     </task>
     <task id="LOCAL-00001" summary="feat(auth,quota,ui): add login/register modal, per-user quotas, and robust bottom bar; remove legacy root counters; harden client flow&#10;&#10;- Add login/register splash modal; require auth when session missing/expired or quota == 0&#10;- Implement per-user storage under users/&lt;username&gt;/:&#10;  - password.txt&#10;  - quota.json (count/max)&#10;  - used.json (dedupe report charges)&#10;- Add endpoints: /auth/status, /auth/login, /auth/register, /auth/logout&#10;- Make /counter user-aware: {is_logged_in, user, count, max}; keep count/max for backward compat&#10;- Guard /clicked via before_request:&#10;  - 403 auth_required when not logged in&#10;  - 403 quota_exhausted when quota == 0&#10;- Client: pre-check /auth/status before calling /clicked; on 403, open modal or show quota message&#10;- Bottom bar:&#10;  - Logged in: &quot;username — count/max — Logout&quot;&#10;  - Guest: &quot;Guest - Login/Register&quot; (no quota)&#10;- Remove functional use of root report_counter.json/report_counter_used.json; consume per-user quota only&#10;- Fix JS syntax errors by consolidating scripts into a single inline block; remove code embedded in &lt;script src=&quot;...&quot;&gt;&#10;- Sanitize report HTML (strip code fences); improve popup styling and mobile responsiveness&#10;- Add dev user rey / R34n3l.2025 (quota=5)&#10;- Preserve all existing routes and functionality; changes are additive and non-breaking">
       <option name="closed" value="true" />
@@ -384,7 +263,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756266100198</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="full EN/ES localization, stable logout, centered limit modal, quota bar cleanup, live language toggle; expand modals; redirect buy/upgrade to root; enlarge popup image; fix parsing errors&#10;&#10;- i18n: Add comprehensive EN/ES strings (auth modal, limit modal, property popup, quota bar, Leaflet layers)&#10;- i18n: Map backend `user_exists` → localized message&#10;- auth: Optimistic logout + POST /auth/logout + /auth/status revalidate; show Guest instantly&#10;- ui(quota): Replace fragmented logic with a single clean IIFE; ensure blue styling; refresh on lang toggle&#10;- ui(limit): Replace browser alert with centered modal; increase padding/line-height/min-height&#10;- ui(auth): Beautify &amp; expand modal to fit content; keep buttons consistent with GUI&#10;- ui(popup): Increase property image to 280px; ensure Close/Print localized&#10;- lang toggle: Rebuild property popup + relabel “Good deal?” buttons + update quota bar labels immediately&#10;- nav: Change /upgrade and /buy actions to redirect to root (/)&#10;- fix: Remove stray tokens/extra braces/dangling catch blocks causing blank screen and missing functions&#10;- chore: Add data-URL favicon to silence 404">
+      <option name="closed" value="true" />
+      <created>1756266888599</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1756266888599</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -398,7 +285,8 @@
     <MESSAGE value="feat(auth): implement frontend logout handler&#10;&#10;- Add window.authLogout() in base.html:&#10;  - POST /auth/logout with credentials&#10;  - Optimistic UI update to Guest; call refreshCounterBar() to confirm&#10;- Leave backend /auth/logout as-is (already implemented)&#10;- Add window.authLogout(): POST /auth/logout, optimistically render Guest, refresh /auth/status&#10;- Add closeReportOverlay(); allow clicking the dim background to close report&#10;- Scope i18n updates to report popup only (#floating-gpt-popup) for print/close labels&#10;- Remove .gpt-popup-print-btn from auth modal submit; use .auth-primary-btn instead&#10;- Use .gpt-popup-btns on report header for correct sticky styling" />
     <MESSAGE value="implement frontend logout handler&#10;&#10;- Add window.authLogout() in base.html:&#10;  - POST /auth/logout with credentials&#10;  - Optimistic UI update to Guest; call refreshCounterBar() to confirm&#10;- Leave backend /auth/logout as-is (already implemented)&#10;- Add window.authLogout(): POST /auth/logout, optimistically render Guest, refresh /auth/status&#10;- Add closeReportOverlay(); allow clicking the dim background to close report&#10;- Scope i18n updates to report popup only (#floating-gpt-popup) for print/close labels&#10;- Remove .gpt-popup-print-btn from auth modal submit; use .auth-primary-btn instead&#10;- Use .gpt-popup-btns on report header for correct sticky styling" />
     <MESSAGE value="implement frontend logout handler&#10;&#10;- Add window.authLogout() in base.html:&#10;  - POST /auth/logout with credentials&#10;  - Optimistic UI update to Guest; call refreshCounterBar() to confirm&#10;- Leave backend /auth/logout as-is (already implemented)&#10;- Add window.authLogout(): POST /auth/logout, optimistically render Guest, refresh /auth/status&#10;- Add closeReportOverlay(); allow clicking the dim background to close report&#10;- Scope i18n updates to report popup only (#floating-gpt-popup) for print/close labels&#10;- Remove .gpt-popup-print-btn from auth modal submit; use .auth-primary-btn instead&#10;- Use .gpt-popup-btns on report header for correct sticky styling&#10;Blank screen fixed. Your previous file had two blockers:&#10;&#10;A stray literal \1 right after &lt;html lang=&quot;en&quot;&gt; (from a regex backreference) that confused parsing.&#10;&#10;Critical functions like applyLang(), createLeafletMap(), updateHouseIcons(), and setupMapRefresh() were missing, so the map never initialized and i18n couldn’t run.&#10;&#10;I rebuilt base.html cleanly with:&#10;&#10;Proper &lt;head&gt; tag and a tiny data-URL favicon (no more 404).&#10;&#10;Full EN/ES i18n dictionary + getI18n(), applyLang(), and toggleLanguage() wired so the property preview popup switches language instantly.&#10;&#10;Complete Leaflet setup (createLeafletMap, layers control, refresh loop, marker rendering).&#10;&#10;The “Good deal?” flow with report popup (print/close localized).&#10;&#10;Limit-reached modal (centered, styled, localized).&#10;&#10;Single, clean quota bar + auth wiring (Login/Register ↔ Logout works, localized)." />
-    <option name="LAST_COMMIT_MESSAGE" value="implement frontend logout handler&#10;&#10;- Add window.authLogout() in base.html:&#10;  - POST /auth/logout with credentials&#10;  - Optimistic UI update to Guest; call refreshCounterBar() to confirm&#10;- Leave backend /auth/logout as-is (already implemented)&#10;- Add window.authLogout(): POST /auth/logout, optimistically render Guest, refresh /auth/status&#10;- Add closeReportOverlay(); allow clicking the dim background to close report&#10;- Scope i18n updates to report popup only (#floating-gpt-popup) for print/close labels&#10;- Remove .gpt-popup-print-btn from auth modal submit; use .auth-primary-btn instead&#10;- Use .gpt-popup-btns on report header for correct sticky styling&#10;Blank screen fixed. Your previous file had two blockers:&#10;&#10;A stray literal \1 right after &lt;html lang=&quot;en&quot;&gt; (from a regex backreference) that confused parsing.&#10;&#10;Critical functions like applyLang(), createLeafletMap(), updateHouseIcons(), and setupMapRefresh() were missing, so the map never initialized and i18n couldn’t run.&#10;&#10;I rebuilt base.html cleanly with:&#10;&#10;Proper &lt;head&gt; tag and a tiny data-URL favicon (no more 404).&#10;&#10;Full EN/ES i18n dictionary + getI18n(), applyLang(), and toggleLanguage() wired so the property preview popup switches language instantly.&#10;&#10;Complete Leaflet setup (createLeafletMap, layers control, refresh loop, marker rendering).&#10;&#10;The “Good deal?” flow with report popup (print/close localized).&#10;&#10;Limit-reached modal (centered, styled, localized).&#10;&#10;Single, clean quota bar + auth wiring (Login/Register ↔ Logout works, localized)." />
+    <MESSAGE value="full EN/ES localization, stable logout, centered limit modal, quota bar cleanup, live language toggle; expand modals; redirect buy/upgrade to root; enlarge popup image; fix parsing errors&#10;&#10;- i18n: Add comprehensive EN/ES strings (auth modal, limit modal, property popup, quota bar, Leaflet layers)&#10;- i18n: Map backend `user_exists` → localized message&#10;- auth: Optimistic logout + POST /auth/logout + /auth/status revalidate; show Guest instantly&#10;- ui(quota): Replace fragmented logic with a single clean IIFE; ensure blue styling; refresh on lang toggle&#10;- ui(limit): Replace browser alert with centered modal; increase padding/line-height/min-height&#10;- ui(auth): Beautify &amp; expand modal to fit content; keep buttons consistent with GUI&#10;- ui(popup): Increase property image to 280px; ensure Close/Print localized&#10;- lang toggle: Rebuild property popup + relabel “Good deal?” buttons + update quota bar labels immediately&#10;- nav: Change /upgrade and /buy actions to redirect to root (/)&#10;- fix: Remove stray tokens/extra braces/dangling catch blocks causing blank screen and missing functions&#10;- chore: Add data-URL favicon to silence 404" />
+    <option name="LAST_COMMIT_MESSAGE" value="full EN/ES localization, stable logout, centered limit modal, quota bar cleanup, live language toggle; expand modals; redirect buy/upgrade to root; enlarge popup image; fix parsing errors&#10;&#10;- i18n: Add comprehensive EN/ES strings (auth modal, limit modal, property popup, quota bar, Leaflet layers)&#10;- i18n: Map backend `user_exists` → localized message&#10;- auth: Optimistic logout + POST /auth/logout + /auth/status revalidate; show Guest instantly&#10;- ui(quota): Replace fragmented logic with a single clean IIFE; ensure blue styling; refresh on lang toggle&#10;- ui(limit): Replace browser alert with centered modal; increase padding/line-height/min-height&#10;- ui(auth): Beautify &amp; expand modal to fit content; keep buttons consistent with GUI&#10;- ui(popup): Increase property image to 280px; ensure Close/Print localized&#10;- lang toggle: Rebuild property popup + relabel “Good deal?” buttons + update quota bar labels immediately&#10;- nav: Change /upgrade and /buy actions to redirect to root (/)&#10;- fix: Remove stray tokens/extra braces/dangling catch blocks causing blank screen and missing functions&#10;- chore: Add data-URL favicon to silence 404" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/reintelligence$map.coverage" NAME="map Coverage Results" MODIFIED="1756266561698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
