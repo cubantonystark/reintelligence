@@ -156,8 +156,8 @@ function renderQuotaBar(state){
       $('lookup-input').placeholder = t.placeholder;
       $('lookup-btn-text').innerText = t.search;
       $('splash-text').innerText = t.analyzing;
-      const printBtn = document.querySelector('.gpt-popup-print-btn'); if (printBtn) printBtn.innerText = "🖨️ " + t.print;
-      const closeBtn = document.querySelector('.gpt-popup-close-btn'); if (closeBtn) closeBtn.innerText = t.close;
+      const printBtn = document.querySelector('#floating-gpt-popup .gpt-popup-print-btn'); if (printBtn) printBtn.innerText = "🖨️ " + t.print;
+      const closeBtn = document.querySelector('#floating-gpt-popup .gpt-popup-close-btn'); if (closeBtn) closeBtn.innerText = t.close;
 
       // Rebuild layer control with localized labels
       relabelLayers();
@@ -412,7 +412,7 @@ function htmlEscape(str){
     var overlayBg = document.getElementById("report-overlay-bg"); if(overlayBg) overlayBg.style.display = "block";
     var oldPopup = document.getElementById("floating-gpt-popup"); if (oldPopup) oldPopup.remove();
     var popupDiv = document.createElement("div"); popupDiv.className="gpt-popup"; popupDiv.id="floating-gpt-popup";
-    var hdr = document.createElement("div"); hdr.className="hdr";
+    var hdr = document.createElement("div"); hdr.className = "gpt-popup-btns";
     var closeBtn = document.createElement("button"); closeBtn.className="gpt-popup-btn gpt-popup-close-btn"; closeBtn.innerText=(window.I18N&&window.I18N[window.currentLanguage] ? I18N[currentLanguage].close : 'Close'); closeBtn.onclick=function(){ if(typeof closeReportOverlay==='function') closeReportOverlay(); };
     var printBtn = document.createElement("button"); printBtn.className="gpt-popup-btn gpt-popup-print-btn"; printBtn.innerText='🖨️ ' + (window.I18N&&window.I18N[window.currentLanguage] ? I18N[currentLanguage].print : 'Print'); printBtn.onclick=function(){ try{ window.print(); }catch(_e){} };
     hdr.appendChild(closeBtn); hdr.appendChild(printBtn); popupDiv.appendChild(hdr);
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ refreshCounterBar
     <label>Password <input id="auth-password" type="password" placeholder="password" style="width:100%; height:38px; border:1px solid rgba(2,6,23,.12); border-radius:10px; padding:0 10px;"></label>
     <div id="auth-hint" style="font-size:.9em; color:#64748b;">Dev test user: <b>rey</b> / <b>R34n3l.2025</b> (5 reports)</div>
     <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:6px;">
-      <button id="auth-submit" class="gpt-popup-btn gpt-popup-print-btn" onclick="submitAuth()">Login</button>
+      <button id="auth-submit" class="gpt-popup-btn auth-primary-btn" onclick="submitAuth()">Login</button>
     </div>
     <div id="auth-toggle-line" style="display:flex; gap:6px; justify-content:center; margin-top:6px; font-size:.9em; color:#64748b;">
       <span id="auth-toggle-text">Don't have an account?</span>
@@ -684,13 +684,56 @@ function ensureAuthModal(){
       + '<label>Username <input id="auth-username" type="text" placeholder="username" style="width:100%;height:38px;border:1px solid rgba(2,6,23,.12);border-radius:10px;padding:0 10px;"></label>'
       + '<label>Password <input id="auth-password" type="password" placeholder="password" style="width:100%;height:38px;border:1px solid rgba(2,6,23,.12);border-radius:10px;padding:0 10px;"></label>'
       + '<div id="auth-hint" style="font-size:.9em;color:#64748b;">Dev test user: <b>rey</b> / <b>R34n3l.2025</b> (5 reports)</div>'
-      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;"><button id="auth-submit" class="gpt-popup-btn gpt-popup-print-btn" onclick="submitAuth()">Login</button></div>'
+      + '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;"><button id="auth-submit" class="gpt-popup-btn auth-primary-btn" onclick="submitAuth()">Login</button></div>'
       + '<div id="auth-toggle-line" style="display:flex;gap:6px;justify-content:center;margin-top:6px;font-size:.9em;color:#64748b;"><span id="auth-toggle-text">Don\'t have an account?</span><a href="#" id="auth-toggle-link">Register</a></div>';
     modal.appendChild(wrap);
     document.body.appendChild(modal);
   }
 }
 
+</script>
+
+<script>
+// --- Session + Report helpers (injected) ---
+(function(){
+  // Close the AI report overlay/popup safely
+  if (typeof window.closeReportOverlay !== 'function') {
+    window.closeReportOverlay = function closeReportOverlay(){
+      try {
+        var bg = document.getElementById('report-overlay-bg');
+        if (bg) bg.style.display = 'none';
+        var pop = document.getElementById('floating-gpt-popup');
+        if (pop && pop.parentNode) pop.parentNode.removeChild(pop);
+      } catch(_e){}
+    };
+    // Also allow clicking the dimmed background to close
+    try {
+      var bg = document.getElementById('report-overlay-bg');
+      if (bg) {
+        bg.onclick = function(){ try{ window.closeReportOverlay(); }catch(_e){} };
+      }
+    } catch(_e){}
+  }
+
+  // Proper logout: POST /auth/logout, then ensure bottom bar shows Guest and refresh status
+  if (typeof window.authLogout !== 'function') {
+    window.authLogout = async function authLogout(){
+      try {
+        await fetch('/auth/logout', { method:'POST', credentials:'same-origin' });
+      } catch(_e) {
+        // ignore network errors; still force UI to guest
+      }
+      try {
+        if (typeof renderQuotaBar === 'function') {
+          renderQuotaBar({ is_logged_in:false, user:'Guest', count:0, max:0 });
+        }
+      } catch(_e){}
+      try {
+        if (typeof refreshCounterBar === 'function') refreshCounterBar();
+      } catch(_e){}
+    };
+  }
+})();
 </script>
 </body>
 </html>

@@ -8606,3 +8606,541 @@
 2025-08-26 21:32:07,015 INFO [property_app] [REFRESH] bounds SW(27.766494433172088,-82.75005340576173) NE(28.134669178920163,-82.16468811035158) center=(27.9506,-82.4572) zoom=12
 2025-08-26 21:32:07,015 INFO [property_app] [REFRESH] skipped (debounce + small move)
 2025-08-26 21:32:07,015 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-26 21:33:15,752 INFO [property_app] [REFRESH] bounds SW(27.91570484164818,-82.49977111816408) NE(28.007739262474974,-82.35342979431154) center=(27.961731861907435,-82.42660045623781) zoom=14
+2025-08-26 21:33:16,338 INFO [property_app] [REFRESH] chosen location='33605'
+2025-08-26 21:33:16,338 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 80 cached homes in bounds
+2025-08-26 21:33:16,338 INFO [property_app] [CACHE][HIT] props_by_location:33605
+2025-08-26 21:33:16,338 INFO [property_app] [FETCH_HOMES] using cached payload for '33605'
+2025-08-26 21:33:16,338 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33605
+2025-08-26 21:33:16,338 INFO [property_app] [FETCH_HOMES] filtered_props=80 (after bounds)
+2025-08-26 21:33:16,338 INFO [property_app] [REFRESH] returning 80 homes
+2025-08-26 21:33:21,656 INFO [property_app] [REFRESH] bounds SW(27.87785246397446,-82.5791645050049) NE(27.969919128121624,-82.43282318115236) center=(27.923895597121078,-82.50599384307863) zoom=14
+2025-08-26 21:33:22,273 INFO [property_app] [REFRESH] chosen location='33629'
+2025-08-26 21:33:22,273 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 48 cached homes in bounds
+2025-08-26 21:33:22,273 INFO [property_app] [CACHE][MISS] props_by_location:33629
+2025-08-26 21:33:22,320 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33629&status_type=ForSale&home_type=Houses&limit=200
+2025-08-26 21:33:24,052 INFO [property_app] [ZILLOW][RES] status=200 bytes=32047 preview='{"props":[{"bathrooms":4,"carouselPhotos":null,"has3DModel":true,"propertyType":"SINGLE_FAMILY","longitude":-82.50407,"livingArea":4227,"address":"911 S Sterling Ave, Tampa, FL 33629","rentZestimate":null,"variableData":null,"priceChange":null,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/ff77c626d1a9910de9684c7208dbb4a2-p_e.jpg","latitude":27.931637,"price":2490000,"bedrooms":'
+2025-08-26 21:33:24,054 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-26 21:33:24,054 INFO [property_app] [CACHE][SET] props_by_location:33629
+2025-08-26 21:33:24,054 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33629
+2025-08-26 21:33:24,054 INFO [property_app] [CACHE][SET] property_by_zpid:166721500
+2025-08-26 21:33:24,056 INFO [property_app] [DISK_CACHE] saved 81 property entries to disk
+2025-08-26 21:33:24,056 INFO [property_app] [CACHE][SET] property_by_zpid:45057592
+2025-08-26 21:33:24,059 INFO [property_app] [DISK_CACHE] saved 82 property entries to disk
+2025-08-26 21:33:24,059 INFO [property_app] [CACHE][SET] property_by_zpid:45055797
+2025-08-26 21:33:24,061 INFO [property_app] [DISK_CACHE] saved 83 property entries to disk
+2025-08-26 21:33:24,061 INFO [property_app] [CACHE][SET] property_by_zpid:45050632
+2025-08-26 21:33:24,064 INFO [property_app] [DISK_CACHE] saved 84 property entries to disk
+2025-08-26 21:33:24,064 INFO [property_app] [CACHE][SET] property_by_zpid:45050573
+2025-08-26 21:33:24,066 INFO [property_app] [DISK_CACHE] saved 85 property entries to disk
+2025-08-26 21:33:24,066 INFO [property_app] [CACHE][SET] property_by_zpid:45058209
+2025-08-26 21:33:24,068 INFO [property_app] [DISK_CACHE] saved 86 property entries to disk
+2025-08-26 21:33:24,068 INFO [property_app] [CACHE][SET] property_by_zpid:45058954
+2025-08-26 21:33:24,071 INFO [property_app] [DISK_CACHE] saved 87 property entries to disk
+2025-08-26 21:33:24,071 INFO [property_app] [CACHE][SET] property_by_zpid:45052053
+2025-08-26 21:33:24,074 INFO [property_app] [DISK_CACHE] saved 88 property entries to disk
+2025-08-26 21:33:24,074 INFO [property_app] [CACHE][SET] property_by_zpid:45057959
+2025-08-26 21:33:24,077 INFO [property_app] [DISK_CACHE] saved 89 property entries to disk
+2025-08-26 21:33:24,077 INFO [property_app] [CACHE][SET] property_by_zpid:45053986
+2025-08-26 21:33:24,079 INFO [property_app] [DISK_CACHE] saved 90 property entries to disk
+2025-08-26 21:33:24,080 INFO [property_app] [CACHE][SET] property_by_zpid:45055117
+2025-08-26 21:33:24,082 INFO [property_app] [DISK_CACHE] saved 91 property entries to disk
+2025-08-26 21:33:24,082 INFO [property_app] [CACHE][SET] property_by_zpid:82051595
+2025-08-26 21:33:24,085 INFO [property_app] [DISK_CACHE] saved 92 property entries to disk
+2025-08-26 21:33:24,085 INFO [property_app] [CACHE][SET] property_by_zpid:45054701
+2025-08-26 21:33:24,088 INFO [property_app] [DISK_CACHE] saved 93 property entries to disk
+2025-08-26 21:33:24,088 INFO [property_app] [CACHE][SET] property_by_zpid:45053222
+2025-08-26 21:33:24,091 INFO [property_app] [DISK_CACHE] saved 94 property entries to disk
+2025-08-26 21:33:24,091 INFO [property_app] [CACHE][SET] property_by_zpid:45055187
+2025-08-26 21:33:24,093 INFO [property_app] [DISK_CACHE] saved 95 property entries to disk
+2025-08-26 21:33:24,093 INFO [property_app] [CACHE][SET] property_by_zpid:45052949
+2025-08-26 21:33:24,096 INFO [property_app] [DISK_CACHE] saved 96 property entries to disk
+2025-08-26 21:33:24,096 INFO [property_app] [CACHE][SET] property_by_zpid:45052466
+2025-08-26 21:33:24,099 INFO [property_app] [DISK_CACHE] saved 97 property entries to disk
+2025-08-26 21:33:24,099 INFO [property_app] [CACHE][SET] property_by_zpid:45057740
+2025-08-26 21:33:24,101 INFO [property_app] [DISK_CACHE] saved 98 property entries to disk
+2025-08-26 21:33:24,102 INFO [property_app] [CACHE][SET] property_by_zpid:45058300
+2025-08-26 21:33:24,104 INFO [property_app] [DISK_CACHE] saved 99 property entries to disk
+2025-08-26 21:33:24,104 INFO [property_app] [CACHE][SET] property_by_zpid:45054696
+2025-08-26 21:33:24,107 INFO [property_app] [DISK_CACHE] saved 100 property entries to disk
+2025-08-26 21:33:24,107 INFO [property_app] [CACHE][SET] property_by_zpid:45053769
+2025-08-26 21:33:24,110 INFO [property_app] [DISK_CACHE] saved 101 property entries to disk
+2025-08-26 21:33:24,110 INFO [property_app] [CACHE][SET] property_by_zpid:45055674
+2025-08-26 21:33:24,113 INFO [property_app] [DISK_CACHE] saved 102 property entries to disk
+2025-08-26 21:33:24,113 INFO [property_app] [CACHE][SET] property_by_zpid:45058533
+2025-08-26 21:33:24,116 INFO [property_app] [DISK_CACHE] saved 103 property entries to disk
+2025-08-26 21:33:24,116 INFO [property_app] [CACHE][SET] property_by_zpid:45052582
+2025-08-26 21:33:24,119 INFO [property_app] [DISK_CACHE] saved 104 property entries to disk
+2025-08-26 21:33:24,119 INFO [property_app] [CACHE][SET] property_by_zpid:58438854
+2025-08-26 21:33:24,122 INFO [property_app] [DISK_CACHE] saved 105 property entries to disk
+2025-08-26 21:33:24,122 INFO [property_app] [CACHE][SET] property_by_zpid:45057937
+2025-08-26 21:33:24,125 INFO [property_app] [DISK_CACHE] saved 106 property entries to disk
+2025-08-26 21:33:24,125 INFO [property_app] [CACHE][SET] property_by_zpid:45053704
+2025-08-26 21:33:24,128 INFO [property_app] [DISK_CACHE] saved 107 property entries to disk
+2025-08-26 21:33:24,128 INFO [property_app] [CACHE][SET] property_by_zpid:45052396
+2025-08-26 21:33:24,130 INFO [property_app] [DISK_CACHE] saved 108 property entries to disk
+2025-08-26 21:33:24,131 INFO [property_app] [CACHE][SET] property_by_zpid:45055335
+2025-08-26 21:33:24,134 INFO [property_app] [DISK_CACHE] saved 109 property entries to disk
+2025-08-26 21:33:24,134 INFO [property_app] [CACHE][SET] property_by_zpid:45054880
+2025-08-26 21:33:24,137 INFO [property_app] [DISK_CACHE] saved 110 property entries to disk
+2025-08-26 21:33:24,137 INFO [property_app] [CACHE][SET] property_by_zpid:51590817
+2025-08-26 21:33:24,140 INFO [property_app] [DISK_CACHE] saved 111 property entries to disk
+2025-08-26 21:33:24,140 INFO [property_app] [CACHE][SET] property_by_zpid:98339715
+2025-08-26 21:33:24,143 INFO [property_app] [DISK_CACHE] saved 112 property entries to disk
+2025-08-26 21:33:24,143 INFO [property_app] [CACHE][SET] property_by_zpid:45053813
+2025-08-26 21:33:24,146 INFO [property_app] [DISK_CACHE] saved 113 property entries to disk
+2025-08-26 21:33:24,147 INFO [property_app] [CACHE][SET] property_by_zpid:45051965
+2025-08-26 21:33:24,150 INFO [property_app] [DISK_CACHE] saved 114 property entries to disk
+2025-08-26 21:33:24,150 INFO [property_app] [CACHE][SET] property_by_zpid:45057833
+2025-08-26 21:33:24,153 INFO [property_app] [DISK_CACHE] saved 115 property entries to disk
+2025-08-26 21:33:24,153 INFO [property_app] [CACHE][SET] property_by_zpid:45056766
+2025-08-26 21:33:24,157 INFO [property_app] [DISK_CACHE] saved 116 property entries to disk
+2025-08-26 21:33:24,157 INFO [property_app] [CACHE][SET] property_by_zpid:45058486
+2025-08-26 21:33:24,160 INFO [property_app] [DISK_CACHE] saved 117 property entries to disk
+2025-08-26 21:33:24,160 INFO [property_app] [CACHE][SET] property_by_zpid:45053378
+2025-08-26 21:33:24,163 INFO [property_app] [DISK_CACHE] saved 118 property entries to disk
+2025-08-26 21:33:24,163 INFO [property_app] [CACHE][SET] property_by_zpid:45055065
+2025-08-26 21:33:24,166 INFO [property_app] [DISK_CACHE] saved 119 property entries to disk
+2025-08-26 21:33:24,166 INFO [property_app] [CACHE][SET] property_by_zpid:154935804
+2025-08-26 21:33:24,170 INFO [property_app] [DISK_CACHE] saved 120 property entries to disk
+2025-08-26 21:33:24,170 INFO [property_app] [CACHE][SET] property_by_zpid:45053271
+2025-08-26 21:33:24,173 INFO [property_app] [DISK_CACHE] saved 121 property entries to disk
+2025-08-26 21:33:24,173 INFO [property_app] [FETCH_HOMES] filtered_props=89 (after bounds)
+2025-08-26 21:33:24,173 INFO [property_app] [REFRESH] returning 89 homes
+2025-08-26 21:33:27,131 INFO [property_app] [REFRESH] bounds SW(27.89522523886815,-82.57470130920412) NE(27.987277109562232,-82.42835998535158) center=(27.94126097931674,-82.50153064727785) zoom=14
+2025-08-26 21:33:27,825 INFO [property_app] [REFRESH] chosen location='33609'
+2025-08-26 21:33:27,825 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 114 cached homes in bounds
+2025-08-26 21:33:27,825 INFO [property_app] [CACHE][MISS] props_by_location:33609
+2025-08-26 21:33:27,872 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33609&status_type=ForSale&home_type=Houses&limit=200
+2025-08-26 21:33:28,910 INFO [property_app] [ZILLOW][RES] status=200 bytes=31908 preview='{"props":[{"bathrooms":7,"carouselPhotos":null,"has3DModel":true,"propertyType":"SINGLE_FAMILY","longitude":-82.49883,"livingArea":5050,"address":"3313 W Mullen Ave, Tampa, FL 33609","rentZestimate":null,"variableData":null,"priceChange":-150000,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/e3f9fcaa75522bf8601fd784b6bd14eb-p_e.jpg","latitude":27.935015,"price":3850000,"bedrooms'
+2025-08-26 21:33:28,911 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-26 21:33:28,912 INFO [property_app] [CACHE][SET] props_by_location:33609
+2025-08-26 21:33:28,912 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33609
+2025-08-26 21:33:28,912 INFO [property_app] [CACHE][SET] property_by_zpid:45051132
+2025-08-26 21:33:28,915 INFO [property_app] [DISK_CACHE] saved 122 property entries to disk
+2025-08-26 21:33:28,915 INFO [property_app] [CACHE][SET] property_by_zpid:45047895
+2025-08-26 21:33:28,918 INFO [property_app] [DISK_CACHE] saved 123 property entries to disk
+2025-08-26 21:33:28,918 INFO [property_app] [CACHE][SET] property_by_zpid:45048466
+2025-08-26 21:33:28,921 INFO [property_app] [DISK_CACHE] saved 124 property entries to disk
+2025-08-26 21:33:28,921 INFO [property_app] [CACHE][SET] property_by_zpid:45048010
+2025-08-26 21:33:28,925 INFO [property_app] [DISK_CACHE] saved 125 property entries to disk
+2025-08-26 21:33:28,925 INFO [property_app] [CACHE][SET] property_by_zpid:45049875
+2025-08-26 21:33:28,928 INFO [property_app] [DISK_CACHE] saved 126 property entries to disk
+2025-08-26 21:33:28,928 INFO [property_app] [CACHE][SET] property_by_zpid:45046682
+2025-08-26 21:33:28,931 INFO [property_app] [DISK_CACHE] saved 127 property entries to disk
+2025-08-26 21:33:28,931 INFO [property_app] [CACHE][SET] property_by_zpid:45048802
+2025-08-26 21:33:28,934 INFO [property_app] [DISK_CACHE] saved 128 property entries to disk
+2025-08-26 21:33:28,935 INFO [property_app] [CACHE][SET] property_by_zpid:45050792
+2025-08-26 21:33:28,938 INFO [property_app] [DISK_CACHE] saved 129 property entries to disk
+2025-08-26 21:33:28,938 INFO [property_app] [CACHE][SET] property_by_zpid:45049854
+2025-08-26 21:33:28,941 INFO [property_app] [DISK_CACHE] saved 130 property entries to disk
+2025-08-26 21:33:28,941 INFO [property_app] [CACHE][SET] property_by_zpid:45048184
+2025-08-26 21:33:28,945 INFO [property_app] [DISK_CACHE] saved 131 property entries to disk
+2025-08-26 21:33:28,945 INFO [property_app] [CACHE][SET] property_by_zpid:45047117
+2025-08-26 21:33:28,948 INFO [property_app] [DISK_CACHE] saved 132 property entries to disk
+2025-08-26 21:33:28,948 INFO [property_app] [CACHE][SET] property_by_zpid:332843784
+2025-08-26 21:33:28,951 INFO [property_app] [DISK_CACHE] saved 133 property entries to disk
+2025-08-26 21:33:28,951 INFO [property_app] [CACHE][SET] property_by_zpid:45095703
+2025-08-26 21:33:28,955 INFO [property_app] [DISK_CACHE] saved 134 property entries to disk
+2025-08-26 21:33:28,955 INFO [property_app] [CACHE][SET] property_by_zpid:45046463
+2025-08-26 21:33:28,958 INFO [property_app] [DISK_CACHE] saved 135 property entries to disk
+2025-08-26 21:33:28,958 INFO [property_app] [CACHE][SET] property_by_zpid:45049532
+2025-08-26 21:33:28,962 INFO [property_app] [DISK_CACHE] saved 136 property entries to disk
+2025-08-26 21:33:28,962 INFO [property_app] [CACHE][SET] property_by_zpid:45052011
+2025-08-26 21:33:28,966 INFO [property_app] [DISK_CACHE] saved 137 property entries to disk
+2025-08-26 21:33:28,966 INFO [property_app] [CACHE][SET] property_by_zpid:45047460
+2025-08-26 21:33:28,970 INFO [property_app] [DISK_CACHE] saved 138 property entries to disk
+2025-08-26 21:33:28,970 INFO [property_app] [CACHE][SET] property_by_zpid:45046532
+2025-08-26 21:33:28,974 INFO [property_app] [DISK_CACHE] saved 139 property entries to disk
+2025-08-26 21:33:28,974 INFO [property_app] [CACHE][SET] property_by_zpid:45046909
+2025-08-26 21:33:28,977 INFO [property_app] [DISK_CACHE] saved 140 property entries to disk
+2025-08-26 21:33:28,978 INFO [property_app] [CACHE][SET] property_by_zpid:45048180
+2025-08-26 21:33:28,981 INFO [property_app] [DISK_CACHE] saved 141 property entries to disk
+2025-08-26 21:33:28,981 INFO [property_app] [CACHE][SET] property_by_zpid:45048242
+2025-08-26 21:33:28,985 INFO [property_app] [DISK_CACHE] saved 142 property entries to disk
+2025-08-26 21:33:28,985 INFO [property_app] [CACHE][SET] property_by_zpid:45045889
+2025-08-26 21:33:28,989 INFO [property_app] [DISK_CACHE] saved 143 property entries to disk
+2025-08-26 21:33:28,989 INFO [property_app] [CACHE][SET] property_by_zpid:45046821
+2025-08-26 21:33:28,993 INFO [property_app] [DISK_CACHE] saved 144 property entries to disk
+2025-08-26 21:33:28,993 INFO [property_app] [CACHE][SET] property_by_zpid:45048069
+2025-08-26 21:33:28,997 INFO [property_app] [DISK_CACHE] saved 145 property entries to disk
+2025-08-26 21:33:28,997 INFO [property_app] [CACHE][SET] property_by_zpid:45046743
+2025-08-26 21:33:29,001 INFO [property_app] [DISK_CACHE] saved 146 property entries to disk
+2025-08-26 21:33:29,001 INFO [property_app] [CACHE][SET] property_by_zpid:45047486
+2025-08-26 21:33:29,004 INFO [property_app] [DISK_CACHE] saved 147 property entries to disk
+2025-08-26 21:33:29,004 INFO [property_app] [CACHE][SET] property_by_zpid:45046681
+2025-08-26 21:33:29,008 INFO [property_app] [DISK_CACHE] saved 148 property entries to disk
+2025-08-26 21:33:29,008 INFO [property_app] [CACHE][SET] property_by_zpid:45048748
+2025-08-26 21:33:29,012 INFO [property_app] [DISK_CACHE] saved 149 property entries to disk
+2025-08-26 21:33:29,012 INFO [property_app] [CACHE][SET] property_by_zpid:45047613
+2025-08-26 21:33:29,016 INFO [property_app] [DISK_CACHE] saved 150 property entries to disk
+2025-08-26 21:33:29,016 INFO [property_app] [CACHE][SET] property_by_zpid:45048776
+2025-08-26 21:33:29,020 INFO [property_app] [DISK_CACHE] saved 151 property entries to disk
+2025-08-26 21:33:29,020 INFO [property_app] [CACHE][SET] property_by_zpid:45045906
+2025-08-26 21:33:29,024 INFO [property_app] [DISK_CACHE] saved 152 property entries to disk
+2025-08-26 21:33:29,024 INFO [property_app] [CACHE][SET] property_by_zpid:45046376
+2025-08-26 21:33:29,028 INFO [property_app] [DISK_CACHE] saved 153 property entries to disk
+2025-08-26 21:33:29,028 INFO [property_app] [CACHE][SET] property_by_zpid:2059106698
+2025-08-26 21:33:29,032 INFO [property_app] [DISK_CACHE] saved 154 property entries to disk
+2025-08-26 21:33:29,033 INFO [property_app] [CACHE][SET] property_by_zpid:45046592
+2025-08-26 21:33:29,036 INFO [property_app] [DISK_CACHE] saved 155 property entries to disk
+2025-08-26 21:33:29,036 INFO [property_app] [CACHE][SET] property_by_zpid:45048070
+2025-08-26 21:33:29,040 INFO [property_app] [DISK_CACHE] saved 156 property entries to disk
+2025-08-26 21:33:29,040 INFO [property_app] [CACHE][SET] property_by_zpid:45046773
+2025-08-26 21:33:29,044 INFO [property_app] [DISK_CACHE] saved 157 property entries to disk
+2025-08-26 21:33:29,044 INFO [property_app] [CACHE][SET] property_by_zpid:45046844
+2025-08-26 21:33:29,049 INFO [property_app] [DISK_CACHE] saved 158 property entries to disk
+2025-08-26 21:33:29,049 INFO [property_app] [CACHE][SET] property_by_zpid:45046388
+2025-08-26 21:33:29,053 INFO [property_app] [DISK_CACHE] saved 159 property entries to disk
+2025-08-26 21:33:29,053 INFO [property_app] [CACHE][SET] property_by_zpid:450776032
+2025-08-26 21:33:29,057 INFO [property_app] [DISK_CACHE] saved 160 property entries to disk
+2025-08-26 21:33:29,057 INFO [property_app] [CACHE][SET] property_by_zpid:45048410
+2025-08-26 21:33:29,061 INFO [property_app] [DISK_CACHE] saved 161 property entries to disk
+2025-08-26 21:33:29,061 INFO [property_app] [CACHE][SET] property_by_zpid:45046685
+2025-08-26 21:33:29,065 INFO [property_app] [DISK_CACHE] saved 162 property entries to disk
+2025-08-26 21:33:29,066 INFO [property_app] [FETCH_HOMES] filtered_props=155 (after bounds)
+2025-08-26 21:33:29,066 INFO [property_app] [REFRESH] returning 155 homes
+2025-08-26 21:33:35,422 INFO [property_app] [REFRESH] bounds SW(27.93026575569793,-82.5158214569092) NE(27.97628657236355,-82.44265079498292) center=(27.95327861600304,-82.47923612594606) zoom=15
+2025-08-26 21:33:36,310 INFO [property_app] [REFRESH] chosen location='33607'
+2025-08-26 21:33:36,310 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 74 cached homes in bounds
+2025-08-26 21:33:36,310 INFO [property_app] [CACHE][MISS] props_by_location:33607
+2025-08-26 21:33:36,353 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33607&status_type=ForSale&home_type=Houses&limit=200
+2025-08-26 21:33:37,359 INFO [property_app] [ZILLOW][RES] status=200 bytes=31781 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":true,"newConstructionType":"BUILDER_SPEC","propertyType":"SINGLE_FAMILY","longitude":-82.488205,"livingArea":1726,"address":"2714 W Tampa Bay Blvd, Tampa, FL 33607","rentZestimate":2578,"variableData":null,"priceChange":null,"zestimate":678700,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/e2a25950501537541e96130e697f1bb4-p_e.jpg","lati'
+2025-08-26 21:33:37,361 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-26 21:33:37,361 INFO [property_app] [CACHE][SET] props_by_location:33607
+2025-08-26 21:33:37,361 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33607
+2025-08-26 21:33:37,361 INFO [property_app] [CACHE][SET] property_by_zpid:45101655
+2025-08-26 21:33:37,365 INFO [property_app] [DISK_CACHE] saved 163 property entries to disk
+2025-08-26 21:33:37,365 INFO [property_app] [CACHE][SET] property_by_zpid:45102408
+2025-08-26 21:33:37,369 INFO [property_app] [DISK_CACHE] saved 164 property entries to disk
+2025-08-26 21:33:37,369 INFO [property_app] [CACHE][SET] property_by_zpid:45103454
+2025-08-26 21:33:37,373 INFO [property_app] [DISK_CACHE] saved 165 property entries to disk
+2025-08-26 21:33:37,373 INFO [property_app] [CACHE][SET] property_by_zpid:45103163
+2025-08-26 21:33:37,377 INFO [property_app] [DISK_CACHE] saved 166 property entries to disk
+2025-08-26 21:33:37,378 INFO [property_app] [CACHE][SET] property_by_zpid:45102800
+2025-08-26 21:33:37,382 INFO [property_app] [DISK_CACHE] saved 167 property entries to disk
+2025-08-26 21:33:37,382 INFO [property_app] [CACHE][SET] property_by_zpid:45102630
+2025-08-26 21:33:37,386 INFO [property_app] [DISK_CACHE] saved 168 property entries to disk
+2025-08-26 21:33:37,386 INFO [property_app] [CACHE][SET] property_by_zpid:45045675
+2025-08-26 21:33:37,390 INFO [property_app] [DISK_CACHE] saved 169 property entries to disk
+2025-08-26 21:33:37,390 INFO [property_app] [CACHE][SET] property_by_zpid:45103592
+2025-08-26 21:33:37,394 INFO [property_app] [DISK_CACHE] saved 170 property entries to disk
+2025-08-26 21:33:37,394 INFO [property_app] [CACHE][SET] property_by_zpid:45103568
+2025-08-26 21:33:37,398 INFO [property_app] [DISK_CACHE] saved 171 property entries to disk
+2025-08-26 21:33:37,398 INFO [property_app] [CACHE][SET] property_by_zpid:45103000
+2025-08-26 21:33:37,402 INFO [property_app] [DISK_CACHE] saved 172 property entries to disk
+2025-08-26 21:33:37,403 INFO [property_app] [CACHE][SET] property_by_zpid:45103356
+2025-08-26 21:33:37,407 INFO [property_app] [DISK_CACHE] saved 173 property entries to disk
+2025-08-26 21:33:37,407 INFO [property_app] [CACHE][SET] property_by_zpid:45044913
+2025-08-26 21:33:37,411 INFO [property_app] [DISK_CACHE] saved 174 property entries to disk
+2025-08-26 21:33:37,411 INFO [property_app] [CACHE][SET] property_by_zpid:338906632
+2025-08-26 21:33:37,416 INFO [property_app] [DISK_CACHE] saved 175 property entries to disk
+2025-08-26 21:33:37,416 INFO [property_app] [CACHE][SET] property_by_zpid:89745177
+2025-08-26 21:33:37,420 INFO [property_app] [DISK_CACHE] saved 176 property entries to disk
+2025-08-26 21:33:37,420 INFO [property_app] [CACHE][SET] property_by_zpid:82052678
+2025-08-26 21:33:37,425 INFO [property_app] [DISK_CACHE] saved 177 property entries to disk
+2025-08-26 21:33:37,425 INFO [property_app] [CACHE][SET] property_by_zpid:45102721
+2025-08-26 21:33:37,429 INFO [property_app] [DISK_CACHE] saved 178 property entries to disk
+2025-08-26 21:33:37,430 INFO [property_app] [CACHE][SET] property_by_zpid:45044458
+2025-08-26 21:33:37,434 INFO [property_app] [DISK_CACHE] saved 179 property entries to disk
+2025-08-26 21:33:37,434 INFO [property_app] [CACHE][SET] property_by_zpid:450224798
+2025-08-26 21:33:37,439 INFO [property_app] [DISK_CACHE] saved 180 property entries to disk
+2025-08-26 21:33:37,439 INFO [property_app] [CACHE][SET] property_by_zpid:453026000
+2025-08-26 21:33:37,444 INFO [property_app] [DISK_CACHE] saved 181 property entries to disk
+2025-08-26 21:33:37,444 INFO [property_app] [CACHE][SET] property_by_zpid:45104393
+2025-08-26 21:33:37,448 INFO [property_app] [DISK_CACHE] saved 182 property entries to disk
+2025-08-26 21:33:37,448 INFO [property_app] [CACHE][SET] property_by_zpid:99617104
+2025-08-26 21:33:37,453 INFO [property_app] [DISK_CACHE] saved 183 property entries to disk
+2025-08-26 21:33:37,453 INFO [property_app] [CACHE][SET] property_by_zpid:45102557
+2025-08-26 21:33:37,458 INFO [property_app] [DISK_CACHE] saved 184 property entries to disk
+2025-08-26 21:33:37,458 INFO [property_app] [CACHE][SET] property_by_zpid:456208646
+2025-08-26 21:33:37,463 INFO [property_app] [DISK_CACHE] saved 185 property entries to disk
+2025-08-26 21:33:37,463 INFO [property_app] [CACHE][SET] property_by_zpid:58438799
+2025-08-26 21:33:37,468 INFO [property_app] [DISK_CACHE] saved 186 property entries to disk
+2025-08-26 21:33:37,468 INFO [property_app] [CACHE][SET] property_by_zpid:83004384
+2025-08-26 21:33:37,473 INFO [property_app] [DISK_CACHE] saved 187 property entries to disk
+2025-08-26 21:33:37,473 INFO [property_app] [CACHE][SET] property_by_zpid:51591108
+2025-08-26 21:33:37,478 INFO [property_app] [DISK_CACHE] saved 188 property entries to disk
+2025-08-26 21:33:37,478 INFO [property_app] [CACHE][SET] property_by_zpid:449581116
+2025-08-26 21:33:37,483 INFO [property_app] [DISK_CACHE] saved 189 property entries to disk
+2025-08-26 21:33:37,483 INFO [property_app] [CACHE][SET] property_by_zpid:45043919
+2025-08-26 21:33:37,489 INFO [property_app] [DISK_CACHE] saved 190 property entries to disk
+2025-08-26 21:33:37,491 INFO [property_app] [CACHE][SET] property_by_zpid:443865701
+2025-08-26 21:33:37,496 INFO [property_app] [DISK_CACHE] saved 191 property entries to disk
+2025-08-26 21:33:37,496 INFO [property_app] [CACHE][SET] property_by_zpid:45043990
+2025-08-26 21:33:37,501 INFO [property_app] [DISK_CACHE] saved 192 property entries to disk
+2025-08-26 21:33:37,501 INFO [property_app] [CACHE][SET] property_by_zpid:45102493
+2025-08-26 21:33:37,506 INFO [property_app] [DISK_CACHE] saved 193 property entries to disk
+2025-08-26 21:33:37,506 INFO [property_app] [CACHE][SET] property_by_zpid:45044812
+2025-08-26 21:33:37,511 INFO [property_app] [DISK_CACHE] saved 194 property entries to disk
+2025-08-26 21:33:37,512 INFO [property_app] [CACHE][SET] property_by_zpid:45103514
+2025-08-26 21:33:37,517 INFO [property_app] [DISK_CACHE] saved 195 property entries to disk
+2025-08-26 21:33:37,517 INFO [property_app] [CACHE][SET] property_by_zpid:45045367
+2025-08-26 21:33:37,522 INFO [property_app] [DISK_CACHE] saved 196 property entries to disk
+2025-08-26 21:33:37,522 INFO [property_app] [CACHE][SET] property_by_zpid:99610855
+2025-08-26 21:33:37,527 INFO [property_app] [DISK_CACHE] saved 197 property entries to disk
+2025-08-26 21:33:37,527 INFO [property_app] [CACHE][SET] property_by_zpid:99641990
+2025-08-26 21:33:37,532 INFO [property_app] [DISK_CACHE] saved 198 property entries to disk
+2025-08-26 21:33:37,532 INFO [property_app] [CACHE][SET] property_by_zpid:45101907
+2025-08-26 21:33:37,537 INFO [property_app] [DISK_CACHE] saved 199 property entries to disk
+2025-08-26 21:33:37,538 INFO [property_app] [CACHE][SET] property_by_zpid:66730121
+2025-08-26 21:33:37,543 INFO [property_app] [DISK_CACHE] saved 200 property entries to disk
+2025-08-26 21:33:37,543 INFO [property_app] [FETCH_HOMES] filtered_props=112 (after bounds)
+2025-08-26 21:33:37,543 INFO [property_app] [REFRESH] returning 112 homes
+2025-08-26 21:33:49,492 INFO [property_app] [REFRESH] bounds SW(27.91945901492847,-82.51148700714113) NE(27.965484436028014,-82.43831634521486) center=(27.942474176824444,-82.47490167617799) zoom=15
+2025-08-26 21:33:50,064 INFO [property_app] [REFRESH] chosen location='33606'
+2025-08-26 21:33:50,064 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 71 cached homes in bounds
+2025-08-26 21:33:50,064 INFO [property_app] [CACHE][MISS] props_by_location:33606
+2025-08-26 21:33:50,107 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33606&status_type=ForSale&home_type=Houses&limit=200
+2025-08-26 21:33:50,948 INFO [property_app] [ZILLOW][RES] status=200 bytes=31852 preview='{"props":[{"bathrooms":7,"carouselPhotos":null,"has3DModel":true,"newConstructionType":"BUILDER_SPEC","propertyType":"SINGLE_FAMILY","longitude":-82.46093,"livingArea":6102,"address":"90 Martinique Ave, Tampa, FL 33606","rentZestimate":null,"variableData":null,"priceChange":null,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/b3083a8529170c3bb71b9950c3b54d31-p_e.jpg","latitude":2'
+2025-08-26 21:33:50,949 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-26 21:33:50,949 INFO [property_app] [CACHE][SET] props_by_location:33606
+2025-08-26 21:33:50,949 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33606
+2025-08-26 21:33:50,950 INFO [property_app] [CACHE][SET] property_by_zpid:82035938
+2025-08-26 21:33:50,955 INFO [property_app] [DISK_CACHE] saved 201 property entries to disk
+2025-08-26 21:33:50,955 INFO [property_app] [CACHE][SET] property_by_zpid:2068626000
+2025-08-26 21:33:50,960 INFO [property_app] [DISK_CACHE] saved 202 property entries to disk
+2025-08-26 21:33:50,960 INFO [property_app] [CACHE][SET] property_by_zpid:45111845
+2025-08-26 21:33:50,965 INFO [property_app] [DISK_CACHE] saved 203 property entries to disk
+2025-08-26 21:33:50,965 INFO [property_app] [CACHE][SET] property_by_zpid:45112385
+2025-08-26 21:33:50,970 INFO [property_app] [DISK_CACHE] saved 204 property entries to disk
+2025-08-26 21:33:50,970 INFO [property_app] [CACHE][SET] property_by_zpid:45112416
+2025-08-26 21:33:50,975 INFO [property_app] [DISK_CACHE] saved 205 property entries to disk
+2025-08-26 21:33:50,975 INFO [property_app] [CACHE][SET] property_by_zpid:45111937
+2025-08-26 21:33:50,980 INFO [property_app] [DISK_CACHE] saved 206 property entries to disk
+2025-08-26 21:33:50,980 INFO [property_app] [CACHE][SET] property_by_zpid:45107212
+2025-08-26 21:33:50,985 INFO [property_app] [DISK_CACHE] saved 207 property entries to disk
+2025-08-26 21:33:50,985 INFO [property_app] [CACHE][SET] property_by_zpid:45107464
+2025-08-26 21:33:50,990 INFO [property_app] [DISK_CACHE] saved 208 property entries to disk
+2025-08-26 21:33:50,990 INFO [property_app] [CACHE][SET] property_by_zpid:45107269
+2025-08-26 21:33:50,996 INFO [property_app] [DISK_CACHE] saved 209 property entries to disk
+2025-08-26 21:33:50,996 INFO [property_app] [CACHE][SET] property_by_zpid:45107674
+2025-08-26 21:33:51,001 INFO [property_app] [DISK_CACHE] saved 210 property entries to disk
+2025-08-26 21:33:51,001 INFO [property_app] [CACHE][SET] property_by_zpid:45106416
+2025-08-26 21:33:51,005 INFO [property_app] [DISK_CACHE] saved 211 property entries to disk
+2025-08-26 21:33:51,006 INFO [property_app] [CACHE][SET] property_by_zpid:45111194
+2025-08-26 21:33:51,011 INFO [property_app] [DISK_CACHE] saved 212 property entries to disk
+2025-08-26 21:33:51,011 INFO [property_app] [CACHE][SET] property_by_zpid:99643269
+2025-08-26 21:33:51,016 INFO [property_app] [DISK_CACHE] saved 213 property entries to disk
+2025-08-26 21:33:51,016 INFO [property_app] [CACHE][SET] property_by_zpid:45104878
+2025-08-26 21:33:51,021 INFO [property_app] [DISK_CACHE] saved 214 property entries to disk
+2025-08-26 21:33:51,022 INFO [property_app] [CACHE][SET] property_by_zpid:45110718
+2025-08-26 21:33:51,028 INFO [property_app] [DISK_CACHE] saved 215 property entries to disk
+2025-08-26 21:33:51,028 INFO [property_app] [CACHE][SET] property_by_zpid:45106756
+2025-08-26 21:33:51,033 INFO [property_app] [DISK_CACHE] saved 216 property entries to disk
+2025-08-26 21:33:51,034 INFO [property_app] [CACHE][SET] property_by_zpid:45111772
+2025-08-26 21:33:51,039 INFO [property_app] [DISK_CACHE] saved 217 property entries to disk
+2025-08-26 21:33:51,040 INFO [property_app] [CACHE][SET] property_by_zpid:45111628
+2025-08-26 21:33:51,045 INFO [property_app] [DISK_CACHE] saved 218 property entries to disk
+2025-08-26 21:33:51,045 INFO [property_app] [CACHE][SET] property_by_zpid:45111232
+2025-08-26 21:33:51,051 INFO [property_app] [DISK_CACHE] saved 219 property entries to disk
+2025-08-26 21:33:51,051 INFO [property_app] [CACHE][SET] property_by_zpid:45111011
+2025-08-26 21:33:51,057 INFO [property_app] [DISK_CACHE] saved 220 property entries to disk
+2025-08-26 21:33:51,057 INFO [property_app] [CACHE][SET] property_by_zpid:45111904
+2025-08-26 21:33:51,063 INFO [property_app] [DISK_CACHE] saved 221 property entries to disk
+2025-08-26 21:33:51,063 INFO [property_app] [CACHE][SET] property_by_zpid:45111735
+2025-08-26 21:33:51,068 INFO [property_app] [DISK_CACHE] saved 222 property entries to disk
+2025-08-26 21:33:51,068 INFO [property_app] [CACHE][SET] property_by_zpid:99610209
+2025-08-26 21:33:51,075 INFO [property_app] [DISK_CACHE] saved 223 property entries to disk
+2025-08-26 21:33:51,075 INFO [property_app] [CACHE][SET] property_by_zpid:45110745
+2025-08-26 21:33:51,081 INFO [property_app] [DISK_CACHE] saved 224 property entries to disk
+2025-08-26 21:33:51,081 INFO [property_app] [CACHE][SET] property_by_zpid:45112408
+2025-08-26 21:33:51,086 INFO [property_app] [DISK_CACHE] saved 225 property entries to disk
+2025-08-26 21:33:51,087 INFO [property_app] [CACHE][SET] property_by_zpid:45110886
+2025-08-26 21:33:51,092 INFO [property_app] [DISK_CACHE] saved 226 property entries to disk
+2025-08-26 21:33:51,092 INFO [property_app] [FETCH_HOMES] filtered_props=97 (after bounds)
+2025-08-26 21:33:51,092 INFO [property_app] [REFRESH] returning 97 homes
+2025-08-26 21:38:03,181 INFO [property_app] [DISK_CACHE] load error: name '_cache_lock' is not defined
+2025-08-26 21:38:04,243 INFO [property_app] [DISK_CACHE] load error: name '_cache_lock' is not defined
+2025-08-26 21:38:07,187 INFO [property_app] [REFRESH] bounds SW(27.766494433172088,-82.75005340576173) NE(28.134669178920163,-82.16468811035158) center=(27.9506,-82.4572) zoom=12
+2025-08-26 21:38:07,188 INFO [property_app] [REFRESH] bounds SW(27.766494433172088,-82.75005340576173) NE(28.134669178920163,-82.16468811035158) center=(27.9506,-82.4572) zoom=12
+2025-08-26 21:38:07,188 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-26 21:38:08,027 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-26 21:38:08,027 INFO [property_app] [CACHE][MISS] props_by_location:33602
+2025-08-26 21:38:08,075 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33602&status_type=ForSale&home_type=Houses&limit=200
+2025-08-26 21:38:09,327 INFO [property_app] [ZILLOW][RES] status=200 bytes=30610 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.46168,"livingArea":1551,"address":"107 W Amelia Ave, Tampa, FL 33602","rentZestimate":null,"variableData":null,"priceChange":-12250,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/a8c4cfb246401308cd0b113d1034d93d-p_e.jpg","latitude":27.96625,"price":490000,"bedrooms":3'
+2025-08-26 21:38:09,328 INFO [property_app] [FETCH_HOMES][TRY1] props=39
+2025-08-26 21:38:09,328 INFO [property_app] [CACHE][SET] props_by_location:33602
+2025-08-26 21:38:09,328 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-26 21:38:09,328 INFO [property_app] [CACHE][SET] property_by_zpid:45110363
+2025-08-26 21:38:09,329 INFO [property_app] [DISK_CACHE] saved 1 property entries to disk
+2025-08-26 21:38:09,329 INFO [property_app] [CACHE][SET] property_by_zpid:45106129
+2025-08-26 21:38:09,330 INFO [property_app] [DISK_CACHE] saved 2 property entries to disk
+2025-08-26 21:38:09,330 INFO [property_app] [CACHE][SET] property_by_zpid:45110242
+2025-08-26 21:38:09,330 INFO [property_app] [DISK_CACHE] saved 3 property entries to disk
+2025-08-26 21:38:09,330 INFO [property_app] [CACHE][SET] property_by_zpid:45110282
+2025-08-26 21:38:09,331 INFO [property_app] [DISK_CACHE] saved 4 property entries to disk
+2025-08-26 21:38:09,331 INFO [property_app] [CACHE][SET] property_by_zpid:45105967
+2025-08-26 21:38:09,332 INFO [property_app] [DISK_CACHE] saved 5 property entries to disk
+2025-08-26 21:38:09,332 INFO [property_app] [CACHE][SET] property_by_zpid:45105855
+2025-08-26 21:38:09,332 INFO [property_app] [DISK_CACHE] saved 6 property entries to disk
+2025-08-26 21:38:09,332 INFO [property_app] [CACHE][SET] property_by_zpid:45105929
+2025-08-26 21:38:09,333 INFO [property_app] [DISK_CACHE] saved 7 property entries to disk
+2025-08-26 21:38:09,333 INFO [property_app] [CACHE][SET] property_by_zpid:45105979
+2025-08-26 21:38:09,334 INFO [property_app] [DISK_CACHE] saved 8 property entries to disk
+2025-08-26 21:38:09,334 INFO [property_app] [CACHE][SET] property_by_zpid:450140453
+2025-08-26 21:38:09,335 INFO [property_app] [DISK_CACHE] saved 9 property entries to disk
+2025-08-26 21:38:09,335 INFO [property_app] [CACHE][SET] property_by_zpid:45112677
+2025-08-26 21:38:09,335 INFO [property_app] [DISK_CACHE] saved 10 property entries to disk
+2025-08-26 21:38:09,336 INFO [property_app] [CACHE][SET] property_by_zpid:82985765
+2025-08-26 21:38:09,336 INFO [property_app] [DISK_CACHE] saved 11 property entries to disk
+2025-08-26 21:38:09,336 INFO [property_app] [CACHE][SET] property_by_zpid:45106337
+2025-08-26 21:38:09,337 INFO [property_app] [DISK_CACHE] saved 12 property entries to disk
+2025-08-26 21:38:09,337 INFO [property_app] [CACHE][SET] property_by_zpid:45106381
+2025-08-26 21:38:09,338 INFO [property_app] [DISK_CACHE] saved 13 property entries to disk
+2025-08-26 21:38:09,338 INFO [property_app] [CACHE][SET] property_by_zpid:455926850
+2025-08-26 21:38:09,339 INFO [property_app] [DISK_CACHE] saved 14 property entries to disk
+2025-08-26 21:38:09,339 INFO [property_app] [CACHE][SET] property_by_zpid:82035704
+2025-08-26 21:38:09,340 INFO [property_app] [DISK_CACHE] saved 15 property entries to disk
+2025-08-26 21:38:09,340 INFO [property_app] [CACHE][SET] property_by_zpid:45105780
+2025-08-26 21:38:09,341 INFO [property_app] [DISK_CACHE] saved 16 property entries to disk
+2025-08-26 21:38:09,341 INFO [property_app] [CACHE][SET] property_by_zpid:45106126
+2025-08-26 21:38:09,342 INFO [property_app] [DISK_CACHE] saved 17 property entries to disk
+2025-08-26 21:38:09,342 INFO [property_app] [CACHE][SET] property_by_zpid:337854912
+2025-08-26 21:38:09,343 INFO [property_app] [DISK_CACHE] saved 18 property entries to disk
+2025-08-26 21:38:09,343 INFO [property_app] [CACHE][SET] property_by_zpid:45110232
+2025-08-26 21:38:09,344 INFO [property_app] [DISK_CACHE] saved 19 property entries to disk
+2025-08-26 21:38:09,344 INFO [property_app] [CACHE][SET] property_by_zpid:45105357
+2025-08-26 21:38:09,345 INFO [property_app] [DISK_CACHE] saved 20 property entries to disk
+2025-08-26 21:38:09,345 INFO [property_app] [CACHE][SET] property_by_zpid:45110503
+2025-08-26 21:38:09,346 INFO [property_app] [DISK_CACHE] saved 21 property entries to disk
+2025-08-26 21:38:09,346 INFO [property_app] [CACHE][SET] property_by_zpid:45106392
+2025-08-26 21:38:09,347 INFO [property_app] [DISK_CACHE] saved 22 property entries to disk
+2025-08-26 21:38:09,347 INFO [property_app] [CACHE][SET] property_by_zpid:45106211
+2025-08-26 21:38:09,348 INFO [property_app] [DISK_CACHE] saved 23 property entries to disk
+2025-08-26 21:38:09,349 INFO [property_app] [CACHE][SET] property_by_zpid:45105339
+2025-08-26 21:38:09,350 INFO [property_app] [DISK_CACHE] saved 24 property entries to disk
+2025-08-26 21:38:09,350 INFO [property_app] [CACHE][SET] property_by_zpid:45105836
+2025-08-26 21:38:09,351 INFO [property_app] [DISK_CACHE] saved 25 property entries to disk
+2025-08-26 21:38:09,351 INFO [property_app] [CACHE][SET] property_by_zpid:45105414
+2025-08-26 21:38:09,353 INFO [property_app] [DISK_CACHE] saved 26 property entries to disk
+2025-08-26 21:38:09,353 INFO [property_app] [CACHE][SET] property_by_zpid:444521851
+2025-08-26 21:38:09,354 INFO [property_app] [DISK_CACHE] saved 27 property entries to disk
+2025-08-26 21:38:09,354 INFO [property_app] [CACHE][SET] property_by_zpid:45106238
+2025-08-26 21:38:09,355 INFO [property_app] [DISK_CACHE] saved 28 property entries to disk
+2025-08-26 21:38:09,355 INFO [property_app] [CACHE][SET] property_by_zpid:45106360
+2025-08-26 21:38:09,356 INFO [property_app] [DISK_CACHE] saved 29 property entries to disk
+2025-08-26 21:38:09,357 INFO [property_app] [CACHE][SET] property_by_zpid:45105361
+2025-08-26 21:38:09,358 INFO [property_app] [DISK_CACHE] saved 30 property entries to disk
+2025-08-26 21:38:09,358 INFO [property_app] [CACHE][SET] property_by_zpid:440572003
+2025-08-26 21:38:09,359 INFO [property_app] [DISK_CACHE] saved 31 property entries to disk
+2025-08-26 21:38:09,359 INFO [property_app] [CACHE][SET] property_by_zpid:45110440
+2025-08-26 21:38:09,361 INFO [property_app] [DISK_CACHE] saved 32 property entries to disk
+2025-08-26 21:38:09,361 INFO [property_app] [CACHE][SET] property_by_zpid:45106279
+2025-08-26 21:38:09,362 INFO [property_app] [DISK_CACHE] saved 33 property entries to disk
+2025-08-26 21:38:09,362 INFO [property_app] [CACHE][SET] property_by_zpid:448759913
+2025-08-26 21:38:09,363 INFO [property_app] [DISK_CACHE] saved 34 property entries to disk
+2025-08-26 21:38:09,363 INFO [property_app] [CACHE][SET] property_by_zpid:45106296
+2025-08-26 21:38:09,365 INFO [property_app] [DISK_CACHE] saved 35 property entries to disk
+2025-08-26 21:38:09,365 INFO [property_app] [CACHE][SET] property_by_zpid:295823777
+2025-08-26 21:38:09,366 INFO [property_app] [DISK_CACHE] saved 36 property entries to disk
+2025-08-26 21:38:09,366 INFO [property_app] [CACHE][SET] property_by_zpid:246233138
+2025-08-26 21:38:09,368 INFO [property_app] [DISK_CACHE] saved 37 property entries to disk
+2025-08-26 21:38:09,368 INFO [property_app] [CACHE][SET] property_by_zpid:45106303
+2025-08-26 21:38:09,369 INFO [property_app] [DISK_CACHE] saved 38 property entries to disk
+2025-08-26 21:38:09,369 INFO [property_app] [CACHE][SET] property_by_zpid:45106267
+2025-08-26 21:38:09,371 INFO [property_app] [DISK_CACHE] saved 39 property entries to disk
+2025-08-26 21:38:09,371 INFO [property_app] [FETCH_HOMES] filtered_props=39 (after bounds)
+2025-08-26 21:38:09,371 INFO [property_app] [REFRESH] returning 39 homes
+2025-08-26 21:39:03,578 INFO [property_app] [DISK_CACHE] load error: name '_cache_lock' is not defined
+2025-08-26 21:39:04,714 INFO [property_app] [DISK_CACHE] load error: name '_cache_lock' is not defined
+2025-08-26 21:39:17,872 INFO [property_app] [DISK_CACHE] load error: name '_cache_lock' is not defined
+2025-08-26 21:39:18,813 INFO [property_app] [DISK_CACHE] load error: name '_cache_lock' is not defined
+2025-08-26 21:41:05,555 INFO [property_app] [REFRESH] bounds SW(27.766494433172088,-82.75005340576173) NE(28.134669178920163,-82.16468811035158) center=(27.9506,-82.4572) zoom=12
+2025-08-26 21:41:05,555 INFO [property_app] [REFRESH] bounds SW(27.766494433172088,-82.75005340576173) NE(28.134669178920163,-82.16468811035158) center=(27.9506,-82.4572) zoom=12
+2025-08-26 21:41:05,556 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-26 21:41:06,421 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-26 21:41:06,421 INFO [property_app] [CACHE][MISS] props_by_location:33602
+2025-08-26 21:41:06,469 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33602&status_type=ForSale&home_type=Houses&limit=200
+2025-08-26 21:41:07,087 INFO [property_app] [ZILLOW][RES] status=200 bytes=30610 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.46168,"livingArea":1551,"address":"107 W Amelia Ave, Tampa, FL 33602","rentZestimate":null,"variableData":null,"priceChange":-12250,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/a8c4cfb246401308cd0b113d1034d93d-p_e.jpg","latitude":27.96625,"price":490000,"bedrooms":3'
+2025-08-26 21:41:07,088 INFO [property_app] [FETCH_HOMES][TRY1] props=39
+2025-08-26 21:41:07,089 INFO [property_app] [CACHE][SET] props_by_location:33602
+2025-08-26 21:41:07,089 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-26 21:41:07,089 INFO [property_app] [CACHE][SET] property_by_zpid:45110363
+2025-08-26 21:41:07,089 INFO [property_app] [DISK_CACHE] saved 1 property entries to disk
+2025-08-26 21:41:07,090 INFO [property_app] [CACHE][SET] property_by_zpid:45106129
+2025-08-26 21:41:07,090 INFO [property_app] [DISK_CACHE] saved 2 property entries to disk
+2025-08-26 21:41:07,090 INFO [property_app] [CACHE][SET] property_by_zpid:45110242
+2025-08-26 21:41:07,091 INFO [property_app] [DISK_CACHE] saved 3 property entries to disk
+2025-08-26 21:41:07,091 INFO [property_app] [CACHE][SET] property_by_zpid:45110282
+2025-08-26 21:41:07,092 INFO [property_app] [DISK_CACHE] saved 4 property entries to disk
+2025-08-26 21:41:07,092 INFO [property_app] [CACHE][SET] property_by_zpid:45105967
+2025-08-26 21:41:07,092 INFO [property_app] [DISK_CACHE] saved 5 property entries to disk
+2025-08-26 21:41:07,092 INFO [property_app] [CACHE][SET] property_by_zpid:45105855
+2025-08-26 21:41:07,093 INFO [property_app] [DISK_CACHE] saved 6 property entries to disk
+2025-08-26 21:41:07,093 INFO [property_app] [CACHE][SET] property_by_zpid:45105929
+2025-08-26 21:41:07,094 INFO [property_app] [DISK_CACHE] saved 7 property entries to disk
+2025-08-26 21:41:07,094 INFO [property_app] [CACHE][SET] property_by_zpid:45105979
+2025-08-26 21:41:07,095 INFO [property_app] [DISK_CACHE] saved 8 property entries to disk
+2025-08-26 21:41:07,095 INFO [property_app] [CACHE][SET] property_by_zpid:450140453
+2025-08-26 21:41:07,095 INFO [property_app] [DISK_CACHE] saved 9 property entries to disk
+2025-08-26 21:41:07,095 INFO [property_app] [CACHE][SET] property_by_zpid:45112677
+2025-08-26 21:41:07,096 INFO [property_app] [DISK_CACHE] saved 10 property entries to disk
+2025-08-26 21:41:07,096 INFO [property_app] [CACHE][SET] property_by_zpid:82985765
+2025-08-26 21:41:07,097 INFO [property_app] [DISK_CACHE] saved 11 property entries to disk
+2025-08-26 21:41:07,097 INFO [property_app] [CACHE][SET] property_by_zpid:45106337
+2025-08-26 21:41:07,098 INFO [property_app] [DISK_CACHE] saved 12 property entries to disk
+2025-08-26 21:41:07,098 INFO [property_app] [CACHE][SET] property_by_zpid:45106381
+2025-08-26 21:41:07,099 INFO [property_app] [DISK_CACHE] saved 13 property entries to disk
+2025-08-26 21:41:07,099 INFO [property_app] [CACHE][SET] property_by_zpid:455926850
+2025-08-26 21:41:07,099 INFO [property_app] [DISK_CACHE] saved 14 property entries to disk
+2025-08-26 21:41:07,099 INFO [property_app] [CACHE][SET] property_by_zpid:82035704
+2025-08-26 21:41:07,100 INFO [property_app] [DISK_CACHE] saved 15 property entries to disk
+2025-08-26 21:41:07,100 INFO [property_app] [CACHE][SET] property_by_zpid:45105780
+2025-08-26 21:41:07,101 INFO [property_app] [DISK_CACHE] saved 16 property entries to disk
+2025-08-26 21:41:07,101 INFO [property_app] [CACHE][SET] property_by_zpid:45106126
+2025-08-26 21:41:07,102 INFO [property_app] [DISK_CACHE] saved 17 property entries to disk
+2025-08-26 21:41:07,102 INFO [property_app] [CACHE][SET] property_by_zpid:337854912
+2025-08-26 21:41:07,103 INFO [property_app] [DISK_CACHE] saved 18 property entries to disk
+2025-08-26 21:41:07,103 INFO [property_app] [CACHE][SET] property_by_zpid:45110232
+2025-08-26 21:41:07,104 INFO [property_app] [DISK_CACHE] saved 19 property entries to disk
+2025-08-26 21:41:07,104 INFO [property_app] [CACHE][SET] property_by_zpid:45105357
+2025-08-26 21:41:07,105 INFO [property_app] [DISK_CACHE] saved 20 property entries to disk
+2025-08-26 21:41:07,105 INFO [property_app] [CACHE][SET] property_by_zpid:45110503
+2025-08-26 21:41:07,106 INFO [property_app] [DISK_CACHE] saved 21 property entries to disk
+2025-08-26 21:41:07,106 INFO [property_app] [CACHE][SET] property_by_zpid:45106392
+2025-08-26 21:41:07,108 INFO [property_app] [DISK_CACHE] saved 22 property entries to disk
+2025-08-26 21:41:07,108 INFO [property_app] [CACHE][SET] property_by_zpid:45106211
+2025-08-26 21:41:07,109 INFO [property_app] [DISK_CACHE] saved 23 property entries to disk
+2025-08-26 21:41:07,109 INFO [property_app] [CACHE][SET] property_by_zpid:45105339
+2025-08-26 21:41:07,110 INFO [property_app] [DISK_CACHE] saved 24 property entries to disk
+2025-08-26 21:41:07,110 INFO [property_app] [CACHE][SET] property_by_zpid:45105836
+2025-08-26 21:41:07,111 INFO [property_app] [DISK_CACHE] saved 25 property entries to disk
+2025-08-26 21:41:07,111 INFO [property_app] [CACHE][SET] property_by_zpid:45105414
+2025-08-26 21:41:07,112 INFO [property_app] [DISK_CACHE] saved 26 property entries to disk
+2025-08-26 21:41:07,112 INFO [property_app] [CACHE][SET] property_by_zpid:444521851
+2025-08-26 21:41:07,113 INFO [property_app] [DISK_CACHE] saved 27 property entries to disk
+2025-08-26 21:41:07,113 INFO [property_app] [CACHE][SET] property_by_zpid:45106238
+2025-08-26 21:41:07,114 INFO [property_app] [DISK_CACHE] saved 28 property entries to disk
+2025-08-26 21:41:07,114 INFO [property_app] [CACHE][SET] property_by_zpid:45106360
+2025-08-26 21:41:07,116 INFO [property_app] [DISK_CACHE] saved 29 property entries to disk
+2025-08-26 21:41:07,116 INFO [property_app] [CACHE][SET] property_by_zpid:45105361
+2025-08-26 21:41:07,117 INFO [property_app] [DISK_CACHE] saved 30 property entries to disk
+2025-08-26 21:41:07,117 INFO [property_app] [CACHE][SET] property_by_zpid:440572003
+2025-08-26 21:41:07,118 INFO [property_app] [DISK_CACHE] saved 31 property entries to disk
+2025-08-26 21:41:07,118 INFO [property_app] [CACHE][SET] property_by_zpid:45110440
+2025-08-26 21:41:07,119 INFO [property_app] [DISK_CACHE] saved 32 property entries to disk
+2025-08-26 21:41:07,120 INFO [property_app] [CACHE][SET] property_by_zpid:45106279
+2025-08-26 21:41:07,121 INFO [property_app] [DISK_CACHE] saved 33 property entries to disk
+2025-08-26 21:41:07,121 INFO [property_app] [CACHE][SET] property_by_zpid:448759913
+2025-08-26 21:41:07,122 INFO [property_app] [DISK_CACHE] saved 34 property entries to disk
+2025-08-26 21:41:07,122 INFO [property_app] [CACHE][SET] property_by_zpid:45106296
+2025-08-26 21:41:07,123 INFO [property_app] [DISK_CACHE] saved 35 property entries to disk
+2025-08-26 21:41:07,123 INFO [property_app] [CACHE][SET] property_by_zpid:295823777
+2025-08-26 21:41:07,125 INFO [property_app] [DISK_CACHE] saved 36 property entries to disk
+2025-08-26 21:41:07,125 INFO [property_app] [CACHE][SET] property_by_zpid:246233138
+2025-08-26 21:41:07,126 INFO [property_app] [DISK_CACHE] saved 37 property entries to disk
+2025-08-26 21:41:07,126 INFO [property_app] [CACHE][SET] property_by_zpid:45106303
+2025-08-26 21:41:07,128 INFO [property_app] [DISK_CACHE] saved 38 property entries to disk
+2025-08-26 21:41:07,128 INFO [property_app] [CACHE][SET] property_by_zpid:45106267
+2025-08-26 21:41:07,129 INFO [property_app] [DISK_CACHE] saved 39 property entries to disk
+2025-08-26 21:41:07,129 INFO [property_app] [FETCH_HOMES] filtered_props=39 (after bounds)
+2025-08-26 21:41:07,129 INFO [property_app] [REFRESH] returning 39 homes
+2025-08-26 21:42:04,394 INFO [property_app] [REFRESH] bounds SW(27.92078621672068,-82.54079818725587) NE(28.012816306088368,-82.39445686340332) center=(27.966811072426754,-82.4676275253296) zoom=14
+2025-08-26 21:42:05,000 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-26 21:42:05,000 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 39 cached homes in bounds
+2025-08-26 21:42:05,000 INFO [property_app] [CACHE][HIT] props_by_location:33602
+2025-08-26 21:42:05,000 INFO [property_app] [FETCH_HOMES] using cached payload for '33602'
+2025-08-26 21:42:05,000 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-26 21:42:05,000 INFO [property_app] [FETCH_HOMES] filtered_props=39 (after bounds)
+2025-08-26 21:42:05,000 INFO [property_app] [REFRESH] returning 39 homes
