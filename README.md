@@ -378,6 +378,38 @@ A Flask web application for interactive property search, analysis, and visualiza
 
 ---
 
+## Changelog
+
+### 2025-08-26
+#### Added
+- **Full EN/ES localization** across:
+  - Login/Register modal (titles, buttons, hints, tab switch copy)
+  - “Limit reached” modal text & actions
+  - Property preview popup (Price, Beds, Baths, View Listing, Close/Print)
+  - Bottom quota bar (Guest, Login/Register, Logout)
+  - Leaflet layer names (Streets/Satellite)
+- **Localized auth error** for existing users:
+  - EN: “That user is already registered. Please try again”
+  - ES: “Ese usuario ya está registrado. Por favor, inténtalo de nuevo.”
+- **Centered, styled “Limit reached” modal** (replaces browser alert)
+- **Data-URL favicon** to remove 404 favicon noise
+
+#### Changed
+- **Logout flow**: Optimistic UI switch to Guest, POST `/auth/logout`, then `/auth/status` revalidation
+- **Quota bar**: Single clean implementation; always styled (blue); shows Guest/Login-Register when logged out
+- **Language toggle**: Instantly re-labels property popup, “Good deal?” buttons, layer names, and **bottom bar links**
+- **Login/Register modal**: Visually aligned to GUI & **expanded height**; button styling improved
+- **Property preview image** enlarged to **280px** width for better readability
+- **Upgrade/Buy actions** now redirect to **root `/`** instead of `/upgrade` or `/buy`
+
+#### Fixed
+- **Script parsing errors** (dangling `catch`, extra braces) that caused blank/unstyled viewport
+- **Duplicate/garbled quota bar code**; consolidated into one IIFE to avoid handler conflicts
+- **`applyLang` not defined** race by ensuring a single, stable definition
+- **Button identity clashes** that made auth buttons morph into report buttons
+
+- ---
+
 ### 🚀 Upgrade Steps
 
 1. Replace `map.py` and `base.html` with the latest versions.
