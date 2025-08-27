@@ -82,7 +82,8 @@
     login: "Login",
     register: "Register",
     dontHave: "Don't have an account?",
-    alreadyHave: "Already have an account?"
+    alreadyHave: "Already have an account?",
+    userExists: "That user is already registered. Please try again"
   }, I18N.en || {});
   I18N.es = Object.assign({
     placeholder: "Buscar dirección o ciudad...",
@@ -110,7 +111,8 @@
     login: "Iniciar sesión",
     register: "Registrarse",
     dontHave: "¿No tienes cuenta?",
-    alreadyHave: "¿Ya tienes cuenta?"
+    alreadyHave: "¿Ya tienes cuenta?",
+    userExists: "Ese usuario ya está registrado. Por favor, inténtalo de nuevo."
   }, I18N.es || {});
 
   function getI18n(){
@@ -180,7 +182,8 @@
     window.currentLanguage = (window.currentLanguage === "en") ? "es" : "en";
     var btn = document.getElementById('lang-toggle');
     if (btn) btn.innerText = (window.currentLanguage === "en") ? "ES" : "EN";
-    try { applyLang(true); } catch(_e){}
+    try { applyLang(true);   try { if (typeof refreshCounterBar === 'function') refreshCounterBar(); } catch(_e){}
+} catch(_e){}
     try {
       if (typeof updateHouseIcons === 'function' && Array.isArray(window.markerData) && markerData.length) {
         updateHouseIcons(true); // rebuild marker popups and keep the open one
@@ -575,7 +578,7 @@
   <div id="limit-overlay" style="display:none; position:fixed; inset:0; background:rgba(2,6,23,.45); z-index:22000;" onclick="closeLimitModal()"></div>
   <div id="limit-modal" class="gpt-popup" style="display:none; z-index:22001; max-width:460px; width:92%; border-radius:16px; position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; padding:16px;" onclick="event.stopPropagation()">
     <button type="button" id="limit-close-x" aria-label="Close" onclick="closeLimitModal()" style="position:absolute;top:8px;right:10px;background:transparent;border:0;font-size:18px;line-height:1;cursor:pointer;padding:4px 6px;">×</button>
-    <div id="limit-msg" style="font-weight:600; font-size:1rem; color:#0b1324; margin:6px 0 16px;">You’ve reached your monthly limit. Please upgrade your plan or buy additional reports.</div>
+    <div id="limit-msg" style="font-weight:600; font-size:1.05rem; line-height:1.45; color:#0b1324; margin:8px 0 18px;">You’ve reached your monthly limit. Please upgrade your plan or buy additional reports.</div>
     <div style="display:flex; gap:8px; justify-content:flex-end;">
       <button id="limit-notnow-btn" class="btn btn-ghost" onclick="closeLimitModal()">Not now</button>
       <button id="limit-buy-btn" class="btn btn-secondary" onclick="goBuyMore()">Buy additional reports</button>
@@ -596,8 +599,8 @@
     if (o) o.style.display = 'none';
     if (m) m.style.display = 'none';
   }
-  function goUpgrade(){ closeLimitModal(); window.location.href = '/upgrade'; }
-  function goBuyMore(){ closeLimitModal(); window.location.href = '/buy'; }
+  function goUpgrade(){ closeLimitModal(); window.location.href = '/'; }
+  function goBuyMore(){ closeLimitModal(); window.location.href = '/'; }
   </script>
 
   <script>
