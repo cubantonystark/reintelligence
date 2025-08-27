@@ -408,7 +408,21 @@ A Flask web application for interactive property search, analysis, and visualiza
 - **`applyLang` not defined** race by ensuring a single, stable definition
 - **Button identity clashes** that made auth buttons morph into report buttons
 
-- ---
+---
+
+# Changelog
+
+## Changed
+- **Quota consumption**: Every generated report (from cache *or* fresh) now decrements the user’s quota by **1**.
+  - Implemented by simplifying `register_report_consumption(report_id)` to always subtract 1 from the current user’s quota and ignore prior “used” tracking.  
+  - Keeps existing `/clicked` integration; no other behavior was altered.  
+- **UI copy**: Updated auth modal helper text to show **“Dev test user: rey / R34n3l.2025 (10 reports)”**.
+
+## Notes
+- No other endpoints, data models, or UI elements were changed.
+- Existing client logic (pre-checking `/auth/status` and showing the report) remains intact.
+
+---
 
 ### 🚀 Upgrade Steps
 
