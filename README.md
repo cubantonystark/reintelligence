@@ -421,6 +421,13 @@ A Flask web application for interactive property search, analysis, and visualiza
 ## Notes
 - No other endpoints, data models, or UI elements were changed.
 - Existing client logic (pre-checking `/auth/status` and showing the report) remains intact.
+- ## [Unreleased] - Quota logic simplification
+
+### Changed
+- Every generated report now decrements user quota by **1** (regardless of cache hit or fresh generation).
+
+### Removed
+- Legacy `used.json` tracking and related helpers (`_report_was_used`, `_report_mark_used`, etc.) to reduce I/O and complexity.
 
 ---
 
