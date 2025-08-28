@@ -15,7 +15,7 @@ from flask import Flask, jsonify, render_template, request, session
 # ---------- OpenAI ----------
 
 from openai import OpenAI
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "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")
 oi_client = OpenAI(api_key=OPENAI_API_KEY)
 
 app = Flask(__name__, template_folder="templates")
@@ -74,6 +74,9 @@ def _save_property_cache_disk():
 
 # ---------- Disk Cache ----------
 CACHE_DIR = os.getenv("CACHE_DIR", "./cache")
+
+REPORT_RAW_DIR = os.path.join(CACHE_DIR, "report_raw")
+os.makedirs(REPORT_RAW_DIR, exist_ok=True)
 PROP_CACHE_DIR = os.path.join(CACHE_DIR, "property_by_zpid")
 os.makedirs(PROP_CACHE_DIR, exist_ok=True)
 
@@ -887,7 +890,13 @@ def clicked():
             register_report_consumption(str(_rid))
         except Exception:
             pass
-        return jsonify({"status":"success", "info": f"{address},{price}", "report": full_cached, "html": full_cached})
+    
+    try:
+        _zid = str(data.get("zpid") or "").strip()
+        save_report_raw_json(address, language, zpid=_zid)
+    except Exception as _e:
+        log(f"[REPORT_RAW][WARN] save failed: {_e}")
+    return jsonify({"status":"success", "info": f"{address},{price}", "report": full_cached, "html": full_cached})
     
     
 
@@ -969,84 +978,94 @@ def clicked():
 
 
     if language == "es":
-        sys_text = "Responde SIEMPRE en español. Devuelve la primera línea como 'GRADE: X' y el resto como HTML solamente."
-        prompt = f"""Eres un analista de inversiones inmobiliarias.  
-Genera un **Informe de Inversión Inmobiliaria** profesional para la siguiente propiedad:
+        sys_text = "Responde SIEMPRE en español. Devuelve todo como HTML solamente."
+        prompt = f"""Eres un analista de inversiones inmobiliarias. Presenta siempre los datos en un formato **claro y fácil de usar**, con tablas para comparables y financiamiento.  
+No inventes datos; apóyate en portales públicos (Zillow, Redfin, Realtor.com, sitios web del condado).
 
-Property: {address} (lat {lat}, lon {lon})
-Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
+Genera un **Informe de Inversión Inmobiliaria** profesional para la siguiente propiedad sujeto:
+
+Propiedad: {address} (lat {lat}, lon {lon})  
+Detalles (hechos):\n{details_html}\n\nComparables proporcionados:\n[COMPARABLES_TABLE]
 
 ### Requisitos de salida:
 - Devuelve el informe **solo como HTML** (HTML5 válido).  
-- Cada encabezado de sección debe incluir un **icono de la librería Material Icons de Google** usando la etiqueta `<span class="material-icons">`.  
-  Ejemplo: `<h2><span class="material-icons">home</span> Aspectos Fundamentales de la Propiedad</h2>`.  
-- Usar `<h2>` para secciones, `<p>` para texto, `<ul>/<li>` para listas, y `<table>` para comparables y escenarios de financiamiento.  
-- El estilo debe ser limpio y moderno, adecuado para mostrar en una aplicación web.  
+- Cada encabezado de sección debe incluir un **ícono de la librería Google Material Icons** usando la etiqueta `<span class="material-icons">`.  
+  Ejemplo: `<h2><span class="material-icons">home</span> Fundamentos específicos de la propiedad</h2>`.  
+- Usa `<h2>` para secciones principales, `<p>` para texto, `<ul>/<li>` para listas con viñetas y `<table>` para comparables y escenarios de financiamiento.  
+- El estilo debe ser limpio y moderno, apto para renderizarse en una aplicación web.
 
 ### Estructura del informe:
+
 1. **Calificación de Inversión (A–F)**  
-   - Mostrar al inicio en una insignia o encabezado estilizado.  
-   - Ejemplo: `<div class="badge">Calificación de Inversión: [INVESTMENT_GRADE]</div>`  
+   - Muéstrala de forma destacada en una insignia o encabezado con estilo.  
+   - Ejemplo: `<div class="badge">Investment Grade: [INVESTMENT_GRADE]</div>`
 
-2. **Aspectos Fundamentales de la Propiedad** (`home`)  
+2. **Fundamentos específicos de la propiedad** (`home`)  
    - Tamaño: [PROPERTY_SIZE]  
-   - Precio por pie² (ft²): [PRICE_PER_SQFT]  
-   - Estado, distribución, características únicas: [PROPERTY_FEATURES]  
-   - Análisis de comparables en tabla HTML con al menos 5 propiedades:  
-     [COMPARABLES_TABLE]  
+   - Precio por pie cuadrado: [PRICE_PER_SQFT]  
+   - Condición, distribución, características únicas: [PROPERTY_FEATURES]  
+   - Análisis de ventas comparables con al menos 5 comparables en una tabla HTML clara:
 
-3. **Ubicación y Vecindario** (`location_on`)  
+3. **Comparables** (`event_list`)  
+   [COMPARABLES_TABLE]  
+
+   escribe aquí un breve análisis comparando el precio de venta de la propiedad con los comparables; usa también Zillow y Redfin o cualquier MLS disponible para extraer el **último precio de venta** de la propiedad y calcula el **porcentaje de diferencia** entre el precio de venta actual y el último precio de venta.
+
+4. **Ubicación y vecindario** (`location_on`)  
    - Escuelas: [SCHOOL_INFO]  
-   - Seguridad: [CRIME_INFO]  
-   - Servicios y tendencias de desarrollo: [NEIGHBORHOOD_INFO]  
+   - Crimen/Seguridad: [CRIME_INFO]  
+   - Amenidades y tendencias de desarrollo: [NEIGHBORHOOD_INFO]  
+   - Zona de inundación o riesgos naturales (usa mapas de FEMA y del condado)
 
-4. **Indicadores Financieros** (`attach_money`)  
+5. **Indicadores financieros** (`attach_money`)  
+   - Valoraciones automatizadas (Zestimate, Redfin)  
    - Impuestos estimados: [ESTIMATED_TAXES]  
    - Seguro: [INSURANCE_COST]  
    - Rango de renta: [RENT_RANGE]  
    - NOI: [NOI]  
-   - Tasa de capitalización: [CAP_RATE]  
-   - Retorno sobre efectivo: [COC_RETURN]  
+   - Tasa de capitalización (Cap Rate): [CAP_RATE]  
+   - Retorno efectivo sobre efectivo (Cash-on-Cash): [COC_RETURN]
 
-5. **Escenarios de Financiamiento** (`calculate`)  
-   - Tabla comparativa lado a lado: Convencional 20%, Convencional 5% (PMI), FHA 3.5% (MIP), VA 0% (cuota de financiación).  
-   - La tabla debe incluir: Enganche, Monto del préstamo, PI mensual, PMI/MIP, y PITI estimado a 6.25%, 6.75%, 7.25%.  
-   - Insertar tabla aquí: [FINANCING_TABLE]  
+6. **Escenarios de financiamiento** (`calculate`)  
+   - Tabla comparativa para: Convencional 20%, Convencional 5% (PMI), FHA 3.5% (MIP), VA 0% (cuota de financiamiento).  
+   - La tabla debe incluir: Enganche, Monto del préstamo, Mensualidad PI, PMI/MIP y PITI estimado a 6.25%, 6.75%, 7.25%.  
+   - Inserta la tabla formateada aquí: [FINANCING_TABLE]
 
-6. **Indicadores de Riesgo** (`warning`)  
+7. **Indicadores de riesgo** (`warning`)  
    - Vacancia: [VACANCY_RISK]  
    - Seguro/Inundación: [INSURANCE_RISK]  
-   - Condición/Inspección: [INSPECTION_RISK]  
-   - HOA/Restricciones: [HOA_RISK]  
-   - Ciclo del mercado: [MARKET_CYCLE]  
+   - Inspección/Condición: [INSPECTION_RISK]  
+   - Restricciones de HOA: [HOA_RISK]  
+   - Ciclo de mercado: [MARKET_CYCLE]
 
-7. **Estrategia de Salida** (`trending_up`)  
+8. **Estrategia de salida** (`trending_up`)  
    - Potencial de reventa: [RESALE_POTENTIAL]  
    - Flexibilidad de renta: [RENTAL_FLEXIBILITY]  
-   - Proyección de apreciación: [APPRECIATION_OUTLOOK]  
+   - Perspectiva de apreciación: [APPRECIATION_OUTLOOK]
 
-8. **Próximos Pasos / Lista de Diligencia** (`checklist`)  
-   - Lista de viñetas: [CHECKLIST_ITEMS]  
+9. **Próximos pasos / Lista de verificación de debida diligencia** (`checklist`)  
+   - Lista con viñetas: [CHECKLIST_ITEMS]
 
-9. **Justificación de la Calificación** (`grading`)  
-   - Viñetas: [GRADE_RATIONALE]  
+10. **Justificación de la calificación** (`grading`)  
+   - Viñetas: [GRADE_RATIONALE]
 
-### Guías de estilo:
-- HTML limpio con etiquetas semánticas.  
-- Usar `<table>` para comparables y financiamiento.  
-- Usar listas con viñetas para checklist y justificación.  
-- Lenguaje claro y conciso para principiantes.  
-- Terminar con un resumen: [INVESTMENT_SUMMARY]  
+11. **Terminar con un breve resumen** (`overview_key`)  
+    [INVESTMENT_SUMMARY]
 
-Devuelve únicamente la **salida en HTML**.
-Return only the **HTML output**.
+### Pautas de estilo:
+- HTML limpio y semántico con encabezados, tablas y listas con viñetas.  
+- Explicaciones aptas para principiantes.
+
 """
         # Inject concrete comparables so the model does NOT invent them
         prompt = prompt.replace('[COMPARABLES_TABLE]', comps_table_html)
         prompt += "\n\nNOTE: Use only the comparables provided above; do not fabricate addresses or prices."
+
     else:
-        sys_text = "Always respond in English. Return the first line as 'GRADE: X' and the rest as HTML only."
-        prompt = f"""You are a real estate investment analyst.  
+        sys_text = "Always respond in English. Return everything as HTML only."
+        prompt = f"""You are a real estate investment analyst. Always present data in a clear, **user-friendly format** with tables for comparables and financing.   
+Do not hallucinate; rely on public portals (Zillow, Redfin, Realtor.com, county websites). 
+
 Generate a professional **Property Investment Report** for the following subject property:
 
 Property: {address} (lat {lat}, lon {lon})
@@ -1060,23 +1079,35 @@ Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
 - Style should be clean and modern, suitable for rendering in a web app.  
 
 ### Report structure:
+
 1. **Investment Grade (A–F)**  
+
    - Show prominently at the top in a badge or styled header.  
    - Example: `<div class="badge">Investment Grade: [INVESTMENT_GRADE]</div>`  
 
 2. **Property-Specific Fundamentals** (`home`)  
+
    - Size: [PROPERTY_SIZE]  
    - Price per square foot: [PRICE_PER_SQFT]  
    - Condition, layout, unique features: [PROPERTY_FEATURES]  
-   - Comparable sales analysis with at least 5 comps in a clean HTML table:  
+   - Comparable sales analysis with at least 5 comps in a clean HTML table: 
+
+3. **Comparables** (`event_list`)
+ 
      [COMPARABLES_TABLE]  
 
-3. **Location & Neighborhood** (`location_on`)  
+     write here a short analysis comparing the property’s asking price to comps, also use Zillow and redfin or any available MLS to extract the last sold price of the property and calculate the percentage difference between the current asking price and the last sold price.
+
+4. **Location & Neighborhood** (`location_on`)  
+
    - Schools: [SCHOOL_INFO]  
    - Crime/Safety: [CRIME_INFO]  
    - Amenities & Development Trends: [NEIGHBORHOOD_INFO]  
+   - Flood zone or natural hazard exposure (use FEMA and county maps)
 
-4. **Financial Indicators** (`attach_money`)  
+5. **Financial Indicators** (`attach_money`) 
+
+   - Automated valuations (Zestimate, Redfin)
    - Estimated Taxes: [ESTIMATED_TAXES]  
    - Insurance: [INSURANCE_COST]  
    - Rent Range: [RENT_RANGE]  
@@ -1084,33 +1115,42 @@ Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
    - Cap Rate: [CAP_RATE]  
    - Cash-on-Cash Return: [COC_RETURN]  
 
-5. **Financing Scenarios** (`calculate`)  
+6. **Financing Scenarios** (`calculate`)  
+
    - Side-by-side table for: Conventional 20%, Conventional 5% (PMI), FHA 3.5% (MIP), VA 0% (funding fee).  
    - Table must include: Down Payment, Loan Amount, Monthly PI, PMI/MIP, and Estimated PITI at 6.25%, 6.75%, 7.25%.  
    - Insert formatted table here: [FINANCING_TABLE]  
 
-6. **Risk Indicators** (`warning`)  
+7. **Risk Indicators** (`warning`)  
+
    - Vacancy: [VACANCY_RISK]  
    - Insurance/Flood: [INSURANCE_RISK]  
    - Inspection/Condition: [INSPECTION_RISK]  
    - HOA Restrictions: [HOA_RISK]  
    - Market Cycle: [MARKET_CYCLE]  
 
-7. **Exit Strategy** (`trending_up`)  
+8. **Exit Strategy** (`trending_up`)  
+
    - Resale Potential: [RESALE_POTENTIAL]  
    - Rental Flexibility: [RENTAL_FLEXIBILITY]  
    - Appreciation Outlook: [APPRECIATION_OUTLOOK]  
 
-8. **Next Steps / Due Diligence Checklist** (`checklist`)  
+9. **Next Steps / Due Diligence Checklist** (`checklist`)  
+
    - Bullet list: [CHECKLIST_ITEMS]  
 
-9. **Grade Rationale** (`grading`)  
+10. **Grade Rationale** (`grading`)  
+
    - Bullet points: [GRADE_RATIONALE]  
 
+11- **End with a short summary** (`overview_key`)
+
+    [INVESTMENT_SUMMARY] 
+
 ### Style guidelines:
+
 - Clean, semantic HTML with headings, tables, and bullet points.  
-- Beginner-friendly explanations.  
-- End with a short summary: [INVESTMENT_SUMMARY]  
+- Beginner-friendly explanations.        
 """
         # Inject concrete comparables so the model does NOT invent them
         prompt = prompt.replace('[COMPARABLES_TABLE]', comps_table_html)
@@ -1126,7 +1166,7 @@ Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
                 {"role": "system", "content": sys_text},
                 {"role": "user", "content": prompt},
             ],
-            max_tokens=2200,
+            max_tokens=8000,
             temperature=0.25
         )
         took = time.time() - start
@@ -1444,3 +1484,47 @@ def _counter_state_useraware():
         return jsonify({"count": st["count"], "max": st["max"], "user": st["user"], "is_logged_in": st["is_logged_in"]})
     except Exception as e:
         return jsonify({"count": 0, "max": 0, "user": "Guest", "is_logged_in": False, "error": str(e)}), 200
+
+
+def save_report_raw_json(address: str, lang: str, zpid: str = "") -> _Optional_cacheutils[str]:
+    """
+    Save the raw JSON body from /property?zpid=... into REPORT_RAW_DIR using the same basename as reports.
+    Returns the file path if saved, else None.
+    """
+    try:
+        if not address:
+            return None
+        # Determine a zpid if not provided
+        zid = (zpid or "").strip()
+        if not zid:
+            try:
+                zid, _addr = zillow_search_get_zpid(address)
+            except Exception:
+                zid = ""
+        if not zid:
+            return None
+
+        # Fetch fresh raw payload from /property to ensure it's the details response
+        status, payload = _zillow_http_get(f"/property?zpid={zid}")
+        if status != 200 or payload is None:
+            return None
+
+        # Build path using the same naming convention as report cache
+        try:
+            base = _cache_basename_cacheutils(address, (lang or "").lower() or None)
+        except Exception:
+            base = _cache_basename_cacheutils(address, None)
+        out_path = os.path.join(REPORT_RAW_DIR, base + ".json")
+
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump({
+                "address": address_to_string(address),
+                "language": (lang or ""),
+                "zpid": zid,
+                "fetched_at": datetime.utcnow().isoformat() + "Z",
+                "payload": payload
+            }, f, ensure_ascii=False, indent=2)
+        return out_path
+    except Exception as e:
+        log(f"[REPORT_RAW][ERR] {e}")
+        return None
