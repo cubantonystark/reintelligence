@@ -36156,3 +36156,409 @@ NOTE: Use only the comparables provided above; do not fabricate addresses or pri
 2025-08-28 19:42:32,279 INFO [property_app] [OPENAI] completion ok in 83.90s, chars=8233
 2025-08-28 19:42:32,282 INFO [property_app] [REPORT_RAW][WARN] save failed: name 'save_report_raw_json' is not defined
 2025-08-28 19:42:49,562 INFO [property_app] [DISK_CACHE] loaded 2980 property entries from disk
+2025-08-28 19:45:07,945 INFO [property_app] [DISK_CACHE] loaded 2980 property entries from disk
+2025-08-28 19:45:08,865 INFO [property_app] [DISK_CACHE] loaded 2980 property entries from disk
+2025-08-28 19:45:12,702 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:45:12,703 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:45:12,703 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:45:13,494 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-28 19:45:13,496 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 2345 cached homes in bounds
+2025-08-28 19:45:13,496 INFO [property_app] [CACHE][MISS] props_by_location:33602
+2025-08-28 19:45:13,545 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33602&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:45:14,356 INFO [property_app] [ZILLOW][RES] status=200 bytes=30734 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.46168,"livingArea":1551,"address":"107 W Amelia Ave, Tampa, FL 33602","rentZestimate":null,"variableData":null,"priceChange":-12250,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/a8c4cfb246401308cd0b113d1034d93d-p_e.jpg","latitude":27.96625,"price":490000,"bedrooms":3'
+2025-08-28 19:45:14,357 INFO [property_app] [FETCH_HOMES][TRY1] props=39
+2025-08-28 19:45:14,357 INFO [property_app] [CACHE][SET] props_by_location:33602
+2025-08-28 19:45:14,357 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-28 19:45:14,358 INFO [property_app] [FETCH_HOMES] filtered_props=2345 (after bounds)
+2025-08-28 19:45:14,358 INFO [property_app] [REFRESH] returning 2345 homes
+2025-08-28 19:45:17,506 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:45:17,508 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:45:17,509 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:45:18,248 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-28 19:45:18,250 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 2345 cached homes in bounds
+2025-08-28 19:45:18,250 INFO [property_app] [CACHE][HIT] props_by_location:33602
+2025-08-28 19:45:18,250 INFO [property_app] [FETCH_HOMES] using cached payload for '33602'
+2025-08-28 19:45:18,250 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-28 19:45:18,251 INFO [property_app] [FETCH_HOMES] filtered_props=2345 (after bounds)
+2025-08-28 19:45:18,251 INFO [property_app] [REFRESH] returning 2345 homes
+2025-08-28 19:45:24,182 INFO [property_app] [REFRESH] bounds SW(27.99773602867913,-82.67744064331056) NE(28.08667156062472,-82.45788574218751) center=(28.042212986097905,-82.56766319274904) zoom=14
+2025-08-28 19:45:24,183 INFO [property_app] [REFRESH] bounds SW(27.99773602867913,-82.67744064331056) NE(28.08667156062472,-82.45788574218751) center=(28.042212986097905,-82.56766319274904) zoom=14
+2025-08-28 19:45:24,183 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:45:24,452 INFO [property_app] [REFRESH] bounds SW(27.99773602867913,-82.67744064331056) NE(28.08667156062472,-82.45788574218751) center=(28.042212986097905,-82.56766319274904) zoom=14
+2025-08-28 19:45:24,452 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:45:24,786 INFO [property_app] [REFRESH] chosen location='33625'
+2025-08-28 19:45:24,787 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 312 cached homes in bounds
+2025-08-28 19:45:24,787 INFO [property_app] [CACHE][MISS] props_by_location:33625
+2025-08-28 19:45:24,831 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33625&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:45:25,978 INFO [property_app] [ZILLOW][RES] status=200 bytes=31792 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.54663,"livingArea":1804,"address":"11815 Hickorynut Dr, Tampa, FL 33625","rentZestimate":null,"variableData":null,"priceChange":null,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/ed3c0d7a2970a92d1470e86f397efcaf-p_e.jpg","latitude":28.05583,"price":445000,"bedrooms":'
+2025-08-28 19:45:25,979 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:45:25,979 INFO [property_app] [CACHE][SET] props_by_location:33625
+2025-08-28 19:45:25,979 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33625
+2025-08-28 19:45:25,979 INFO [property_app] [FETCH_HOMES] filtered_props=312 (after bounds)
+2025-08-28 19:45:25,979 INFO [property_app] [REFRESH] returning 312 homes
+2025-08-28 19:45:28,297 INFO [property_app] [REPORT_RAW][WARN] save failed: name 'save_report_raw_json' is not defined
+2025-08-28 19:47:53,848 INFO [property_app] [DISK_CACHE] loaded 2980 property entries from disk
+2025-08-28 19:48:11,089 INFO [property_app] [DISK_CACHE] loaded 2980 property entries from disk
+2025-08-28 19:48:12,023 INFO [property_app] [DISK_CACHE] loaded 2980 property entries from disk
+2025-08-28 19:48:16,514 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:48:16,514 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:48:16,515 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:17,285 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-28 19:48:17,288 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 2345 cached homes in bounds
+2025-08-28 19:48:17,288 INFO [property_app] [CACHE][MISS] props_by_location:33602
+2025-08-28 19:48:17,334 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33602&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:48:17,857 INFO [property_app] [ZILLOW][RES] status=200 bytes=30734 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.46168,"livingArea":1551,"address":"107 W Amelia Ave, Tampa, FL 33602","rentZestimate":null,"variableData":null,"priceChange":-12250,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/a8c4cfb246401308cd0b113d1034d93d-p_e.jpg","latitude":27.96625,"price":490000,"bedrooms":3'
+2025-08-28 19:48:17,859 INFO [property_app] [FETCH_HOMES][TRY1] props=39
+2025-08-28 19:48:17,859 INFO [property_app] [CACHE][SET] props_by_location:33602
+2025-08-28 19:48:17,859 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-28 19:48:17,859 INFO [property_app] [FETCH_HOMES] filtered_props=2345 (after bounds)
+2025-08-28 19:48:17,859 INFO [property_app] [REFRESH] returning 2345 homes
+2025-08-28 19:48:19,775 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:48:19,775 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:19,777 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:48:19,777 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:28,281 INFO [property_app] [REFRESH] bounds SW(27.923061381889237,-82.61152267456055) NE(28.01205855357855,-82.39196777343751) center=(27.96756914304626,-82.50174522399904) zoom=14
+2025-08-28 19:48:28,281 INFO [property_app] [REFRESH] bounds SW(27.923061381889237,-82.61152267456055) NE(28.01205855357855,-82.39196777343751) center=(27.96756914304626,-82.50174522399904) zoom=14
+2025-08-28 19:48:28,282 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:29,066 INFO [property_app] [REFRESH] chosen location='33607'
+2025-08-28 19:48:29,067 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 450 cached homes in bounds
+2025-08-28 19:48:29,068 INFO [property_app] [CACHE][MISS] props_by_location:33607
+2025-08-28 19:48:29,117 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33607&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:48:29,897 INFO [property_app] [REFRESH] bounds SW(27.570373523891185,-83.27911376953125) NE(28.282614623837407,-81.52267456054689) center=(27.92708072333704,-82.40055084228517) zoom=11
+2025-08-28 19:48:29,899 INFO [property_app] [REFRESH] bounds SW(27.570373523891185,-83.27911376953125) NE(28.282614623837407,-81.52267456054689) center=(27.92708072333704,-82.40055084228517) zoom=11
+2025-08-28 19:48:29,899 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:29,991 INFO [property_app] [ZILLOW][RES] status=200 bytes=31894 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":true,"newConstructionType":"BUILDER_SPEC","propertyType":"SINGLE_FAMILY","longitude":-82.488205,"livingArea":1726,"address":"2714 W Tampa Bay Blvd, Tampa, FL 33607","rentZestimate":2793,"variableData":null,"priceChange":null,"zestimate":683700,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/e2a25950501537541e96130e697f1bb4-p_e.jpg","lati'
+2025-08-28 19:48:29,992 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:48:29,992 INFO [property_app] [CACHE][SET] props_by_location:33607
+2025-08-28 19:48:29,992 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33607
+2025-08-28 19:48:29,993 INFO [property_app] [FETCH_HOMES] filtered_props=450 (after bounds)
+2025-08-28 19:48:29,993 INFO [property_app] [REFRESH] returning 450 homes
+2025-08-28 19:48:30,177 INFO [property_app] [REFRESH] bounds SW(27.570373523891185,-83.27911376953125) NE(28.282614623837407,-81.52267456054689) center=(27.92708072333704,-82.40055084228517) zoom=11
+2025-08-28 19:48:30,178 INFO [property_app] [REFRESH] bounds SW(27.570373523891185,-83.27911376953125) NE(28.282614623837407,-81.52267456054689) center=(27.92708072333704,-82.40055084228517) zoom=11
+2025-08-28 19:48:30,178 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:30,178 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:30,467 INFO [property_app] [REFRESH] bounds SW(27.570373523891185,-83.27911376953125) NE(28.282614623837407,-81.52267456054689) center=(27.92708072333704,-82.40055084228517) zoom=11
+2025-08-28 19:48:30,468 INFO [property_app] [REFRESH] bounds SW(27.570373523891185,-83.27911376953125) NE(28.282614623837407,-81.52267456054689) center=(27.92708072333704,-82.40055084228517) zoom=11
+2025-08-28 19:48:30,468 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:30,468 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:30,502 INFO [property_app] [REFRESH] chosen location='33619'
+2025-08-28 19:48:30,505 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 2958 cached homes in bounds
+2025-08-28 19:48:30,505 INFO [property_app] [CACHE][MISS] props_by_location:33619
+2025-08-28 19:48:30,505 INFO [property_app] [RATE] Spacing calls: sleeping 0.06s
+2025-08-28 19:48:30,615 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33619&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:48:31,467 INFO [property_app] [ZILLOW][RES] status=200 bytes=31560 preview='{"props":[{"bathrooms":3,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.392815,"livingArea":1472,"address":"5608 Palm River Rd, Tampa, FL 33619","rentZestimate":2148,"variableData":null,"priceChange":null,"zestimate":254100,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/00040bf09b7152569eec6e228b64bc60-p_e.jpg","latitude":27.94353,"price":260000,"bedrooms'
+2025-08-28 19:48:31,469 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:48:31,469 INFO [property_app] [CACHE][SET] props_by_location:33619
+2025-08-28 19:48:31,469 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33619
+2025-08-28 19:48:31,469 INFO [property_app] [FETCH_HOMES] filtered_props=2958 (after bounds)
+2025-08-28 19:48:31,470 INFO [property_app] [REFRESH] returning 2958 homes
+2025-08-28 19:48:33,760 INFO [property_app] [REFRESH] bounds SW(28.077130043937515,-82.68859863281251) NE(28.25479596176442,-82.24948883056642) center=(28.165999875080267,-82.46904373168947) zoom=13
+2025-08-28 19:48:34,350 INFO [property_app] [REFRESH] chosen location='33548'
+2025-08-28 19:48:34,351 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 410 cached homes in bounds
+2025-08-28 19:48:34,352 INFO [property_app] [CACHE][MISS] props_by_location:33548
+2025-08-28 19:48:34,406 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33548&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:48:34,568 INFO [property_app] [REFRESH] bounds SW(28.16138409236731,-82.5487804412842) NE(28.205793280016117,-82.43900299072267) center=(28.18359099165026,-82.49389171600343) zoom=15
+2025-08-28 19:48:34,569 INFO [property_app] [REFRESH] bounds SW(28.16138409236731,-82.5487804412842) NE(28.205793280016117,-82.43900299072267) center=(28.18359099165026,-82.49389171600343) zoom=15
+2025-08-28 19:48:34,569 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:35,039 INFO [property_app] [REFRESH] bounds SW(28.16138409236731,-82.5487804412842) NE(28.205793280016117,-82.43900299072267) center=(28.18359099165026,-82.49389171600343) zoom=15
+2025-08-28 19:48:35,039 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:35,040 INFO [property_app] [REFRESH] bounds SW(28.16138409236731,-82.5487804412842) NE(28.205793280016117,-82.43900299072267) center=(28.18359099165026,-82.49389171600343) zoom=15
+2025-08-28 19:48:35,040 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:35,498 INFO [property_app] [REFRESH] chosen location='33558'
+2025-08-28 19:48:35,499 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 49 cached homes in bounds
+2025-08-28 19:48:35,500 INFO [property_app] [CACHE][MISS] props_by_location:33558
+2025-08-28 19:48:35,500 INFO [property_app] [RATE] Spacing calls: sleeping 0.35s
+2025-08-28 19:48:35,897 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33558&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:48:35,905 INFO [property_app] [ZILLOW][RES] status=200 bytes=32193 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.46705,"livingArea":1914,"address":"17301 Estes Rd, Lutz, FL 33548","rentZestimate":3582,"variableData":null,"priceChange":null,"zestimate":728100,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/544787ab25d04f0b4adb496f685fb187-p_e.jpg","latitude":28.120604,"price":750000,"bedrooms":3,"'
+2025-08-28 19:48:35,906 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:48:35,906 INFO [property_app] [CACHE][SET] props_by_location:33548
+2025-08-28 19:48:35,906 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33548
+2025-08-28 19:48:35,907 INFO [property_app] [CACHE][SET] property_by_zpid:44881426
+2025-08-28 19:48:35,980 INFO [property_app] [DISK_CACHE] saved 2981 property entries to disk
+2025-08-28 19:48:35,980 INFO [property_app] [CACHE][SET] property_by_zpid:44882767
+2025-08-28 19:48:36,050 INFO [property_app] [DISK_CACHE] saved 2982 property entries to disk
+2025-08-28 19:48:36,050 INFO [property_app] [CACHE][SET] property_by_zpid:44880663
+2025-08-28 19:48:36,121 INFO [property_app] [DISK_CACHE] saved 2983 property entries to disk
+2025-08-28 19:48:36,121 INFO [property_app] [CACHE][SET] property_by_zpid:44883629
+2025-08-28 19:48:36,193 INFO [property_app] [DISK_CACHE] saved 2984 property entries to disk
+2025-08-28 19:48:36,193 INFO [property_app] [CACHE][SET] property_by_zpid:166726597
+2025-08-28 19:48:36,266 INFO [property_app] [DISK_CACHE] saved 2985 property entries to disk
+2025-08-28 19:48:36,266 INFO [property_app] [CACHE][SET] property_by_zpid:44878263
+2025-08-28 19:48:36,341 INFO [property_app] [DISK_CACHE] saved 2986 property entries to disk
+2025-08-28 19:48:36,341 INFO [property_app] [CACHE][SET] property_by_zpid:44881685
+2025-08-28 19:48:36,414 INFO [property_app] [DISK_CACHE] saved 2987 property entries to disk
+2025-08-28 19:48:36,414 INFO [property_app] [CACHE][SET] property_by_zpid:166726612
+2025-08-28 19:48:36,484 INFO [property_app] [DISK_CACHE] saved 2988 property entries to disk
+2025-08-28 19:48:36,484 INFO [property_app] [CACHE][SET] property_by_zpid:44893204
+2025-08-28 19:48:36,556 INFO [property_app] [DISK_CACHE] saved 2989 property entries to disk
+2025-08-28 19:48:36,556 INFO [property_app] [CACHE][SET] property_by_zpid:44881496
+2025-08-28 19:48:36,629 INFO [property_app] [DISK_CACHE] saved 2990 property entries to disk
+2025-08-28 19:48:36,629 INFO [property_app] [CACHE][SET] property_by_zpid:44881367
+2025-08-28 19:48:36,703 INFO [property_app] [DISK_CACHE] saved 2991 property entries to disk
+2025-08-28 19:48:36,703 INFO [property_app] [CACHE][SET] property_by_zpid:125975430
+2025-08-28 19:48:36,779 INFO [property_app] [DISK_CACHE] saved 2992 property entries to disk
+2025-08-28 19:48:36,779 INFO [property_app] [CACHE][SET] property_by_zpid:89748407
+2025-08-28 19:48:36,852 INFO [property_app] [DISK_CACHE] saved 2993 property entries to disk
+2025-08-28 19:48:36,852 INFO [property_app] [CACHE][SET] property_by_zpid:44878248
+2025-08-28 19:48:36,924 INFO [property_app] [DISK_CACHE] saved 2994 property entries to disk
+2025-08-28 19:48:36,924 INFO [property_app] [CACHE][SET] property_by_zpid:44880672
+2025-08-28 19:48:36,997 INFO [property_app] [DISK_CACHE] saved 2995 property entries to disk
+2025-08-28 19:48:36,997 INFO [property_app] [CACHE][SET] property_by_zpid:44881834
+2025-08-28 19:48:37,071 INFO [property_app] [DISK_CACHE] saved 2996 property entries to disk
+2025-08-28 19:48:37,071 INFO [property_app] [CACHE][SET] property_by_zpid:166726650
+2025-08-28 19:48:37,142 INFO [property_app] [DISK_CACHE] saved 2997 property entries to disk
+2025-08-28 19:48:37,142 INFO [property_app] [CACHE][SET] property_by_zpid:44878340
+2025-08-28 19:48:37,216 INFO [property_app] [DISK_CACHE] saved 2998 property entries to disk
+2025-08-28 19:48:37,216 INFO [property_app] [CACHE][SET] property_by_zpid:99621898
+2025-08-28 19:48:37,291 INFO [property_app] [DISK_CACHE] saved 2999 property entries to disk
+2025-08-28 19:48:37,291 INFO [property_app] [CACHE][SET] property_by_zpid:99625365
+2025-08-28 19:48:37,332 INFO [property_app] [ZILLOW][RES] status=200 bytes=31857 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":true,"propertyType":"SINGLE_FAMILY","longitude":-82.53202,"livingArea":2471,"address":"1566 Woodfield Ct, Lutz, FL 33558","rentZestimate":3517,"variableData":null,"priceChange":null,"zestimate":607000,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/9f4f66019d9782a9e6a2fb2970f02ab9-p_e.jpg","latitude":28.180595,"price":760000,"bedrooms":3'
+2025-08-28 19:48:37,335 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:48:37,367 INFO [property_app] [DISK_CACHE] saved 3000 property entries to disk
+2025-08-28 19:48:37,367 INFO [property_app] [CACHE][SET] props_by_location:33558
+2025-08-28 19:48:37,368 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33558
+2025-08-28 19:48:37,368 INFO [property_app] [CACHE][SET] property_by_zpid:46456382
+2025-08-28 19:48:37,367 INFO [property_app] [CACHE][SET] property_by_zpid:89744361
+2025-08-28 19:48:37,444 INFO [property_app] [DISK_CACHE] saved 3002 property entries to disk
+2025-08-28 19:48:37,445 INFO [property_app] [FETCH_HOMES] filtered_props=50 (after bounds)
+2025-08-28 19:48:37,445 INFO [property_app] [REFRESH] returning 50 homes
+2025-08-28 19:48:37,525 INFO [property_app] [DISK_CACHE] saved 3002 property entries to disk
+2025-08-28 19:48:37,525 INFO [property_app] [CACHE][SET] property_by_zpid:44882754
+2025-08-28 19:48:37,600 INFO [property_app] [DISK_CACHE] saved 3003 property entries to disk
+2025-08-28 19:48:37,600 INFO [property_app] [CACHE][SET] property_by_zpid:44883358
+2025-08-28 19:48:37,676 INFO [property_app] [DISK_CACHE] saved 3004 property entries to disk
+2025-08-28 19:48:37,676 INFO [property_app] [CACHE][SET] property_by_zpid:455424486
+2025-08-28 19:48:37,750 INFO [property_app] [DISK_CACHE] saved 3005 property entries to disk
+2025-08-28 19:48:37,750 INFO [property_app] [CACHE][SET] property_by_zpid:456145213
+2025-08-28 19:48:37,824 INFO [property_app] [DISK_CACHE] saved 3006 property entries to disk
+2025-08-28 19:48:37,824 INFO [property_app] [CACHE][SET] property_by_zpid:456028164
+2025-08-28 19:48:37,896 INFO [property_app] [DISK_CACHE] saved 3007 property entries to disk
+2025-08-28 19:48:37,896 INFO [property_app] [CACHE][SET] property_by_zpid:456201693
+2025-08-28 19:48:37,971 INFO [property_app] [DISK_CACHE] saved 3008 property entries to disk
+2025-08-28 19:48:37,971 INFO [property_app] [CACHE][SET] property_by_zpid:44880726
+2025-08-28 19:48:38,044 INFO [property_app] [DISK_CACHE] saved 3009 property entries to disk
+2025-08-28 19:48:38,045 INFO [property_app] [CACHE][SET] property_by_zpid:44881450
+2025-08-28 19:48:38,119 INFO [property_app] [DISK_CACHE] saved 3010 property entries to disk
+2025-08-28 19:48:38,120 INFO [property_app] [CACHE][SET] property_by_zpid:44881804
+2025-08-28 19:48:38,192 INFO [property_app] [DISK_CACHE] saved 3011 property entries to disk
+2025-08-28 19:48:38,193 INFO [property_app] [CACHE][SET] property_by_zpid:44884276
+2025-08-28 19:48:38,264 INFO [property_app] [DISK_CACHE] saved 3012 property entries to disk
+2025-08-28 19:48:38,264 INFO [property_app] [CACHE][SET] property_by_zpid:44883416
+2025-08-28 19:48:38,338 INFO [property_app] [DISK_CACHE] saved 3013 property entries to disk
+2025-08-28 19:48:38,338 INFO [property_app] [CACHE][SET] property_by_zpid:345002149
+2025-08-28 19:48:38,413 INFO [property_app] [DISK_CACHE] saved 3014 property entries to disk
+2025-08-28 19:48:38,413 INFO [property_app] [CACHE][SET] property_by_zpid:44884358
+2025-08-28 19:48:38,484 INFO [property_app] [DISK_CACHE] saved 3015 property entries to disk
+2025-08-28 19:48:38,484 INFO [property_app] [CACHE][SET] property_by_zpid:2087912791
+2025-08-28 19:48:38,557 INFO [property_app] [DISK_CACHE] saved 3016 property entries to disk
+2025-08-28 19:48:38,557 INFO [property_app] [CACHE][SET] property_by_zpid:345002153
+2025-08-28 19:48:38,632 INFO [property_app] [DISK_CACHE] saved 3017 property entries to disk
+2025-08-28 19:48:38,632 INFO [property_app] [CACHE][SET] property_by_zpid:453450144
+2025-08-28 19:48:38,706 INFO [property_app] [DISK_CACHE] saved 3018 property entries to disk
+2025-08-28 19:48:38,707 INFO [property_app] [CACHE][SET] property_by_zpid:345002154
+2025-08-28 19:48:38,783 INFO [property_app] [DISK_CACHE] saved 3019 property entries to disk
+2025-08-28 19:48:38,783 INFO [property_app] [FETCH_HOMES] filtered_props=448 (after bounds)
+2025-08-28 19:48:38,783 INFO [property_app] [REFRESH] returning 448 homes
+2025-08-28 19:48:42,469 INFO [property_app] [REFRESH] bounds SW(28.080007733491822,-82.68482208251953) NE(28.257668877246434,-82.24571228027345) center=(28.168875180063345,-82.4652671813965) zoom=13
+2025-08-28 19:48:42,470 INFO [property_app] [REFRESH] bounds SW(28.080007733491822,-82.68482208251953) NE(28.257668877246434,-82.24571228027345) center=(28.168875180063345,-82.4652671813965) zoom=13
+2025-08-28 19:48:42,470 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:43,103 INFO [property_app] [REFRESH] chosen location='33548'
+2025-08-28 19:48:43,104 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 432 cached homes in bounds
+2025-08-28 19:48:43,105 INFO [property_app] [CACHE][HIT] props_by_location:33548
+2025-08-28 19:48:43,105 INFO [property_app] [FETCH_HOMES] using cached payload for '33548'
+2025-08-28 19:48:43,105 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33548
+2025-08-28 19:48:43,105 INFO [property_app] [FETCH_HOMES] filtered_props=432 (after bounds)
+2025-08-28 19:48:43,105 INFO [property_app] [REFRESH] returning 432 homes
+2025-08-28 19:48:45,961 INFO [property_app] [REFRESH] bounds SW(28.100300827900902,-82.68310546875001) NE(28.277928292824047,-82.24399566650392) center=(28.18915145242851,-82.46355056762695) zoom=13
+2025-08-28 19:48:46,575 INFO [property_app] [REFRESH] chosen location='33549'
+2025-08-28 19:48:46,577 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 393 cached homes in bounds
+2025-08-28 19:48:46,577 INFO [property_app] [CACHE][MISS] props_by_location:33549
+2025-08-28 19:48:46,636 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33549&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:48:47,069 INFO [property_app] [REFRESH] bounds SW(28.17990277142623,-82.5172805786133) NE(28.20210582582454,-82.46239185333253) center=(28.19100487508924,-82.48983621597291) zoom=16
+2025-08-28 19:48:47,070 INFO [property_app] [REFRESH] bounds SW(28.17990277142623,-82.5172805786133) NE(28.20210582582454,-82.46239185333253) center=(28.19100487508924,-82.48983621597291) zoom=16
+2025-08-28 19:48:47,070 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:47,635 INFO [property_app] [ZILLOW][RES] status=200 bytes=31856 preview='{"props":[{"bathrooms":3,"carouselPhotos":null,"has3DModel":true,"propertyType":"SINGLE_FAMILY","longitude":-82.44525,"livingArea":2227,"address":"16415 Hanna Rd, Lutz, FL 33549","rentZestimate":3237,"variableData":null,"priceChange":null,"zestimate":726500,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/e3a6ea056218d5fd0aed0058b0b88a97-p_e.jpg","latitude":28.105268,"price":755000,"bedrooms":5,"l'
+2025-08-28 19:48:47,639 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:48:47,639 INFO [property_app] [CACHE][SET] props_by_location:33549
+2025-08-28 19:48:47,639 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33549
+2025-08-28 19:48:47,639 INFO [property_app] [CACHE][SET] property_by_zpid:154980120
+2025-08-28 19:48:47,641 INFO [property_app] [REFRESH] bounds SW(28.17990277142623,-82.5172805786133) NE(28.20210582582454,-82.46239185333253) center=(28.19100487508924,-82.48983621597291) zoom=16
+2025-08-28 19:48:47,641 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:47,643 INFO [property_app] [REFRESH] bounds SW(28.17990277142623,-82.5172805786133) NE(28.20210582582454,-82.46239185333253) center=(28.19100487508924,-82.48983621597291) zoom=16
+2025-08-28 19:48:47,643 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:48:47,788 INFO [property_app] [DISK_CACHE] saved 3020 property entries to disk
+2025-08-28 19:48:47,788 INFO [property_app] [CACHE][SET] property_by_zpid:44883856
+2025-08-28 19:48:47,903 INFO [property_app] [DISK_CACHE] saved 3021 property entries to disk
+2025-08-28 19:48:47,903 INFO [property_app] [CACHE][SET] property_by_zpid:44920969
+2025-08-28 19:48:47,978 INFO [property_app] [REFRESH] chosen location='33558'
+2025-08-28 19:48:47,996 INFO [property_app] [DISK_CACHE] saved 3022 property entries to disk
+2025-08-28 19:48:47,997 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 6 cached homes in bounds
+2025-08-28 19:48:47,997 INFO [property_app] [CACHE][SET] property_by_zpid:44923359
+2025-08-28 19:48:47,997 INFO [property_app] [CACHE][HIT] props_by_location:33558
+2025-08-28 19:48:47,997 INFO [property_app] [FETCH_HOMES] using cached payload for '33558'
+2025-08-28 19:48:47,997 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33558
+2025-08-28 19:48:47,997 INFO [property_app] [FETCH_HOMES] filtered_props=6 (after bounds)
+2025-08-28 19:48:47,997 INFO [property_app] [REFRESH] returning 6 homes
+2025-08-28 19:48:48,083 INFO [property_app] [DISK_CACHE] saved 3023 property entries to disk
+2025-08-28 19:48:48,084 INFO [property_app] [CACHE][SET] property_by_zpid:440578403
+2025-08-28 19:48:48,181 INFO [property_app] [DISK_CACHE] saved 3024 property entries to disk
+2025-08-28 19:48:48,181 INFO [property_app] [CACHE][SET] property_by_zpid:44884199
+2025-08-28 19:48:48,262 INFO [property_app] [DISK_CACHE] saved 3025 property entries to disk
+2025-08-28 19:48:48,262 INFO [property_app] [FETCH_HOMES] filtered_props=399 (after bounds)
+2025-08-28 19:48:48,262 INFO [property_app] [REFRESH] returning 399 homes
+2025-08-28 19:48:49,661 INFO [property_app] [OPENAI]/clicked address=2401 Morninglight Dr, Lutz, FL 33558 price=595,000 lat=28.19212 lon=-82.49542 lang=en
+2025-08-28 19:48:49,662 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 38 cached homes in bounds
+2025-08-28 19:48:49,662 INFO [property_app] [CACHE][HIT] props_by_location:33558
+2025-08-28 19:48:49,662 INFO [property_app] [FETCH_HOMES] using cached payload for '33558'
+2025-08-28 19:48:49,662 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33558
+2025-08-28 19:48:49,662 INFO [property_app] [FETCH_HOMES] filtered_props=38 (after bounds)
+2025-08-28 19:48:49,662 INFO [property_app] [COMPS] using radius=0.03 deg with 37 comps
+2025-08-28 19:49:38,537 INFO [property_app] [DISK_CACHE] loaded 3025 property entries from disk
+2025-08-28 19:49:44,159 INFO [property_app] [DISK_CACHE] loaded 3025 property entries from disk
+2025-08-28 19:50:01,076 INFO [property_app] [DISK_CACHE] loaded 3025 property entries from disk
+2025-08-28 19:50:02,035 INFO [property_app] [DISK_CACHE] loaded 3025 property entries from disk
+2025-08-28 19:50:05,499 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:50:05,500 INFO [property_app] [REFRESH] bounds SW(27.77257007076659,-82.89630889892578) NE(28.128613881422787,-82.01808929443361) center=(27.9506,-82.4572) zoom=12
+2025-08-28 19:50:05,500 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:50:06,255 INFO [property_app] [REFRESH] chosen location='33602'
+2025-08-28 19:50:06,258 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 2363 cached homes in bounds
+2025-08-28 19:50:06,258 INFO [property_app] [CACHE][MISS] props_by_location:33602
+2025-08-28 19:50:06,306 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33602&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:50:06,819 INFO [property_app] [ZILLOW][RES] status=200 bytes=30734 preview='{"props":[{"bathrooms":2,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-82.46168,"livingArea":1551,"address":"107 W Amelia Ave, Tampa, FL 33602","rentZestimate":null,"variableData":null,"priceChange":-12250,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/a8c4cfb246401308cd0b113d1034d93d-p_e.jpg","latitude":27.96625,"price":490000,"bedrooms":3'
+2025-08-28 19:50:06,820 INFO [property_app] [FETCH_HOMES][TRY1] props=39
+2025-08-28 19:50:06,820 INFO [property_app] [CACHE][SET] props_by_location:33602
+2025-08-28 19:50:06,820 INFO [property_app] [FETCH_HOMES] raw_props=39 for location=33602
+2025-08-28 19:50:06,821 INFO [property_app] [FETCH_HOMES] filtered_props=2363 (after bounds)
+2025-08-28 19:50:06,821 INFO [property_app] [REFRESH] returning 2363 homes
+2025-08-28 19:50:09,228 INFO [property_app] [REFRESH] bounds SW(27.979242758002407,-82.82867431640626) NE(28.334603934280253,-81.95045471191408) center=(28.15707080401254,-82.38956451416017) zoom=12
+2025-08-28 19:50:09,868 INFO [property_app] [REFRESH] chosen location='33559'
+2025-08-28 19:50:09,869 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 1535 cached homes in bounds
+2025-08-28 19:50:09,869 INFO [property_app] [CACHE][MISS] props_by_location:33559
+2025-08-28 19:50:09,914 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33559&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:50:11,100 INFO [property_app] [ZILLOW][RES] status=200 bytes=28012 preview='{"props":[{"bathrooms":5,"carouselPhotos":null,"has3DModel":true,"newConstructionType":"BUILDER_SPEC","propertyType":"SINGLE_FAMILY","longitude":-82.41727,"livingArea":5359,"address":"3317 Chase Jackson Branch, Lutz, FL 33559","rentZestimate":null,"variableData":null,"priceChange":null,"zestimate":null,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/78f6adc9793222df40a9bcf949594db9-p_e.jpg","lati'
+2025-08-28 19:50:11,102 INFO [property_app] [FETCH_HOMES][TRY1] props=36
+2025-08-28 19:50:11,102 INFO [property_app] [CACHE][SET] props_by_location:33559
+2025-08-28 19:50:11,102 INFO [property_app] [FETCH_HOMES] raw_props=36 for location=33559
+2025-08-28 19:50:11,102 INFO [property_app] [CACHE][SET] property_by_zpid:46456709
+2025-08-28 19:50:11,172 INFO [property_app] [DISK_CACHE] saved 3026 property entries to disk
+2025-08-28 19:50:11,172 INFO [property_app] [CACHE][SET] property_by_zpid:66190094
+2025-08-28 19:50:11,244 INFO [property_app] [DISK_CACHE] saved 3027 property entries to disk
+2025-08-28 19:50:11,245 INFO [property_app] [CACHE][SET] property_by_zpid:46463403
+2025-08-28 19:50:11,316 INFO [property_app] [DISK_CACHE] saved 3028 property entries to disk
+2025-08-28 19:50:11,316 INFO [property_app] [CACHE][SET] property_by_zpid:121150210
+2025-08-28 19:50:11,391 INFO [property_app] [DISK_CACHE] saved 3029 property entries to disk
+2025-08-28 19:50:11,391 INFO [property_app] [CACHE][SET] property_by_zpid:44920770
+2025-08-28 19:50:11,465 INFO [property_app] [DISK_CACHE] saved 3030 property entries to disk
+2025-08-28 19:50:11,465 INFO [property_app] [CACHE][SET] property_by_zpid:44925694
+2025-08-28 19:50:11,538 INFO [property_app] [DISK_CACHE] saved 3031 property entries to disk
+2025-08-28 19:50:11,538 INFO [property_app] [CACHE][SET] property_by_zpid:121347484
+2025-08-28 19:50:11,614 INFO [property_app] [DISK_CACHE] saved 3032 property entries to disk
+2025-08-28 19:50:11,614 INFO [property_app] [CACHE][SET] property_by_zpid:46456617
+2025-08-28 19:50:11,687 INFO [property_app] [DISK_CACHE] saved 3033 property entries to disk
+2025-08-28 19:50:11,688 INFO [property_app] [CACHE][SET] property_by_zpid:66190983
+2025-08-28 19:50:11,760 INFO [property_app] [DISK_CACHE] saved 3034 property entries to disk
+2025-08-28 19:50:11,760 INFO [property_app] [CACHE][SET] property_by_zpid:452719887
+2025-08-28 19:50:11,834 INFO [property_app] [DISK_CACHE] saved 3035 property entries to disk
+2025-08-28 19:50:11,834 INFO [property_app] [CACHE][SET] property_by_zpid:66190504
+2025-08-28 19:50:11,910 INFO [property_app] [DISK_CACHE] saved 3036 property entries to disk
+2025-08-28 19:50:11,910 INFO [property_app] [CACHE][SET] property_by_zpid:46456659
+2025-08-28 19:50:11,982 INFO [property_app] [DISK_CACHE] saved 3037 property entries to disk
+2025-08-28 19:50:11,982 INFO [property_app] [CACHE][SET] property_by_zpid:121344529
+2025-08-28 19:50:12,056 INFO [property_app] [DISK_CACHE] saved 3038 property entries to disk
+2025-08-28 19:50:12,056 INFO [property_app] [CACHE][SET] property_by_zpid:44922373
+2025-08-28 19:50:12,131 INFO [property_app] [DISK_CACHE] saved 3039 property entries to disk
+2025-08-28 19:50:12,131 INFO [property_app] [CACHE][SET] property_by_zpid:46456723
+2025-08-28 19:50:12,208 INFO [property_app] [DISK_CACHE] saved 3040 property entries to disk
+2025-08-28 19:50:12,209 INFO [property_app] [CACHE][SET] property_by_zpid:447578567
+2025-08-28 19:50:12,283 INFO [property_app] [DISK_CACHE] saved 3041 property entries to disk
+2025-08-28 19:50:12,283 INFO [property_app] [CACHE][SET] property_by_zpid:46380936
+2025-08-28 19:50:12,356 INFO [property_app] [DISK_CACHE] saved 3042 property entries to disk
+2025-08-28 19:50:12,356 INFO [property_app] [CACHE][SET] property_by_zpid:68578118
+2025-08-28 19:50:12,428 INFO [property_app] [DISK_CACHE] saved 3043 property entries to disk
+2025-08-28 19:50:12,428 INFO [property_app] [CACHE][SET] property_by_zpid:66659158
+2025-08-28 19:50:12,500 INFO [property_app] [DISK_CACHE] saved 3044 property entries to disk
+2025-08-28 19:50:12,500 INFO [property_app] [CACHE][SET] property_by_zpid:62665994
+2025-08-28 19:50:12,574 INFO [property_app] [DISK_CACHE] saved 3045 property entries to disk
+2025-08-28 19:50:12,574 INFO [property_app] [CACHE][SET] property_by_zpid:46462843
+2025-08-28 19:50:12,647 INFO [property_app] [DISK_CACHE] saved 3046 property entries to disk
+2025-08-28 19:50:12,647 INFO [property_app] [CACHE][SET] property_by_zpid:53469839
+2025-08-28 19:50:12,722 INFO [property_app] [DISK_CACHE] saved 3047 property entries to disk
+2025-08-28 19:50:12,722 INFO [property_app] [CACHE][SET] property_by_zpid:82049764
+2025-08-28 19:50:12,795 INFO [property_app] [DISK_CACHE] saved 3048 property entries to disk
+2025-08-28 19:50:12,795 INFO [property_app] [CACHE][SET] property_by_zpid:68577386
+2025-08-28 19:50:12,871 INFO [property_app] [DISK_CACHE] saved 3049 property entries to disk
+2025-08-28 19:50:12,871 INFO [property_app] [CACHE][SET] property_by_zpid:46380842
+2025-08-28 19:50:12,947 INFO [property_app] [DISK_CACHE] saved 3050 property entries to disk
+2025-08-28 19:50:12,947 INFO [property_app] [CACHE][SET] property_by_zpid:46463383
+2025-08-28 19:50:13,023 INFO [property_app] [DISK_CACHE] saved 3051 property entries to disk
+2025-08-28 19:50:13,023 INFO [property_app] [CACHE][SET] property_by_zpid:55807545
+2025-08-28 19:50:13,097 INFO [property_app] [DISK_CACHE] saved 3052 property entries to disk
+2025-08-28 19:50:13,097 INFO [property_app] [CACHE][SET] property_by_zpid:68577385
+2025-08-28 19:50:13,171 INFO [property_app] [DISK_CACHE] saved 3053 property entries to disk
+2025-08-28 19:50:13,171 INFO [property_app] [CACHE][SET] property_by_zpid:46463305
+2025-08-28 19:50:13,246 INFO [property_app] [DISK_CACHE] saved 3054 property entries to disk
+2025-08-28 19:50:13,246 INFO [property_app] [CACHE][SET] property_by_zpid:54034904
+2025-08-28 19:50:13,319 INFO [property_app] [DISK_CACHE] saved 3055 property entries to disk
+2025-08-28 19:50:13,320 INFO [property_app] [CACHE][SET] property_by_zpid:55368643
+2025-08-28 19:50:13,393 INFO [property_app] [DISK_CACHE] saved 3056 property entries to disk
+2025-08-28 19:50:13,393 INFO [property_app] [CACHE][SET] property_by_zpid:55807490
+2025-08-28 19:50:13,466 INFO [property_app] [DISK_CACHE] saved 3057 property entries to disk
+2025-08-28 19:50:13,466 INFO [property_app] [CACHE][SET] property_by_zpid:69065243
+2025-08-28 19:50:13,542 INFO [property_app] [DISK_CACHE] saved 3058 property entries to disk
+2025-08-28 19:50:13,543 INFO [property_app] [CACHE][SET] property_by_zpid:70596026
+2025-08-28 19:50:13,617 INFO [property_app] [DISK_CACHE] saved 3059 property entries to disk
+2025-08-28 19:50:13,617 INFO [property_app] [FETCH_HOMES] filtered_props=1569 (after bounds)
+2025-08-28 19:50:13,617 INFO [property_app] [REFRESH] returning 1569 homes
+2025-08-28 19:50:15,660 INFO [property_app] [REFRESH] bounds SW(28.130052045559317,-82.4982261657715) NE(28.218877987570004,-82.27867126464845) center=(28.174474236444453,-82.38844871520998) zoom=14
+2025-08-28 19:50:15,661 INFO [property_app] [REFRESH] bounds SW(28.130052045559317,-82.4982261657715) NE(28.218877987570004,-82.27867126464845) center=(28.174474236444453,-82.38844871520998) zoom=14
+2025-08-28 19:50:15,661 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:50:16,297 INFO [property_app] [REFRESH] chosen location='33544'
+2025-08-28 19:50:16,299 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 197 cached homes in bounds
+2025-08-28 19:50:16,299 INFO [property_app] [CACHE][MISS] props_by_location:33544
+2025-08-28 19:50:16,344 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=33544&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:50:16,414 INFO [property_app] [REFRESH] bounds SW(28.13217141016254,-82.4993419647217) NE(28.220995592970976,-82.27978706359865) center=(28.176592721900406,-82.38956451416017) zoom=14
+2025-08-28 19:50:16,414 INFO [property_app] [REFRESH] skipped (debounce + small move)
+2025-08-28 19:50:17,314 INFO [property_app] [ZILLOW][RES] status=200 bytes=32370 preview='{"props":[{"bathrooms":4,"carouselPhotos":null,"has3DModel":true,"propertyType":"SINGLE_FAMILY","longitude":-82.365944,"livingArea":3372,"address":"2614 Sylvan Ramble Ct, Zephyrhills, FL 33544","rentZestimate":4155,"variableData":null,"priceChange":null,"zestimate":724900,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/888eee8504545332c3065824cda3100e-p_e.jpg","latitude":28.19446,"price":750000,"'
+2025-08-28 19:50:17,316 INFO [property_app] [FETCH_HOMES][TRY1] props=41
+2025-08-28 19:50:17,316 INFO [property_app] [CACHE][SET] props_by_location:33544
+2025-08-28 19:50:17,316 INFO [property_app] [FETCH_HOMES] raw_props=41 for location=33544
+2025-08-28 19:50:17,316 INFO [property_app] [CACHE][SET] property_by_zpid:54035960
+2025-08-28 19:50:17,388 INFO [property_app] [DISK_CACHE] saved 3060 property entries to disk
+2025-08-28 19:50:17,388 INFO [property_app] [CACHE][SET] property_by_zpid:60283782
+2025-08-28 19:50:17,466 INFO [property_app] [DISK_CACHE] saved 3061 property entries to disk
+2025-08-28 19:50:17,466 INFO [property_app] [CACHE][SET] property_by_zpid:46479647
+2025-08-28 19:50:17,542 INFO [property_app] [DISK_CACHE] saved 3062 property entries to disk
+2025-08-28 19:50:17,542 INFO [property_app] [CACHE][SET] property_by_zpid:62664686
+2025-08-28 19:50:17,618 INFO [property_app] [DISK_CACHE] saved 3063 property entries to disk
+2025-08-28 19:50:17,618 INFO [property_app] [CACHE][SET] property_by_zpid:70796170
+2025-08-28 19:50:17,694 INFO [property_app] [DISK_CACHE] saved 3064 property entries to disk
+2025-08-28 19:50:17,694 INFO [property_app] [CACHE][SET] property_by_zpid:60283637
+2025-08-28 19:50:17,767 INFO [property_app] [DISK_CACHE] saved 3065 property entries to disk
+2025-08-28 19:50:17,768 INFO [property_app] [CACHE][SET] property_by_zpid:62664541
+2025-08-28 19:50:17,843 INFO [property_app] [DISK_CACHE] saved 3066 property entries to disk
+2025-08-28 19:50:17,843 INFO [property_app] [CACHE][SET] property_by_zpid:113984459
+2025-08-28 19:50:17,917 INFO [property_app] [DISK_CACHE] saved 3067 property entries to disk
+2025-08-28 19:50:17,917 INFO [property_app] [CACHE][SET] property_by_zpid:46479685
+2025-08-28 19:50:17,991 INFO [property_app] [DISK_CACHE] saved 3068 property entries to disk
+2025-08-28 19:50:17,992 INFO [property_app] [CACHE][SET] property_by_zpid:67092357
+2025-08-28 19:50:18,064 INFO [property_app] [DISK_CACHE] saved 3069 property entries to disk
+2025-08-28 19:50:18,064 INFO [property_app] [CACHE][SET] property_by_zpid:69064992
+2025-08-28 19:50:18,138 INFO [property_app] [DISK_CACHE] saved 3070 property entries to disk
+2025-08-28 19:50:18,138 INFO [property_app] [CACHE][SET] property_by_zpid:80404582
+2025-08-28 19:50:18,210 INFO [property_app] [DISK_CACHE] saved 3071 property entries to disk
+2025-08-28 19:50:18,211 INFO [property_app] [CACHE][SET] property_by_zpid:121058255
+2025-08-28 19:50:18,283 INFO [property_app] [DISK_CACHE] saved 3072 property entries to disk
+2025-08-28 19:50:18,283 INFO [property_app] [CACHE][SET] property_by_zpid:69065072
+2025-08-28 19:50:18,357 INFO [property_app] [DISK_CACHE] saved 3073 property entries to disk
+2025-08-28 19:50:18,357 INFO [property_app] [FETCH_HOMES] filtered_props=211 (after bounds)
+2025-08-28 19:50:18,357 INFO [property_app] [REFRESH] returning 211 homes
+2025-08-28 19:50:22,244 INFO [property_app] [OPENAI]/clicked address=20115 Shady Hill Ln, Tampa, FL 33647 price=899,999 lat=28.161007 lon=-82.370224 lang=en
+2025-08-28 19:50:22,245 INFO [property_app] [FETCH_HOMES][CACHE_FIRST] 25 cached homes in bounds
+2025-08-28 19:50:22,245 INFO [property_app] [CACHE][MISS] props_by_location:20115
+2025-08-28 19:50:22,299 INFO [property_app] [ZILLOW][REQ] GET /propertyExtendedSearch?location=20115&status_type=ForSale&home_type=Houses&limit=200
+2025-08-28 19:50:23,686 INFO [property_app] [ZILLOW][RES] status=200 bytes=22333 preview='{"props":[{"bathrooms":6,"carouselPhotos":null,"has3DModel":false,"propertyType":"SINGLE_FAMILY","longitude":-77.89049,"livingArea":4706,"address":"6229 Enon School Rd, Marshall, VA 20115","rentZestimate":5365,"variableData":null,"priceChange":-25000,"zestimate":961300,"imgSrc":"https:\\/\\/photos.zillowstatic.com\\/fp\\/1e36c716488f94cadce17097ced998df-p_e.jpg","latitude":38.78119,"price":975000,"bed'
+2025-08-28 19:50:23,687 INFO [property_app] [FETCH_HOMES][TRY1] props=28
+2025-08-28 19:50:23,687 INFO [property_app] [CACHE][SET] props_by_location:20115
+2025-08-28 19:50:23,687 INFO [property_app] [FETCH_HOMES] raw_props=28 for location=20115
+2025-08-28 19:50:23,687 INFO [property_app] [FETCH_HOMES] filtered_props=25 (after bounds)
+2025-08-28 19:50:23,687 INFO [property_app] [COMPS] using radius=0.03 deg with 24 comps

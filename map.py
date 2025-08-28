@@ -74,9 +74,6 @@ def _save_property_cache_disk():
 
 # ---------- Disk Cache ----------
 CACHE_DIR = os.getenv("CACHE_DIR", "./cache")
-
-REPORT_RAW_DIR = os.path.join(CACHE_DIR, "report_raw")
-os.makedirs(REPORT_RAW_DIR, exist_ok=True)
 PROP_CACHE_DIR = os.path.join(CACHE_DIR, "property_by_zpid")
 os.makedirs(PROP_CACHE_DIR, exist_ok=True)
 
@@ -710,6 +707,10 @@ def report_wrapper_css():
   ul{margin:6px 0 0 18px;padding:0}
   .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:10px;background:#f1f5f9;font-weight:700}
   .fine{font-size:.76rem;color:#6b7280;margin-top:10px}
+  /* Force left alignment for all sections (incl. Investment Summary) */
+  #deal-report h2, #deal-report h3, #deal-report p, #deal-report ul, #deal-report li { text-align:left !important }
+  .addr-meta{ margin:-6px 0 8px 38px; }
+  .price-line{ font-size:.95rem; color:var(--muted); margin:2px 0 6px; }
 </style>
 """
 
@@ -733,7 +734,7 @@ def extract_grade_and_html(gpt_text: str):
         body = cleaned
     return grade, body
 
-def wrap_report_html(address, content_html, language="en", grade=None):
+def wrap_report_html(address, content_html, language="en", grade=None, price=None):
     rubric = ("A=Outstanding value; B=Good; C=Fair/market; D=Below avg; F=Poor/overpriced."
               if language == "en"
               else "A=Valor excepcional; B=Bueno; C=Justo/mercado; D=Debajo del promedio; F=Malo/sobreprecio.")
@@ -741,7 +742,24 @@ def wrap_report_html(address, content_html, language="en", grade=None):
                   if language == "en"
                   else "Este informe es solo informativo y no constituye asesoramiento financiero.")
     addr = address_to_string(address)
-    chip_label = (f"Grade: {grade}" if language == "en" else f"Calificación: {grade}") if grade else ""
+    grade_label = (f"{grade}" if grade else "")
+
+    price_label = ("Asking price" if language == "en" else "Precio de oferta")
+
+    price_line = f"<div class=\"price-line\">{price_label}: {price}</div>" if price not in (None, "", "No price") else ""
+
+    badge_html = ""
+    # Start with the model HTML and sanitize duplicates for grade badges/labels
+    cleaned_content = content_html if content_html is not None else ""
+    # Remove any .badge blocks the model may have inserted
+    # (removed) previously stripped .badge blocks to allow model badge to remain
+    # Remove lines like "Grade: B" or "Calificación: A" inside common tags
+    cleaned_content = re.sub(r'(?is)<(p|div|h[1-6])[^>]*>\s*(grade|calificaci[óo]n)\s*:\s*[A-F][\+\-]?\b.*?</\\\1>', '', cleaned_content)
+    # Remove standalone Grade/Calificación lines (plain text)
+    cleaned_content = re.sub(r'(?im)^\s*(grade|calificaci[óo]n)\s*:\s*[A-F][\+\-]?\b.*$\n?', '', cleaned_content)
+
+
+
     return f"""
 {report_wrapper_css()}
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -749,9 +767,10 @@ def wrap_report_html(address, content_html, language="en", grade=None):
   <div class="hdr">
     <span class="material-icons icon">home</span>
     <div class="title">{addr}</div>
-    <div class="chip"><span class="material-icons">insights</span>{chip_label}</div>
+    
   </div>
-  {content_html}
+  <div class="addr-meta">{price_line}</div>
+  {cleaned_content}
   <div class="fine">{rubric}<br>{disclaimer}</div>
 </div>
 """
@@ -884,19 +903,13 @@ def clicked():
         cached_html, cached_meta = cached
         # Wrap the cached body HTML with the shell so the UI/printing looks consistent
         grade_cached = cached_meta.get("grade")
-        full_cached = wrap_report_html(address, cached_html, language, grade=grade_cached)
+        full_cached = wrap_report_html(address, cached_html, language, grade=grade_cached, price=price)
         try:
             _rid = data.get('zpid') or address
             register_report_consumption(str(_rid))
         except Exception:
             pass
-    
-    try:
-        _zid = str(data.get("zpid") or "").strip()
-        save_report_raw_json(address, language, zpid=_zid)
-    except Exception as _e:
-        log(f"[REPORT_RAW][WARN] save failed: {_e}")
-    return jsonify({"status":"success", "info": f"{address},{price}", "report": full_cached, "html": full_cached})
+        return jsonify({"status":"success", "info": f"{address},{price}", "report": full_cached, "html": full_cached})
     
     
 
@@ -978,7 +991,7 @@ def clicked():
 
 
     if language == "es":
-        sys_text = "Responde SIEMPRE en español. Devuelve todo como HTML solamente."
+        sys_text = "Responde SIEMPRE en español. Devuelve la primera línea como 'GRADE: X' y el resto como HTML solamente."
         prompt = f"""Eres un analista de inversiones inmobiliarias. Presenta siempre los datos en un formato **claro y fácil de usar**, con tablas para comparables y financiamiento.  
 No inventes datos; apóyate en portales públicos (Zillow, Redfin, Realtor.com, sitios web del condado).
 
@@ -1062,7 +1075,7 @@ Detalles (hechos):\n{details_html}\n\nComparables proporcionados:\n[COMPARABLES_
         prompt += "\n\nNOTE: Use only the comparables provided above; do not fabricate addresses or prices."
 
     else:
-        sys_text = "Always respond in English. Return everything as HTML only."
+        sys_text = "Always respond in English. Return the first line as 'GRADE: X' and the rest as HTML only."
         prompt = f"""You are a real estate investment analyst. Always present data in a clear, **user-friendly format** with tables for comparables and financing.   
 Do not hallucinate; rely on public portals (Zillow, Redfin, Realtor.com, county websites). 
 
@@ -1156,36 +1169,75 @@ Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
         prompt = prompt.replace('[COMPARABLES_TABLE]', comps_table_html)
         # Strong instruction to avoid fabricating comps
         prompt += "\n\nNOTE: Use only the comparables provided above; do not fabricate addresses or prices."
-
-
-    try:
-        start = time.time()
-        resp = oi_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": sys_text},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=8000,
-            temperature=0.25
-        )
-        took = time.time() - start
-        raw = resp.choices[0].message.content or ""
-        log(f"[OPENAI] completion ok in {took:.2f}s, chars={len(raw)}")
-        grade, body_html = extract_grade_and_html(raw)
-        full_html = wrap_report_html(address, body_html, language, grade=grade)
+    def _is_bad_report(html_text: str, lang: str) -> bool:
         try:
-            save_report_to_cache(address, body_html, lang=language, extras={"grade": grade, "asking_price": price})
-        except Exception as _e:
-            log(f"[CACHE][WARN] {str(_e)}")
+            txt = re.sub(r"<[^>]+>", " ", html_text or "", flags=re.IGNORECASE)
+            low = txt.lower()
+            phrases = ["information not available", "información no proporcionada", "informacion no proporcionada"]
+            hits = sum(low.count(p) for p in phrases)
+            if not txt.strip(): return True
+            if hits >= 3: return True
+            ratio = (sum(low.count(p) * len(p) for p in phrases) / max(1, len(low)))
+            return ratio >= 0.20
+        except Exception:
+            return False
 
-    except Exception as e:
-        log(f"[OPENAI][ERR] {e}")
-        full_html = wrap_report_html(
-            address,
-            "<section class='card'><h3><span class='material-icons'>report_problem</span> Error</h3><div class='note'>Report unavailable.</div></section>",
-            language, grade=None
-        )
+    max_attempts = 3
+    attempt = 0
+    body_html = ""
+    grade = None
+    full_html = ""
+    last_err = None
+
+    nudge = ("Avoid writing 'Information not available'. If a field is unknown, omit the line or write 'N/A' once. "
+             "Prefer summarizing available facts from the inputs instead of placeholders.")
+    nudge_es = ("Evita escribir 'información no proporcionada'. Si un dato es desconocido, omite la línea o usa 'N/A' una sola vez. "
+                "Resume los hechos disponibles en lugar de marcadores de posición.")
+
+    while attempt < max_attempts:
+        try:
+            start = time.time()
+            resp = oi_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {"role": "system", "content": sys_text},
+                    {"role": "user", "content": prompt + "\n\n" + (nudge_es if language=='es' else nudge)}
+                ],
+                max_tokens=8000,
+                temperature=0.25
+            )
+            took = time.time() - start
+            raw = resp.choices[0].message.content or ""
+            log(f"[OPENAI] completion ok in {took:.2f}s, chars={len(raw)} (attempt {attempt+1}/{max_attempts})")
+            grade, body_html = extract_grade_and_html(raw)
+            if not _is_bad_report(body_html, language):
+                full_html = wrap_report_html(address, body_html, language, grade=grade, price=price)
+                try:
+                    save_report_to_cache(address, body_html, lang=language, extras={"grade": grade, "asking_price": price})
+                except Exception as _e:
+                    log(f"[CACHE][WARN] {str(_e)}")
+                break
+            else:
+                attempt += 1
+                last_err = "bad_report"
+                if attempt >= max_attempts:
+                    full_html = wrap_report_html(
+                        address,
+                        "<section class='card'><h3><span class='material-icons'>report_problem</span> Error</h3><div class='note'>Report unavailable (retry failed).</div></section>",
+                        language, grade=None, price=price
+                    )
+                    break
+        except Exception as e:
+            last_err = str(e)
+            log(f"[OPENAI][ERR] {e}")
+            attempt += 1
+            if attempt >= max_attempts:
+                full_html = wrap_report_html(
+                    address,
+                    "<section class='card'><h3><span class='material-icons'>report_problem</span> Error</h3><div class='note'>Report unavailable.</div></section>",
+                    language, grade=None, price=price
+                )
+                break
 
     try:
         _rid = (locals().get('zpid') or data.get('zpid') or address)
@@ -1484,47 +1536,3 @@ def _counter_state_useraware():
         return jsonify({"count": st["count"], "max": st["max"], "user": st["user"], "is_logged_in": st["is_logged_in"]})
     except Exception as e:
         return jsonify({"count": 0, "max": 0, "user": "Guest", "is_logged_in": False, "error": str(e)}), 200
-
-
-def save_report_raw_json(address: str, lang: str, zpid: str = "") -> _Optional_cacheutils[str]:
-    """
-    Save the raw JSON body from /property?zpid=... into REPORT_RAW_DIR using the same basename as reports.
-    Returns the file path if saved, else None.
-    """
-    try:
-        if not address:
-            return None
-        # Determine a zpid if not provided
-        zid = (zpid or "").strip()
-        if not zid:
-            try:
-                zid, _addr = zillow_search_get_zpid(address)
-            except Exception:
-                zid = ""
-        if not zid:
-            return None
-
-        # Fetch fresh raw payload from /property to ensure it's the details response
-        status, payload = _zillow_http_get(f"/property?zpid={zid}")
-        if status != 200 or payload is None:
-            return None
-
-        # Build path using the same naming convention as report cache
-        try:
-            base = _cache_basename_cacheutils(address, (lang or "").lower() or None)
-        except Exception:
-            base = _cache_basename_cacheutils(address, None)
-        out_path = os.path.join(REPORT_RAW_DIR, base + ".json")
-
-        with open(out_path, "w", encoding="utf-8") as f:
-            json.dump({
-                "address": address_to_string(address),
-                "language": (lang or ""),
-                "zpid": zid,
-                "fetched_at": datetime.utcnow().isoformat() + "Z",
-                "payload": payload
-            }, f, ensure_ascii=False, indent=2)
-        return out_path
-    except Exception as e:
-        log(f"[REPORT_RAW][ERR] {e}")
-        return None

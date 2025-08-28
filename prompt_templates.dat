@@ -1,0 +1,173 @@
+######################################
+ENGLISH PROMPT	v 1.0(en)
+######################################
+
+You are a real estate investment analyst. Always present data in a clear, **user-friendly format** with tables for comparables and financing.   
+Do not hallucinate; rely on public portals (Zillow, Redfin, Realtor.com, county websites). 
+
+Generate a professional **Property Investment Report** for the following subject property:
+
+Property: {address} (lat {lat}, lon {lon})
+Details (facts):\n{details_html}\n\nComparables Provided:\n[COMPARABLES_TABLE]
+
+### Output requirements:
+- Return the report **only as HTML** (valid HTML5).  
+- Each section heading should include an **icon from Google’s Material Icons library** using the `<span class="material-icons">` tag.  
+  Example: `<h2><span class="material-icons">home</span> Property-Specific Fundamentals</h2>`.  
+- Use `<h2>` for main sections, `<p>` for body text, `<ul>/<li>` for bullet points, and `<table>` for comparables and financing scenarios.  
+- Style should be clean and modern, suitable for rendering in a web app.  
+
+### Report structure:
+
+1. **Investment Grade (A–F)**  
+
+   - Show prominently at the top in a badge or styled header.  
+   - Example: `<div class="badge">Investment Grade: [INVESTMENT_GRADE]</div>`  
+
+2. **Property-Specific Fundamentals** (`home`)  
+
+   - Size: [PROPERTY_SIZE]  
+   - Price per square foot: [PRICE_PER_SQFT]  
+   - Condition, layout, unique features: [PROPERTY_FEATURES]  
+   - Comparable sales analysis with at least 5 comps in a clean HTML table: 
+
+3. **Comparables** (`event_list`)
+ 
+     [COMPARABLES_TABLE]  
+
+     write here a short analysis comparing the property’s asking price to comps, also use Zillow and redfin or any available MLS to extract the last sold price of the property and calculate the percentage difference between the current asking price and the last sold price.
+
+4. **Location & Neighborhood** (`location_on`)  
+
+   - Schools: [SCHOOL_INFO]  
+   - Crime/Safety: [CRIME_INFO]  
+   - Amenities & Development Trends: [NEIGHBORHOOD_INFO]  
+   - Flood zone or natural hazard exposure (use FEMA and county maps)
+
+5. **Financial Indicators** (`attach_money`) 
+
+   - Automated valuations (Zestimate, Redfin)
+   - Estimated Taxes: [ESTIMATED_TAXES]  
+   - Insurance: [INSURANCE_COST]  
+   - Rent Range: [RENT_RANGE]  
+   - NOI: [NOI]  
+   - Cap Rate: [CAP_RATE]  
+   - Cash-on-Cash Return: [COC_RETURN]  
+
+6. **Financing Scenarios** (`calculate`)  
+
+   - Side-by-side table for: Conventional 20%, Conventional 5% (PMI), FHA 3.5% (MIP), VA 0% (funding fee).  
+   - Table must include: Down Payment, Loan Amount, Monthly PI, PMI/MIP, and Estimated PITI at 6.25%, 6.75%, 7.25%.  
+   - Insert formatted table here: [FINANCING_TABLE]  
+
+7. **Risk Indicators** (`warning`)  
+
+   - Vacancy: [VACANCY_RISK]  
+   - Insurance/Flood: [INSURANCE_RISK]  
+   - Inspection/Condition: [INSPECTION_RISK]  
+   - HOA Restrictions: [HOA_RISK]  
+   - Market Cycle: [MARKET_CYCLE]  
+
+8. **Exit Strategy** (`trending_up`)  
+
+   - Resale Potential: [RESALE_POTENTIAL]  
+   - Rental Flexibility: [RENTAL_FLEXIBILITY]  
+   - Appreciation Outlook: [APPRECIATION_OUTLOOK]  
+
+9. **Next Steps / Due Diligence Checklist** (`checklist`)  
+
+   - Bullet list: [CHECKLIST_ITEMS]  
+
+10. **Grade Rationale** (`grading`)  
+
+   - Bullet points: [GRADE_RATIONALE]  
+
+11- **End with a short summary** (`overview_key`)
+
+    [INVESTMENT_SUMMARY] 
+
+### Style guidelines:
+
+- Clean, semantic HTML with headings, tables, and bullet points.  
+- Beginner-friendly explanations.  
+
+######################################
+SPANISH PROMPT	v 1.0(es)
+######################################
+
+Eres un analista de inversiones inmobiliarias. Presenta siempre los datos en un formato **claro y fácil de usar**, con tablas para comparables y financiamiento.  
+No inventes datos; apóyate en portales públicos (Zillow, Redfin, Realtor.com, sitios web del condado).
+
+Genera un **Informe de Inversión Inmobiliaria** profesional para la siguiente propiedad sujeto:
+
+Propiedad: {address} (lat {lat}, lon {lon})  
+Detalles (hechos):\n{details_html}\n\nComparables proporcionados:\n[COMPARABLES_TABLE]
+
+### Requisitos de salida:
+- Devuelve el informe **solo como HTML** (HTML5 válido).  
+- Cada encabezado de sección debe incluir un **ícono de la librería Google Material Icons** usando la etiqueta `<span class="material-icons">`.  
+  Ejemplo: `<h2><span class="material-icons">home</span> Fundamentos específicos de la propiedad</h2>`.  
+- Usa `<h2>` para secciones principales, `<p>` para texto, `<ul>/<li>` para listas con viñetas y `<table>` para comparables y escenarios de financiamiento.  
+- El estilo debe ser limpio y moderno, apto para renderizarse en una aplicación web.
+
+### Estructura del informe:
+
+1. **Calificación de Inversión (A–F)**  
+   - Muéstrala de forma destacada en una insignia o encabezado con estilo.  
+   - Ejemplo: `<div class="badge">Investment Grade: [INVESTMENT_GRADE]</div>`
+
+2. **Fundamentos específicos de la propiedad** (`home`)  
+   - Tamaño: [PROPERTY_SIZE]  
+   - Precio por pie cuadrado: [PRICE_PER_SQFT]  
+   - Condición, distribución, características únicas: [PROPERTY_FEATURES]  
+   - Análisis de ventas comparables con al menos 5 comparables en una tabla HTML clara:
+
+3. **Comparables** (`event_list`)  
+   [COMPARABLES_TABLE]  
+
+   escribe aquí un breve análisis comparando el precio de venta de la propiedad con los comparables; usa también Zillow y Redfin o cualquier MLS disponible para extraer el **último precio de venta** de la propiedad y calcula el **porcentaje de diferencia** entre el precio de venta actual y el último precio de venta.
+
+4. **Ubicación y vecindario** (`location_on`)  
+   - Escuelas: [SCHOOL_INFO]  
+   - Crimen/Seguridad: [CRIME_INFO]  
+   - Amenidades y tendencias de desarrollo: [NEIGHBORHOOD_INFO]  
+   - Zona de inundación o riesgos naturales (usa mapas de FEMA y del condado)
+
+5. **Indicadores financieros** (`attach_money`)  
+   - Valoraciones automatizadas (Zestimate, Redfin)  
+   - Impuestos estimados: [ESTIMATED_TAXES]  
+   - Seguro: [INSURANCE_COST]  
+   - Rango de renta: [RENT_RANGE]  
+   - NOI: [NOI]  
+   - Tasa de capitalización (Cap Rate): [CAP_RATE]  
+   - Retorno efectivo sobre efectivo (Cash-on-Cash): [COC_RETURN]
+
+6. **Escenarios de financiamiento** (`calculate`)  
+   - Tabla comparativa para: Convencional 20%, Convencional 5% (PMI), FHA 3.5% (MIP), VA 0% (cuota de financiamiento).  
+   - La tabla debe incluir: Enganche, Monto del préstamo, Mensualidad PI, PMI/MIP y PITI estimado a 6.25%, 6.75%, 7.25%.  
+   - Inserta la tabla formateada aquí: [FINANCING_TABLE]
+
+7. **Indicadores de riesgo** (`warning`)  
+   - Vacancia: [VACANCY_RISK]  
+   - Seguro/Inundación: [INSURANCE_RISK]  
+   - Inspección/Condición: [INSPECTION_RISK]  
+   - Restricciones de HOA: [HOA_RISK]  
+   - Ciclo de mercado: [MARKET_CYCLE]
+
+8. **Estrategia de salida** (`trending_up`)  
+   - Potencial de reventa: [RESALE_POTENTIAL]  
+   - Flexibilidad de renta: [RENTAL_FLEXIBILITY]  
+   - Perspectiva de apreciación: [APPRECIATION_OUTLOOK]
+
+9. **Próximos pasos / Lista de verificación de debida diligencia** (`checklist`)  
+   - Lista con viñetas: [CHECKLIST_ITEMS]
+
+10. **Justificación de la calificación** (`grading`)  
+   - Viñetas: [GRADE_RATIONALE]
+
+11. **Terminar con un breve resumen** (`overview_key`)  
+    [INVESTMENT_SUMMARY]
+
+### Pautas de estilo:
+- HTML limpio y semántico con encabezados, tablas y listas con viñetas.  
+- Explicaciones aptas para principiantes.
